@@ -15,9 +15,12 @@
 # limitations under the License.
 
 - name: Chart dependencies
-  command: helm dep update ./xos-profiles/base-openstack
+  command: helm dep update {{ item }}
   args:
     chdir: "{{ ansible_env.HOME }}/cord/build/helm-charts"
+  with_items:
+    - ./xos-core
+    - ./xos-profiles/base-openstack
   tags:
   - skip_ansible_lint
 
