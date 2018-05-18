@@ -50,12 +50,12 @@ tag_and_push () {
 
   # looping over docker images
   IMAGELIST_LENGTH=${#DOCKER_IMAGES[@]}
-  while [ $IMAGELIST_LENGTH -gt 0 ]
+  while [ "$IMAGELIST_LENGTH" -gt 0 ]
   do
     IMAGE=${DOCKER_IMAGES[0]}:${DOCKER_IMAGES[1]}
 
-    docker tag $IMAGE $DOCKER_REGISTRY/$IMAGE
-    docker push $DOCKER_REGISTRY/$IMAGE
+    docker tag "$IMAGE $DOCKER_REGISTRY/$IMAGE"
+    docker push "$DOCKER_REGISTRY/$IMAGE"
 
     # removing the already tagged and pushed image
     DOCKER_IMAGES=("${DOCKER_IMAGES[@]:2}")
@@ -86,7 +86,7 @@ do
         break
         ;;
     *)
-        echo Error: Unknown option: $CLI_OPT >&2
+        echo Error: Unknown option: "$CLI_OPT" >&2
         echo " "
         display_help
         exit -1
