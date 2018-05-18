@@ -18,6 +18,7 @@
   git:
     repo: https://git.openstack.org/openstack/openstack-helm.git
     dest: "{{ ansible_env.HOME }}/openstack-helm"
+    version: 3587e1679b54fb44c6ffa16ed35149e108a22b14
   tags:
   - skip_ansible_lint
 
