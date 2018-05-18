@@ -14,15 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-################################################
-#                                              #
-# Installs Kubespray on remote target machines #
-#                                              #
-################################################
-
 #
 # Installs Kubespray on remote target machines.
 #
+
+set +e -u -o pipefail
+
 install_kubespray () {
   # Cleanup Old Kubespray Installations
   echo -e "\nCleaning Up Old Kubespray Installation" && \
@@ -34,29 +31,29 @@ install_kubespray () {
 
   # Generate inventory and var files
   echo -e "\nGenerating The Inventory File" && \
-  rm -rf inventories/${DEPLOYMENT_NAME} && \
-  cp -r kubespray/inventory inventories/${DEPLOYMENT_NAME} && \
-  CONFIG_FILE=inventories/${DEPLOYMENT_NAME}/inventory.cfg python3 kubespray/contrib/inventory_builder/inventory.py ${NODES[@]} && \
+  rm -rf "inventories/${DEPLOYMENT_NAME}" && \
+  cp -r "kubespray/inventory inventories/${DEPLOYMENT_NAME}" && \
+  CONFIG_FILE="inventories/${DEPLOYMENT_NAME}/inventory.cfg" python3 kubespray/contrib/inventory_builder/inventory.py "${NODES[@]}" && \
 
   # Edit inventory var files
-  NODE_LIST=`echo ${NODES[@]}`
+  NODE_LIST=$(echo "${NODES[@]}")
   ansible-playbook k8s-configs.yaml --extra-vars "deployment_name=${DEPLOYMENT_NAME} k8s_nodes='${NODE_LIST}'"
 
   # Copy SSH keys
   echo -e "\nCopying Public SSH Keys To Remote Machines" && \
-  source copy-ssh-keys.sh ${NODES[@]} && \
+  source copy-ssh-keys.sh "${NODES[@]}" && \
 
   # Prepare Target Machines
   echo -e "\nInstalling Prerequisites On Remote Machines" && \
-  ansible-playbook -i inventories/${DEPLOYMENT_NAME}/inventory.cfg k8s-requirements.yaml && \
+  ansible-playbook -i "inventories/${DEPLOYMENT_NAME}/inventory.cfg" k8s-requirements.yaml && \
 
   # Install Kubespray
   echo -e "\nInstalling Kubespray" && \
-  ansible-playbook -i inventories/${DEPLOYMENT_NAME}/inventory.cfg kubespray/cluster.yml -b -v && \
+  ansible-playbook -i "inventories/${DEPLOYMENT_NAME}/inventory.cfg" kubespray/cluster.yml -b -v && \
 
   # Export the Kubespray Config Location
   echo -e "\nLoading Kubespray Configuration" && \
-  cp kubespray/artifacts/admin.conf configs/${DEPLOYMENT_NAME}.conf
+  cp kubespray/artifacts/admin.conf "configs/${DEPLOYMENT_NAME}.conf"
 }
 
 #
@@ -71,7 +68,7 @@ source_kubeconfig () {
 #
 helm_init () {
   echo -e "\nInitializing Helm" && \
-  source_kubeconfig $DEPLOYMENT_NAME && \
+  source_kubeconfig "$DEPLOYMENT_NAME" && \
   helm init --upgrade
 }
 
@@ -80,7 +77,7 @@ helm_init () {
 #
 deploy_insecure_registry () {
   echo -e "\nDeploying insecure registry" && \
-  source_kubeconfig $DEPLOYMENT_NAME && \
+  source_kubeconfig "$DEPLOYMENT_NAME" && \
   helm install stable/docker-registry --set service.nodePort=30500,service.type=NodePort -n docker-registry
 }
 
@@ -89,7 +86,7 @@ deploy_insecure_registry () {
 # operations.
 #
 check_pod_name () {
-  if [ -z $DEPLOYMENT_NAME ]
+  if [ -z "$DEPLOYMENT_NAME" ]
     then
       echo "Missing option: podname" >&2
       echo " "
@@ -131,9 +128,9 @@ do
   case $CLI_OPT in
     -i | --install)
         check_pod_name
-        install_kubespray $DEPLOYMENT_NAME $NODES
-        helm_init $DEPLOYMENT_NAME
-        deploy_insecure_registry $DEPLOYMENT_NAME
+        install_kubespray "$DEPLOYMENT_NAME" "$NODES"
+        helm_init "$DEPLOYMENT_NAME"
+        deploy_insecure_registry "$DEPLOYMENT_NAME"
         exit 0
         ;;
     -h | --help)
@@ -142,7 +139,7 @@ do
         ;;
     -s | --source)
         check_pod_name
-        source_kubeconfig $DEPLOYMENT_NAME
+        source_kubeconfig "$DEPLOYMENT_NAME"
         return 0
          ;;
     --) # End of all options
@@ -150,7 +147,7 @@ do
         break
         ;;
     *)
-        echo Error: Unknown option: $CLI_OPT >&2
+        echo Error: Unknown option: "$CLI_OPT" >&2
         echo " "
         display_help
         exit -1

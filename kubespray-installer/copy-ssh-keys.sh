@@ -17,8 +17,9 @@
 NODES=($@)
 
 for NODE in "${NODES[@]}";
-  do
-    ssh-keygen -R ${NODE}
-    ssh cord@${NODE} 'mkdir -p .ssh'
-    cat ~/.ssh/id_rsa.pub | ssh cord@${NODE} 'cat >> .ssh/authorized_keys'
-  done
+do
+  ssh-keygen -R "${NODE}"
+  ssh "cord@${NODE}" 'mkdir -p .ssh'
+  ssh "cord@${NODE}" 'cat >> .ssh/authorized_keys' <  ~/.ssh/id_rsa.pub
+done
+

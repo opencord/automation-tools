@@ -12,7 +12,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
 
 - hosts: all
   gather_facts: False
@@ -20,9 +19,13 @@
   tasks:
     - name: Update apt-get
       raw: sudo apt-get update -qq
+      tags:
+        - skip_ansible_lint # raw command in prep for python install
 
     - name: Install python 2.7
       raw: sudo apt-get install -qq python2.7
+      tags:
+        - skip_ansible_lint # raw command to install python
 
     - name: Install prerequisites for using PPA repos
       apt:
@@ -47,7 +50,6 @@
     - name: Make sure Ansible is newest version
       apt:
         name: "ansible"
-        state: latest
         update_cache: yes
         cache_valid_time: 3600
 
@@ -66,4 +68,7 @@
         state: absent
 
     - name: Disable swap
-      command: swapoff -a
+      command: "swapoff -a"
+      tags:
+        - skip_ansible_lint # there isn't a module for this, command is idempotent
+
