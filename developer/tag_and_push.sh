@@ -45,21 +45,14 @@ tag_and_push () {
   echo " "
 
   # reading docker images
-  DOCKER_IMAGES_STR=$(docker images --format="{{.Repository}} {{.Tag}}" --filter "dangling=false" | grep -v none | grep "^xosproject")
-  DOCKER_IMAGES=($DOCKER_IMAGES_STR)
+  DOCKER_IMAGES=$(docker images --format="{{.Repository}}:{{.Tag}}" --filter "dangling=false" | grep -v none | grep "^xosproject")
 
-  # looping over docker images
-  IMAGELIST_LENGTH=${#DOCKER_IMAGES[@]}
-  while [ $IMAGELIST_LENGTH -gt 0 ]
+  # split string to list only on newlines
+  IFS=$'\n'
+  for image in $DOCKER_IMAGES;
   do
-    IMAGE=${DOCKER_IMAGES[0]}:${DOCKER_IMAGES[1]}
-
-    docker tag $IMAGE $DOCKER_REGISTRY/$IMAGE
-    docker push $DOCKER_REGISTRY/$IMAGE
-
-    # removing the already tagged and pushed image
-    DOCKER_IMAGES=("${DOCKER_IMAGES[@]:2}")
-    IMAGELIST_LENGTH=${#DOCKER_IMAGES[@]}
+    docker tag "$image $DOCKER_REGISTRY/$image"
+    docker push "$DOCKER_REGISTRY/$image"
   done
 }
 
@@ -86,7 +79,7 @@ do
         break
         ;;
     *)
-        echo Error: Unknown option: $CLI_OPT >&2
+        echo Error: Unknown option: "$CLI_OPT" >&2
         echo " "
         display_help
         exit -1

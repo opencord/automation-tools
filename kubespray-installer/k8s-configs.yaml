@@ -15,12 +15,8 @@
 #
 
 - hosts: localhost
-
   vars:
-    tryluca:
-      - one
-      - two
-      - three
+    kubespray_remote_ssh_user: "cord"
 
   tasks:
     # Edit all.yml variable file
@@ -33,7 +29,7 @@
     - name: Add default Ansible user
       lineinfile:
         path: inventories/{{ deployment_name }}/group_vars/all.yml
-        line: 'ansible_user: cord'
+        line: 'ansible_user: {{ kubespray_remote_ssh_user }}'
 
     - name: Give sudoer permissions
       lineinfile:
