@@ -14,9 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-NODES=($@)
-
-for NODE in "${NODES[@]}";
+for NODE in "$@";
 do
   ssh-keygen -R "${NODE}"
   ssh "cord@${NODE}" 'mkdir -p .ssh'
