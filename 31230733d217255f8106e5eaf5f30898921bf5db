@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "a187e2a5_a83e4e93",
+        "filename": "kubespray-installer/test/README.md",
+        "patchSetId": 10
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2018-05-19T02:54:48Z",
+      "side": 1,
+      "message": "Sure.  \n\nI did consider this - there\u0027s a difference between giving commands that overwrite a file, and having that overwrite happen in a script they likely won\u0027t read before executing.   \n\nIn this case, it\u0027s quite obvious that an overwrite is happening, and when iterating and wiping out VM\u0027s, you\u0027d want an overwrite.\n\nAs the \"overwrite desirable\" case isn\u0027t very common, I\u0027ll change it.",
+      "parentUuid": "b2f413ad_9e7e8bf8",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 34
+      },
+      "revId": "31230733d217255f8106e5eaf5f30898921bf5db",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6bf57dcb_7b176416",
         "filename": "kubespray-installer/test/test_boostrap.sh",
         "patchSetId": 10
@@ -36,6 +60,30 @@
       "writtenOn": "2018-05-19T02:29:10Z",
       "side": 1,
       "message": "Why is cloudlab related stuff in here?",
+      "range": {
+        "startLine": 23,
+        "startChar": 9,
+        "endLine": 23,
+        "endChar": 23
+      },
+      "revId": "31230733d217255f8106e5eaf5f30898921bf5db",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8bd44916_01e56922",
+        "filename": "kubespray-installer/test/test_boostrap.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2018-05-19T02:54:48Z",
+      "side": 1,
+      "message": "This is the \"format and mount the /extra\" partition chunk we\u0027ve used historically - If you test on cloudlab without this, it runs out of disk space partway through the kubespray install.",
+      "parentUuid": "6bf57dcb_7b176416",
       "range": {
         "startLine": 23,
         "startChar": 9,
