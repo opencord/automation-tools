@@ -1,0 +1,211 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a28c182e_5b6875fd",
+        "filename": "kubespray-installer/k8s-configs.yaml",
+        "patchSetId": 11
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2018-05-21T19:55:05Z",
+      "side": 1,
+      "message": "thanks. I meant to do this. Even better to make the user configurable form the .setup.sh CLI, but not absolutely a priority",
+      "range": {
+        "startLine": 19,
+        "startChar": 32,
+        "endLine": 19,
+        "endChar": 36
+      },
+      "revId": "6e7366feb9548c197298690de15d7d7ba4b4dece",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2e443ebc_dfa55214",
+        "filename": "kubespray-installer/test/README.md",
+        "patchSetId": 11
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2018-05-21T19:55:05Z",
+      "side": 1,
+      "message": "Any mention to Cloudlab should be out of CORD",
+      "range": {
+        "startLine": 7,
+        "startChar": 64,
+        "endLine": 7,
+        "endChar": 82
+      },
+      "revId": "6e7366feb9548c197298690de15d7d7ba4b4dece",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "96828454_507927a8",
+        "filename": "kubespray-installer/test/README.md",
+        "patchSetId": 11
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2018-05-21T19:55:05Z",
+      "side": 1,
+      "message": "\u0027 ??",
+      "range": {
+        "startLine": 11,
+        "startChar": 14,
+        "endLine": 11,
+        "endChar": 15
+      },
+      "revId": "6e7366feb9548c197298690de15d7d7ba4b4dece",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2d7ec1b3_4c135749",
+        "filename": "kubespray-installer/test/README.md",
+        "patchSetId": 11
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2018-05-21T19:55:05Z",
+      "side": 1,
+      "message": "I think it\u0027s terrible to touch the user .ssh config. I\u0027m really not for it.",
+      "range": {
+        "startLine": 19,
+        "startChar": 1,
+        "endLine": 19,
+        "endChar": 77
+      },
+      "revId": "6e7366feb9548c197298690de15d7d7ba4b4dece",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "339e2a81_031fd766",
+        "filename": "kubespray-installer/test/Vagrantfile",
+        "patchSetId": 11
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2018-05-21T19:55:05Z",
+      "side": 1,
+      "message": "Can\u0027t remember what bento is...just a though..our users will be recommended to install on a \"classic\" 16.04 server. Any difference?",
+      "range": {
+        "startLine": 9,
+        "startChar": 19,
+        "endLine": 9,
+        "endChar": 37
+      },
+      "revId": "6e7366feb9548c197298690de15d7d7ba4b4dece",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "51db259c_77d21da0",
+        "filename": "kubespray-installer/test/Vagrantfile",
+        "patchSetId": 11
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2018-05-21T19:55:05Z",
+      "side": 1,
+      "message": "I think 2G per machine are more than enough. We only have to install k8s, not run CORD over it.",
+      "range": {
+        "startLine": 16,
+        "startChar": 21,
+        "endLine": 16,
+        "endChar": 25
+      },
+      "revId": "6e7366feb9548c197298690de15d7d7ba4b4dece",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cb95d39f_ae245732",
+        "filename": "kubespray-installer/test/Vagrantfile",
+        "patchSetId": 11
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2018-05-21T19:55:05Z",
+      "side": 1,
+      "message": "IPs hardcoded?",
+      "range": {
+        "startLine": 21,
+        "startChar": 7,
+        "endLine": 21,
+        "endChar": 30
+      },
+      "revId": "6e7366feb9548c197298690de15d7d7ba4b4dece",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "42a24d1a_a1392bcd",
+        "filename": "kubespray-installer/test/test_boostrap.sh",
+        "patchSetId": 11
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2018-05-21T19:55:05Z",
+      "side": 1,
+      "message": "In general, I don\u0027t understand what this thing is doing. In my mind the vagrantfile should be used only to spawn one or more clean Ubuntu 16.04 VMs to run the k8s installation against...the only customization to do (maybe?) is to have a default used who is sudoer without passwd on the machine. Am I missing anything?",
+      "range": {
+        "startLine": 3,
+        "startChar": 2,
+        "endLine": 3,
+        "endChar": 35
+      },
+      "revId": "6e7366feb9548c197298690de15d7d7ba4b4dece",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "de420583_46766007",
+        "filename": "kubespray-installer/test/test_boostrap.sh",
+        "patchSetId": 11
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2018-05-21T19:55:05Z",
+      "side": 1,
+      "message": "No cloudlab stuff in our tests please",
+      "range": {
+        "startLine": 23,
+        "startChar": 0,
+        "endLine": 23,
+        "endChar": 26
+      },
+      "revId": "6e7366feb9548c197298690de15d7d7ba4b4dece",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}

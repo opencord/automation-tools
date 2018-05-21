@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f442a97c_7fad0d93",
+        "filename": "kubespray-installer/copy-ssh-keys.sh",
+        "patchSetId": 11
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2018-05-21T19:55:05Z",
+      "side": 0,
+      "message": "I think there\u0027s value keeping this in place. Nothing complicate to maintain...don\u0027t see why we should not do it.",
+      "revId": "11b2e5c70b08193d7ed01345623434c7c0bafb76",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
