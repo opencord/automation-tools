@@ -1,0 +1,263 @@
+---
+# Copyright 2017-present Open Networking Foundation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# docker_images.yml
+# master list of docker images used by imagebuilder.py
+
+# tag to set on every container built/downloaded
+
+docker_build_tag: "candidate"
+
+# pull_only_images: images pulled and used directly without changes
+# you must include a tag (':1.0') on these images to pull the correct version
+#
+# do not include images in this list that are parents of images
+# in buildable_images - those are automatically pulled
+
+pull_only_images:
+  - "nginx:1.13"
+  - "onosproject/onos:1.12.0"
+  - "redis:3.2"
+  - "node:7.9.0" # remove once the issue with node:candidate is resolved
+  - "postgres:10.3-alpine"
+  - "sebp/elk:564"
+
+# buildable_images - list of images that we build from Dockerfiles
+#
+# required:
+#  name: Name of docker image
+#  repo: git repo name (not the path! not what it's renamed to be in the repo manifest!)
+# optional:
+#  dockerfile: Name of Dockerfile. Default: "Dockerfile"
+#  path: Path to parent directory of containing dockerfile, relative to. Default: "."
+#  context: Path to docker build context, relative to path item. Default: "."
+#  component: dict of sub-component paths to copy into build context.
+#    repo: Name of component repo to copy from (required)
+#    path: path in to copy from. Relative to component repo. Default "."
+#    dest: destination path to copy components to, relative to context
+
+buildable_images:
+
+  - name: opencord/mavenrepo
+    repo: cord-onos-publisher
+    dockerfile: "Dockerfile.make"
+
+  - name: xosproject/xos-base
+    repo: xos
+    path: "containers/xos"
+    dockerfile: "Dockerfile.base"
+
+  - name: xosproject/xos-core
+    repo: xos
+    path: "containers/xos"
+    dockerfile: "Dockerfile.xos-core"
+    context: "../.."
+
+  - name: xosproject/xos-libraries
+    repo: xos
+    path: "containers/xos"
+    dockerfile: "Dockerfile.libraries"
+    context: "../.."
+
+  - name: xosproject/chameleon
+    repo: xos
+    path: "containers/chameleon"
+    dockerfile: "Dockerfile.chameleon"
+    components:
+      - repo: chameleon
+        dest: tmp.chameleon
+
+  - name: xosproject/xos-client
+    repo: xos
+    path: "containers/xos"
+    dockerfile: "Dockerfile.client"
+    context: "../.."
+    components:
+      - repo: chameleon
+        dest: containers/xos/tmp.chameleon
+
+  - name: xosproject/xos-synchronizer-base
+    repo: xos
+    path: "containers/xos"
+    dockerfile: "Dockerfile.synchronizer-base"
+    context: "../.."
+
+  - name: xosproject/xos-tosca
+    repo: xos-tosca
+
+  - name: xosproject/xos-ws
+    repo: xos-rest-gw
+
+  - name: xosproject/xos-gui-builder
+    repo: xos-gui
+    dockerfile: "Dockerfile.xos-gui-builder"
+
+  - name: xosproject/xos-gui
+    repo: xos-gui
+
+  - name: xosproject/gui-extension-rcord
+    repo: rcord
+    path: "xos/gui"
+
+  - name: xosproject/gui-extension-veestat
+    repo: vEE
+    path: "xos/veestat"
+
+  - name: xosproject/gui-extension-vtr
+    repo: vtr
+    path: "xos/gui"
+
+  - name: xosproject/gui-extension-vnaas
+    repo: vnaas
+    path: "xos/gui"
+
+  - name: xosproject/gui-extension-sample
+    repo: xos-sample-gui-extension
+
+  - name: xosproject/addressmanager-synchronizer
+    repo: addressmanager
+    dockerfile: "Dockerfile.synchronizer"
+
+  - name: xosproject/openstack-synchronizer
+    repo: openstack
+    dockerfile: "Dockerfile.synchronizer"
+
+  - name: xosproject/onos-synchronizer
+    repo: onos-service
+    dockerfile: "Dockerfile.synchronizer"
+
+  - name: xosproject/vee-synchronizer
+    repo: vEE
+    path: "xos/synchronizer"
+    dockerfile: "Dockerfile.synchronizer"
+
+  - name: xosproject/veg-synchronizer
+    repo: vEG
+    path: "xos/synchronizer"
+    dockerfile: "Dockerfile.synchronizer"
+
+  - name: xosproject/vnaas-synchronizer
+    repo: vnaas
+    path: "xos/synchronizer"
+    dockerfile: "Dockerfile.synchronizer"
+
+  - name: xosproject/volt-synchronizer
+    repo: olt-service
+    dockerfile: "Dockerfile.synchronizer"
+
+  - name: xosproject/vrouter-synchronizer
+    repo: vrouter
+    dockerfile: "Dockerfile.synchronizer"
+
+  - name: xosproject/vtn-synchronizer
+    repo: vtn-service
+    dockerfile: "Dockerfile.synchronizer"
+
+  - name: xosproject/vtr-synchronizer
+    repo: vtr
+    dockerfile: "Dockerfile.synchronizer"
+
+  - name: xosproject/vsg-hw-synchronizer
+    repo: vsg-hw
+    dockerfile: "Dockerfile.synchronizer"
+
+  - name: xosproject/kubernetes-synchronizer
+    repo: kubernetes-service
+    dockerfile: "Dockerfile.synchronizer"
+
+  - name: xosproject/vsg-synchronizer
+    repo: vsg
+    dockerfile: "Dockerfile.synchronizer"
+
+  - name: xosproject/fabric-synchronizer
+    repo: fabric
+    dockerfile: "Dockerfile.synchronizer"
+
+  - name: xosproject/exampleservice-synchronizer
+    repo: exampleservice
+    dockerfile: "Dockerfile.synchronizer"
+
+  - name: xosproject/simpleexampleservice-synchronizer
+    repo: simpleexampleservice
+    dockerfile: "Dockerfile.synchronizer"
+
+  - name: xosproject/vmme-synchronizer
+    repo: vMME
+    path: "xos/synchronizer"
+    dockerfile: "Dockerfile.synchronizer"
+
+  - name: xosproject/vhss-synchronizer
+    repo: vHSS
+    path: "xos/synchronizer"
+    dockerfile: "Dockerfile.synchronizer"
+
+  - name: xosproject/hssdb-synchronizer
+    repo: hss_db
+    path: "xos/synchronizer"
+    dockerfile: "Dockerfile.synchronizer"
+
+  - name: xosproject/internetemulator-synchronizer
+    repo: internetemulator
+    path: "xos/synchronizer"
+    dockerfile: "Dockerfile.synchronizer"
+
+  - name: xosproject/sdncontroller-synchronizer
+    repo: sdn-controller
+    path: "xos/synchronizer"
+    dockerfile: "Dockerfile.synchronizer"
+
+  - name: xosproject/vspgwc-synchronizer
+    repo: vspgwc
+    path: "xos/synchronizer"
+    dockerfile: "Dockerfile.synchronizer"
+
+  - name: xosproject/vspgwu-synchronizer
+    repo: vspgwu
+    path: "xos/synchronizer"
+    dockerfile: "Dockerfile.synchronizer"
+
+  - name: xosproject/vepc-synchronizer
+    repo: epc-service
+    path: "xos/synchronizer"
+    dockerfile: "Dockerfile.synchronizer"
+
+  - name: xosproject/mcord-synchronizer
+    repo: mcord
+    path: "xos/synchronizer"
+    dockerfile: "Dockerfile.synchronizer"
+
+  - name: xosproject/venb-synchronizer
+    repo: venb
+    path: "xos/synchronizer"
+    dockerfile: "Dockerfile.synchronizer"
+
+  - name: xosproject/templateservice-synchronizer
+    repo: templateservice
+    path: "xos/synchronizer"
+    dockerfile: "Dockerfile.synchronizer"
+
+  - name: xosproject/rcord-synchronizer
+    repo: rcord
+    dockerfile: "Dockerfile.synchronizer"
+
+  - name: xosproject/progran-synchronizer
+    repo: progran
+    path: "xos/synchronizer"
+    dockerfile: "Dockerfile.synchronizer"
+
+  - name: xosproject/xos-api-tester
+    repo: cord-tester
+    path: "src/test/cord-api"
+    dockerfile: "Dockerfile.k8s-api-tester"
