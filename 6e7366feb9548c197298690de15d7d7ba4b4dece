@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "011ae37d_4e27a58a",
+        "filename": "kubespray-installer/k8s-configs.yaml",
+        "patchSetId": 11
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2018-05-22T17:00:01Z",
+      "side": 1,
+      "message": "If you run setup.sh with an env var:\n\n    REMOTE_SSH_USER\u003dusername\n\nit overrides this variable.",
+      "parentUuid": "a28c182e_5b6875fd",
+      "range": {
+        "startLine": 19,
+        "startChar": 32,
+        "endLine": 19,
+        "endChar": 36
+      },
+      "revId": "6e7366feb9548c197298690de15d7d7ba4b4dece",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2e443ebc_dfa55214",
         "filename": "kubespray-installer/test/README.md",
         "patchSetId": 11
