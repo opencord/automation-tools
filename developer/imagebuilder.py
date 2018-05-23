@@ -101,7 +101,7 @@ def parse_args():
     parser.add_argument('-l', '--build_log_dir', action="store",
                         help="Log build output to this dir if set")
 
-    parser.add_argument('-r', '--repo_root', default="../..", action="store",
+    parser.add_argument('-r', '--repo_root', default="..", action="store",
                         help="Repo root directory")
 
     parser.add_argument('-t', '--build_tag', default=None, action="store",
@@ -142,22 +142,25 @@ def load_config():
     else:
         build_tag = conf['docker_build_tag']
 
-    if args.filter_images is None:
-        buildable_images = conf['buildable_images']
-        pull_only_images = conf['pull_only_images']
-    else:
+    buildable_images = conf.get('buildable_images', [])
+    pull_only_images = conf.get('pull_only_images', [])
+    directory_named_images = conf.get('directory_named_images', [])
+
+    # add directory_named_images to buildable_images here!
+
+    if args.filter_images is not None:
         fi_abs = os.path.abspath(args.filter_images)
 
-        LOG.info("Filtering image list per 'docker_image_whitelist' in: %s" %
-                 fi_abs)
         try:
             fi_fh = open(fi_abs, 'r')
             filter_list = yaml.safe_load(fi_fh)
             fi_fh.close()
 
-            if 'docker_image_whitelist' not in filter_list:
-                LOG.error("No 'docker_image_whitelist' defined in: %s" %
-                          fi_abs)
+            LOG.info("Marking items in 'docker_images' as requested: %s" %
+                     fi_abs)
+
+            if 'docker_images' not in filter_list:
+                LOG.error("No 'docker_images' defined in: %s" % fi_abs)
                 sys.exit(1)
 
             # fail if pull_only_images in docker_images.yml doesn't have tags
@@ -173,12 +176,12 @@ def load_config():
 
             pull_only_images = [img for img in conf['pull_only_images']
                                 if split_name(img)[0]
-                                in map(lambda x: split_name(x)[0],
-                                       filter_list['docker_image_whitelist'])]
+                                in [split_name(x)[0] for x in
+                                    filter_list['docker_image_whitelist']]]
 
-            pull_only_images = map(override_tags(
+            pull_only_images = list(map(override_tags(
                                    filter_list['docker_image_whitelist']),
-                                   pull_only_images)
+                                   pull_only_images))
 
         except KeyError:
             LOG.exception("Problem with filter list file")
@@ -187,7 +190,7 @@ def load_config():
 
 def override_tags(image_list_with_tags):
 
-    untagged_whitelist = map(lambda x: split_name(x)[0], image_list_with_tags)
+    untagged_whitelist = [split_name(x)[0] for x in image_list_with_tags]
 
     def inner(i):
         img_name = split_name(i)[0]
@@ -196,6 +199,7 @@ def override_tags(image_list_with_tags):
         if tag_override:
             return "%s:%s" % (img_name, tag_override)
         return i
+
     return inner
 
 
@@ -349,7 +353,7 @@ class RepoManifest():
                 LOG.debug("Repo in manifest but not checked out: %s" %
                           repo_name)
 
-        for repo_name, repo_path in project_repos.iteritems():
+        for repo_name, repo_path in list(project_repos.items()):
             self.repos[repo_name] = RepoRepo(repo_name, repo_path,
                                              self.remote_url,
                                              self.remote_branch,
@@ -410,8 +414,8 @@ class DockerImage():
             self.name = image_name
 
         # Add the build tag if exists
-        if build_tag not in self.tags:
-            self.tags.append(build_tag)
+#        if build_tag not in self.tags:
+#            self.tags.append(build_tag)
 
         # split names from tag list
         if tags is not None:
@@ -646,16 +650,6 @@ class DockerImage():
 
             # if clean and parents clean, add tags for branch/commit
             if self.parents_clean():
-
-                # add build tag
-                if build_tag not in self.tags:
-                    self.tags.append(build_tag)
-
-                # add branch tag
-                branch_tag = self.repo_d.short_branch
-                if branch_tag not in self.tags:
-                    self.tags.append(branch_tag)
-
                 # Add <branch>-<commit> tag, which is used to pull
                 commit_tag = "%s-%s" % (self.repo_d.short_branch,
                                         self.repo_d.head_commit)
@@ -664,6 +658,15 @@ class DockerImage():
 
                     # this is most specific tag, so pull using it
                     self.raw_name = "%s:%s" % (self.name, commit_tag)
+
+                # add branch tag
+                branch_tag = self.repo_d.short_branch
+                if branch_tag not in self.tags:
+                    self.tags.append(branch_tag)
+
+                # add build tag
+                if build_tag not in self.tags:
+                    self.tags.append(build_tag)
 
                 # add all tags in git that point at the commit
                 for gt in self.repo_d.git_tags:
@@ -894,12 +897,6 @@ class DockerBuilder():
                     LOG.info("Preexisting Image - ID: %s, tags: %s" %
                              (pe_image['Id'], ",".join(raw_tags)))
 
-                    has_build_tag = False
-                    for tag in raw_tags:
-                        if build_tag in tag:
-                            LOG.debug(" image has build_tag: %s" % build_tag)
-                            has_build_tag = True
-
                     base_name = raw_tags[0].split(":")[0]
                     image = self.find_image(base_name)
 
@@ -907,6 +904,21 @@ class DockerBuilder():
                     if image is not None:
 
                         good_labels = image.compare_labels(pe_image['Labels'])
+
+                        has_build_tag = False
+                        for tag in raw_tags:
+                            if build_tag in tag:
+                                LOG.debug(" image has build_tag: %s" %
+                                          build_tag)
+                                has_build_tag = True
+
+                        missing_tags = []
+                        for req_tag in image.tags:
+                            req_fullname = "%s:%s" % (base_name, req_tag)
+                            if req_fullname not in raw_tags \
+                               and req_tag != build_tag:
+                                LOG.debug(" image missing tag: %s" % req_tag)
+                                missing_tags.append(req_tag)
 
                         if good_labels:
                             if has_build_tag:
@@ -921,9 +933,14 @@ class DockerBuilder():
                                 self.dc.tag(pe_image['Id'], image.name,
                                             tag=build_tag)
 
+                            for mt in missing_tags:
+                                LOG.debug(" adding missing tag: %s" % req_tag)
+                                self.dc.tag(pe_image['Id'], image.name,
+                                            tag=mt)
+
                             self.preexisting.append({
                                     'id': pe_image['Id'],
-                                    'tags': raw_tags,
+                                    'tags': image.tags,
                                     'base': image.name.split(":")[0],
                                 })
 
@@ -966,7 +983,7 @@ class DockerBuilder():
 
         # List of lists of parents images. Done in two steps for clarity
         lol_of_parents = [img.parent_names for img in self.images
-                          if img.parent_names is not []]
+                          if img.parent_names != []]
 
         # flat list of all parent image names, with dupes
         parents_with_dupes = [parent for parent_sublist in lol_of_parents
@@ -1004,8 +1021,8 @@ class DockerBuilder():
             self.images.append(img_o)
 
         # now that all images (including parents) are in list, associate them
-        for image in filter(lambda img: img.parent_names is not [],
-                            self.images):
+        for image in [img for img in self.images if
+                      img.parent_names is not []]:
 
             LOG.debug("Associating image: %s" % image.name)
 
@@ -1014,14 +1031,9 @@ class DockerBuilder():
                 parent = self.find_image(parent_name)
                 image.parents.append(parent)
 
-                if parent is not None:
-                    LOG.debug(" internal image '%s' is parent of '%s'" %
-                              (parent.name, image.name))
-                    parent.children.append(image)
-
-                else:
-                    LOG.debug(" external image '%s' is parent of '%s'" %
-                              (image.parent_name, image.name))
+                LOG.debug(" internal image '%s' is parent of '%s'" %
+                          (parent.name, image.name))
+                parent.children.append(image)
 
         # loop again now that parents are linked to create labels
         for image in self.images:
@@ -1102,14 +1114,14 @@ class DockerBuilder():
 
         """ determine whether to build/fetch images """
         # upstream images (have no parents), must be fetched
-        must_fetch_a = filter(lambda img: not img.parents, self.images)
+        must_fetch_a = [img for img in self.images if not img.parents]
 
         for image in must_fetch_a:
             if image.status is not DI_EXISTS:
                 image.status = DI_FETCH
 
         # images that can be built or fetched (have parents)
-        b_or_f_a = filter(lambda img: img.parents, self.images)
+        b_or_f_a = [img for img in self.images if img.parents]
 
         for image in b_or_f_a:
             if not image.parents_clean() or args.build:
@@ -1120,21 +1132,21 @@ class DockerBuilder():
                 image.status = DI_FETCH
             # otherwise, image is clean and exists (image.status == DI_EXISTS)
 
-        c_and_e_a = filter(lambda img: img.status is DI_EXISTS, self.images)
+        c_and_e_a = [img for img in self.images if img.status is DI_EXISTS]
         LOG.info("Preexisting and clean images: %s" %
                  ", ".join(c.name for c in c_and_e_a))
 
-        upstream_a = filter(lambda img: (img.status is DI_FETCH and
-                                         not img.parents), self.images)
+        upstream_a = [img for img in self.images if
+                      (img.status is DI_FETCH and not img.parents)]
         LOG.info("Upstream images that must be fetched: %s" %
                  ", ".join(u.raw_name for u in upstream_a))
 
-        fetch_a = filter(lambda img: (img.status is DI_FETCH and
-                                      img.parents), self.images)
+        fetch_a = [img for img in self.images if
+                   (img.status is DI_FETCH and img.parents)]
         LOG.info("Clean, buildable images to attempt to fetch: %s" %
                  ", ".join(f.raw_name for f in fetch_a))
 
-        build_a = filter(lambda img: img.status is DI_BUILD, self.images)
+        build_a = [img for img in self.images if img.status is DI_BUILD]
         LOG.info("Buildable images, due to unclean context or parents: %s" %
                  ", ".join(b.raw_name for b in build_a))
 
@@ -1176,7 +1188,7 @@ class DockerBuilder():
 
         buildable = []
 
-        for image in filter(lambda img: img.status is DI_BUILD, self.images):
+        for image in [img for img in self.images if img.status is DI_BUILD]:
             for parent in image.parents:
                 if parent.status is DI_EXISTS:
                     if image not in buildable:  # build once if two parents
@@ -1279,13 +1291,18 @@ class DockerBuilder():
             LOG.info("Fetched image %s, id: %s" %
                      (image.raw_name, image.image_id))
 
+            self.tag_image(image)
+
+            # don't push the build_tag to dockerhub
+            fetched_tags = list(image.tags)
+            fetched_tags.remove(build_tag)
+
             self.pulled.append({
                     "id": pulled_image['Id'],
-                    "tags": pulled_image['RepoTags'],
+                    "tags": fetched_tags,
                     "base": image.name.split(":")[0],
                 })
 
-            self.tag_image(image)
             image.status = DI_EXISTS
             return True
 
@@ -1303,7 +1320,7 @@ class DockerBuilder():
             context_tar = image.context_tarball()
             dockerfile = image.dockerfile_rel_path()
 
-            for key, val in buildargs.iteritems():
+            for key, val in list(buildargs.items()):
                 LOG.debug("Buildarg - %s : %s" % (key, val))
 
             bl_path = ""
