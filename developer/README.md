@@ -4,8 +4,8 @@ This directory contains a collections of scripts usefull for development.
 
 ## Tag and Push Docker images to a remote registry
 
-The `tag_and_push.sh` script will read your local docker images starting with `xosproject`, tag and push them to a docker registry.
-Please use `bash tag_and_push.sh -h` for usage instructions.
+`tag_and_push.sh` tags and pushes to a remote registry all the images present in the local docker registry.
+Please use `bash tag_and_push.sh -h` to see instructions.
 
 ## Imagebuilder
 

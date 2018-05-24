@@ -24,10 +24,12 @@
 # Displays the help menu.
 #
 display_help () {
+  echo "Tags and pushes to a remote registry all the images present in the local docker registry." >&2
+  echo " "
   echo "Usage: $0 {--push|--help} [docker-registry] [tag=candidate] " >&2
   echo " "
-  echo "   -h, --help              Display this help message."
-  echo "   -r, --registry          Tags and push all the local docker images to <docker-registry>"
+  echo "   -h, --help              Displays this help message."
+  echo "   -r, --registry          Tags and pushes all the local docker images to the remote <docker-registry>"
   echo " "
   echo "   docker-registry         The address of the registry"
   echo "   tag                     The tag to be used"
@@ -45,7 +47,7 @@ tag_and_push () {
   echo " "
 
   # reading docker images
-  DOCKER_IMAGES=$(docker images --format="{{.Repository}}:{{.Tag}}" --filter "dangling=false" | grep -v none | grep "^xosproject")
+  DOCKER_IMAGES=$(docker images --format="{{.Repository}}:{{.Tag}}" --filter "dangling=false" | grep -v none)
 
   # split string to list only on newlines
   IFS=$'\n'
