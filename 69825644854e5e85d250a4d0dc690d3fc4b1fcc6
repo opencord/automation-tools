@@ -22,6 +22,75 @@
       "revId": "69825644854e5e85d250a4d0dc690d3fc4b1fcc6",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "37fde7c2_ae80ef35",
+        "filename": "openstack-helm/cloudlab-disk-setup.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2018-05-24T18:07:14Z",
+      "side": 1,
+      "message": "Do we need to wrap everything in a function?",
+      "range": {
+        "startLine": 59,
+        "startChar": 0,
+        "endLine": 60,
+        "endChar": 14
+      },
+      "revId": "69825644854e5e85d250a4d0dc690d3fc4b1fcc6",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ce528ae2_8b06d0ce",
+        "filename": "openstack-helm/openstack-helm-dev-setup.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2018-05-24T18:07:14Z",
+      "side": 1,
+      "message": "should this be in the cloudlab setup?",
+      "range": {
+        "startLine": 25,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 28
+      },
+      "revId": "69825644854e5e85d250a4d0dc690d3fc4b1fcc6",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "293667eb_02995971",
+        "filename": "openstack-helm/openstack-helm-dev-setup.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2018-05-24T18:07:14Z",
+      "side": 1,
+      "message": "Specify branch/version on these?",
+      "range": {
+        "startLine": 33,
+        "startChar": 1,
+        "endLine": 35,
+        "endChar": 0
+      },
+      "revId": "69825644854e5e85d250a4d0dc690d3fc4b1fcc6",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": true
     }
   ]
 }
