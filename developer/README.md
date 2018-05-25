@@ -11,6 +11,6 @@ Please use `bash tag_and_push.sh -h` to see instructions.
 
 Usage:
 
-```
+```shell
 python imagebuilder.py -f ../../helm-charts/examples/filter-images.yaml -x
 ```
