@@ -126,6 +126,10 @@ buildable_images:
   - name: xosproject/gui-extension-sample
     repo: xos-sample-gui-extension
 
+  - name: xosproject/acordion-synchronizer
+    repo: acordion
+    dockerfile: "Dockerfile.synchronizer"
+
   - name: xosproject/addressmanager-synchronizer
     repo: addressmanager
     dockerfile: "Dockerfile.synchronizer"
