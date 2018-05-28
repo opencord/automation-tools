@@ -1,0 +1,10 @@
+# Example inventory file for network configuration
+
+all:
+  hosts:
+    host1.example.dns:
+      management_net_ip_cidr: "10.123.45.67/28"
+      fabric_net_ip_cidr: "10.234.56.78/29"
+      management_net_hwaddrs: ['00:8c:fa:f7:1c:5c']
+      management_net_interfaces: ['eth2']
+
