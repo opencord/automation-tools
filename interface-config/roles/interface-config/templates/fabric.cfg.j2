@@ -1,0 +1,50 @@
+# Copyright 2017-present Open Networking Foundation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# CORD Fabric interface configuration
+# # created by automation-tools template fabric.cfg.j2
+
+# fabric bridge between physical and virtual interfaces for VTN
+auto fabricbridge
+iface fabricbridge inet static
+  pre-up ip link add fabricbridge type bridge
+  address {{ fabric_net_ip_cidr | ipaddr('address') }}
+  network {{ fabric_net_ip_cidr | ipaddr('network') }}
+  netmask {{ fabric_net_ip_cidr | ipaddr('netmask') }}
+  broadcast {{ fabric_net_ip_cidr | ipaddr('broadcast') }}
+  bridge_ports fabricbond
+  post-down ip link del fabricbridge
+
+# management bond of physical intefaces
+auto fabricbond
+iface fabricbond inet manual
+  pre-up ip link add fabricbond type bond
+  pre-up ip link set fabricbond up
+  bond-miimon 100
+  bond-slaves none
+  bond-mode active-backup
+  post-down ip link del fabricbond
+
+{% if fabric_net_interfaces %}
+# physical network members of fabricbond
+{% for fab_int in fabric_net_interfaces %}
+auto {{ fab_int }}
+iface {{ fab_int }} inet manual
+  pre-up ip link set {{ fab_int }} master fabricbond
+  bond-master fabricbond
+  bond-primary {{ fabric_net_interfaces | join(' ') }}
+  post-down ip link set dev {{ fab_int }} nomaster
+
+{% endfor %}
+{% endif %}
