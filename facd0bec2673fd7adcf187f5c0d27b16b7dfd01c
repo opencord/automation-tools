@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "f675c9e3_37004e3a",
+        "filename": "mcord/mcord-in-a-box.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1000010
+      },
+      "writtenOn": "2018-05-31T16:47:52Z",
+      "side": 1,
+      "message": "Since they are referenced below, it seemed reasonable to me to check them out here.  Are you proposing that the script fail with an error message of \"You need to check out these repos...\" if they don\u0027t exist?",
+      "parentUuid": "453be827_180c31c1",
+      "range": {
+        "startLine": 25,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 101
+      },
+      "revId": "facd0bec2673fd7adcf187f5c0d27b16b7dfd01c",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b29ac846_4554b928",
         "filename": "mcord/mcord-in-a-box.sh",
         "patchSetId": 10
@@ -53,6 +77,30 @@
       "writtenOn": "2018-05-31T14:22:28Z",
       "side": 1,
       "message": "why do we do an upgrade instead of an install?",
+      "range": {
+        "startLine": 53,
+        "startChar": 5,
+        "endLine": 53,
+        "endChar": 13
+      },
+      "revId": "facd0bec2673fd7adcf187f5c0d27b16b7dfd01c",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fea1ef5e_f3047bc9",
+        "filename": "mcord/mcord-in-a-box.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1000010
+      },
+      "writtenOn": "2018-05-31T16:47:52Z",
+      "side": 1,
+      "message": "This is just a helm idiom.  It installs the chart if it is not already installed, otherwise it upgrades it.",
+      "parentUuid": "0dda834a_1efa1528",
       "range": {
         "startLine": 53,
         "startChar": 5,
