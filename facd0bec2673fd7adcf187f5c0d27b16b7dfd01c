@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "453be827_180c31c1",
+        "filename": "mcord/mcord-in-a-box.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2018-05-31T14:22:28Z",
+      "side": 1,
+      "message": "Should we exclude these to make it more modular?",
+      "range": {
+        "startLine": 25,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 101
+      },
+      "revId": "facd0bec2673fd7adcf187f5c0d27b16b7dfd01c",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b29ac846_4554b928",
+        "filename": "mcord/mcord-in-a-box.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2018-05-31T14:22:28Z",
+      "side": 1,
+      "message": "remove empty line",
+      "revId": "facd0bec2673fd7adcf187f5c0d27b16b7dfd01c",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0dda834a_1efa1528",
+        "filename": "mcord/mcord-in-a-box.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2018-05-31T14:22:28Z",
+      "side": 1,
+      "message": "why do we do an upgrade instead of an install?",
+      "range": {
+        "startLine": 53,
+        "startChar": 5,
+        "endLine": 53,
+        "endChar": 13
+      },
+      "revId": "facd0bec2673fd7adcf187f5c0d27b16b7dfd01c",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
