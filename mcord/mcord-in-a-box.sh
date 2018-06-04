@@ -31,11 +31,6 @@ CORDDIR="${CORDDIR:-${HOME}/cord}"
 "$CORDDIR"/automation-tools/openstack-helm/openstack-helm-dev-setup.sh
 
 
-# VTN requirements
-POD=$( kubectl get pod --namespace openstack|grep openvswitch-db|awk '{print $1}' )
-kubectl --namespace openstack exec "$POD" \
-    -- ovs-appctl -t ovsdb-server ovsdb-server/add-remote ptcp:6641
-
 # Add keys for VTN
 [ ! -e ~/.ssh/id_rsa ] && ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ""
 cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys

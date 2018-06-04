@@ -38,7 +38,7 @@ fi
 
 cd ~
 [ ! -e openstack-helm-infra ] && git clone https://git.openstack.org/openstack/openstack-helm-infra.git -b "${OPENSTACK_HELM_BRANCH}"
-[ ! -e openstack-helm ] && git clone https://git.openstack.org/openstack/openstack-helm.git -b "${OPENSTACK_HELM_BRANCH}"
+[ ! -e openstack-helm ] && git clone https://git.openstack.org/openstack/openstack-helm.git -b "${OPENSTACK_HELM_BRANCH}" && sed -i 's/--remote=db:Open_vSwitch,Open_vSwitch,manager_options/--remote=db:Open_vSwitch,Open_vSwitch,manager_options --remote=ptcp:6641/' openstack-helm/openvswitch/templates/bin/_openvswitch-db-server.sh.tpl
 
 # Customizations for CORD
 cat <<EOF > /tmp/glance-cord.yaml
