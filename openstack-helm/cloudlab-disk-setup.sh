@@ -51,5 +51,8 @@ for DIR in docker kubelet openstack-helm nova
 do
     sudo mkdir -p /mnt/extra/$DIR
     sudo chmod -R a+rwx /mnt/extra/$DIR
-    [ ! -e /var/lib/$DIR ] && sudo ln -s /mnt/extra/$DIR /var/lib/$DIR
+    if [ ! -e /var/lib/$DIR ]
+    then
+        sudo ln -s /mnt/extra/$DIR /var/lib/$DIR
+    fi
 done

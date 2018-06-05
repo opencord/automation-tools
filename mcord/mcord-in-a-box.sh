@@ -37,10 +37,12 @@ cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 cp ~/.ssh/id_rsa "$CORDDIR"/helm-charts/xos-profiles/base-openstack/files/node_key
 
 # Add dummy fabric interface
-sudo modprobe dummy
-sudo ip link set name fabric dev dummy0
-sudo ifconfig fabric up
-
+if ! ifconfig fabric &>> /dev/null
+then
+    sudo modprobe dummy
+    sudo ip link set name fabric dev dummy0
+    sudo ifconfig fabric up
+fi
 
 # Install charts for M-CORD
 cd "$CORDDIR"/helm-charts
@@ -63,12 +65,14 @@ helm upgrade --install mcord ./xos-profiles/mcord \
 ~/openstack-helm/tools/deployment/common/wait-for-pods.sh default
 
 
-# Firewall VNC ports for security
-sudo ufw default allow incoming
-sudo ufw default allow outgoing
-sudo ufw default allow routed
-sudo ufw deny proto tcp from any to any port 5900:5950 comment 'vnc'
-sudo ufw --force enable
-
+# Firewall VNC ports for security (CloudLab)
+if [ -d /mnt/extra ]
+then
+    sudo ufw default allow incoming
+    sudo ufw default allow outgoing
+    sudo ufw default allow routed
+    sudo ufw deny proto tcp from any to any port 5900:5950 comment 'vnc'
+    sudo ufw --force enable
+fi
 
 echo "M-CORD has been successfully installed"
