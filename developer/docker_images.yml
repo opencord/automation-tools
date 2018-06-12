@@ -195,17 +195,14 @@ buildable_images:
 
   - name: xosproject/vmme-synchronizer
     repo: vMME
-    path: "xos/synchronizer"
     dockerfile: "Dockerfile.synchronizer"
 
   - name: xosproject/vhss-synchronizer
     repo: vHSS
-    path: "xos/synchronizer"
     dockerfile: "Dockerfile.synchronizer"
 
   - name: xosproject/hssdb-synchronizer
     repo: hss_db
-    path: "xos/synchronizer"
     dockerfile: "Dockerfile.synchronizer"
 
   - name: xosproject/internetemulator-synchronizer
@@ -214,22 +211,18 @@ buildable_images:
 
   - name: xosproject/sdncontroller-synchronizer
     repo: sdn-controller
-    path: "xos/synchronizer"
     dockerfile: "Dockerfile.synchronizer"
 
   - name: xosproject/vspgwc-synchronizer
     repo: vspgwc
-    path: "xos/synchronizer"
     dockerfile: "Dockerfile.synchronizer"
 
   - name: xosproject/vspgwu-synchronizer
     repo: vspgwu
-    path: "xos/synchronizer"
     dockerfile: "Dockerfile.synchronizer"
 
   - name: xosproject/vepc-synchronizer
     repo: epc-service
-    path: "xos/synchronizer"
     dockerfile: "Dockerfile.synchronizer"
 
   - name: xosproject/mcord-synchronizer
@@ -253,7 +246,6 @@ buildable_images:
 
   - name: xosproject/progran-synchronizer
     repo: progran
-    path: "xos/synchronizer"
     dockerfile: "Dockerfile.synchronizer"
 
   - name: xosproject/xos-api-tester
