@@ -59,26 +59,6 @@ source_kubeconfig () {
 }
 
 #
-# Helm init
-#
-helm_init () {
-  echo "Initializing Helm"
-  source_kubeconfig "$DEPLOYMENT_NAME"
-  helm init --upgrade
-  echo "Waiting a minute for Tiller to start"
-  sleep 60
-}
-
-#
-# Deploy an insecure registry
-#
-deploy_insecure_registry () {
-  echo "Deploying insecure registry"
-  source_kubeconfig "$DEPLOYMENT_NAME"
-  helm install stable/docker-registry --set service.nodePort=30500,service.type=NodePort -n docker-registry
-}
-
-#
 # Checks if an arbitrary pod name is given during specifc
 # operations.
 #
@@ -128,8 +108,6 @@ do
     -i | --install)
         check_pod_name
         install_kubespray
-        helm_init
-        deploy_insecure_registry
         exit 0
         ;;
     -h | --help)
