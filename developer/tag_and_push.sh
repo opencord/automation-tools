@@ -47,13 +47,14 @@ tag_and_push () {
   echo " "
 
   # reading docker images
-  DOCKER_IMAGES=$(docker images --format="{{.Repository}}:{{.Tag}}" --filter "dangling=false" | grep -v none)
+  DOCKER_IMAGES=$(docker images --format="{{.Repository}}:{{.Tag}}" --filter "dangling=false" | grep -v none | grep "xosproject")
 
   # split string to list only on newlines
   IFS=$'\n'
   for image in $DOCKER_IMAGES;
   do
-    docker tag "$image $DOCKER_REGISTRY/$image"
+    echo "Tagging $image with $DOCKER_REGISTRY/$image"
+    docker tag "$image" "$DOCKER_REGISTRY/$image"
     docker push "$DOCKER_REGISTRY/$image"
   done
 }
