@@ -16,8 +16,22 @@
 
 set -xe
 
-# This script assumes the following repos exist
+# This script assumes the following repos exist and will create them if not
 # ~/cord/automation-tools
+# ~/cord/helm-charts
+
+# Sanity tests
+if [[ $UID == 0 ]]; then
+    echo "Please run this script as non-root user"
+    exit 1
+fi
+
+if ! sudo -n true; then
+    echo "Please configure passwordless sudo on this account"
+    exit 1
+fi
+
+
 
 # Location of 'cord' directory for checkouts on the local system
 CORDDIR="${CORDDIR:-${HOME}/cord}"
@@ -47,7 +61,8 @@ fi
 # Install charts for M-CORD
 cd "$CORDDIR"/helm-charts
 helm dep update ./xos-core
-helm upgrade --install xos-core ./xos-core
+helm upgrade --install xos-core ./xos-core \
+    --set xos-gui.xos_projectName="M-CORD"
 ~/openstack-helm/tools/deployment/common/wait-for-pods.sh default
 
 helm dep update ./xos-profiles/base-openstack

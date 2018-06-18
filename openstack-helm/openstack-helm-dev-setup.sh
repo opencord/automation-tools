@@ -23,6 +23,10 @@ set -xe
 
 # CORD versioning
 OPENSTACK_HELM_BRANCH="${OPENSTACK_HELM_BRANCH:-master}"
+OPENSTACK_HELM_COMMIT="${OPENSTACK_HELM_COMMIT:-5cfa1501a2e4912860f5393e81e72f37688e919f}"
+OPENSTACK_HELM_INFRA_BRANCH="${OPENSTACK_HELM_BRANCH:-master}"
+OPENSTACK_HELM_INFRA_COMMIT="${OPENSTACK_HELM_INFRA_COMMIT:-b0c34c4468633af62e88a604d6e27c53343d4686}"
+
 
 # openstack-helm steps to execute
 STEPS="000-install-packages 010-deploy-k8s 020-setup-client 030-ingress 040-ceph 045-ceph-ns-activate 050-mariadb 060-rabbitmq 070-memcached 080-keystone 090-heat 110-ceph-radosgateway 120-glance 140-openvswitch 150-libvirt 160-compute-kit"
@@ -36,9 +40,28 @@ then
   "$DIR"/cloudlab-disk-setup.sh
 fi
 
-cd ~
-[ ! -e openstack-helm-infra ] && git clone https://git.openstack.org/openstack/openstack-helm-infra.git -b "${OPENSTACK_HELM_BRANCH}"
-[ ! -e openstack-helm ] && git clone https://git.openstack.org/openstack/openstack-helm.git -b "${OPENSTACK_HELM_BRANCH}" && sed -i 's/--remote=db:Open_vSwitch,Open_vSwitch,manager_options/--remote=db:Open_vSwitch,Open_vSwitch,manager_options --remote=ptcp:6641/' openstack-helm/openvswitch/templates/bin/_openvswitch-db-server.sh.tpl
+if [ ! -e ~/openstack-helm-infra ]
+then
+  cd ~
+  git clone https://git.openstack.org/openstack/openstack-helm-infra.git -b "${OPENSTACK_HELM_INFRA_BRANCH}"
+  if [ ! -z "${OPENSTACK_HELM_INFRA_COMMIT}" ]
+  then
+    cd openstack-helm-infra
+    git reset --hard "${OPENSTACK_HELM_INFRA_COMMIT}"
+  fi
+fi
+
+if [ ! -e ~/openstack-helm ]
+then
+  cd ~
+  git clone https://git.openstack.org/openstack/openstack-helm.git -b "${OPENSTACK_HELM_BRANCH}"
+  if [ ! -z "${OPENSTACK_HELM_COMMIT}" ]
+  then
+    cd openstack-helm
+    git reset --hard "${OPENSTACK_HELM_COMMIT}"
+  fi
+  sed -i 's/--remote=db:Open_vSwitch,Open_vSwitch,manager_options/--remote=db:Open_vSwitch,Open_vSwitch,manager_options --remote=ptcp:6641/' ~/openstack-helm/openvswitch/templates/bin/_openvswitch-db-server.sh.tpl
+fi
 
 # Customizations for CORD
 cat <<EOF > /tmp/glance-cord.yaml
