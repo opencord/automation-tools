@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9832210f_9fbe91e0",
+        "filename": "openstack-helm/openstack-helm-dev-setup.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1000162
+      },
+      "writtenOn": "2018-06-19T17:03:31Z",
+      "side": 1,
+      "message": "Need to append \"~/\" before \"openstack-helm\"",
+      "revId": "4355dcf1c879eb13fdfd6bf7a4608657dd41a494",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
