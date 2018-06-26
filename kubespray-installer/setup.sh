@@ -83,7 +83,7 @@ display_help () {
   echo "   -s, --source            Source the Kubectl config for <podname>"
   echo " "
   echo "   podname                 An arbitrary name representing the pod"
-  echo "   ip                      The IP address of a remote node"
+  echo "   ip                      The IP address of a remote node(s)"
   echo " "
   echo "Example usages:"
   echo "   ./setup.sh -i podname 192.168.10.100 192.168.10.101 192.168.10.102"
@@ -94,6 +94,12 @@ display_help () {
 #
 # Init
 #
+if [ $# -lt 2 ]
+then
+  display_help
+  exit 0
+fi
+
 CLI_OPT=$1
 DEPLOYMENT_NAME=$2
 shift 2
