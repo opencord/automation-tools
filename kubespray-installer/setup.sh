@@ -20,6 +20,8 @@
 
 set -e -u -o pipefail
 
+KS_COMMIT="${KS_COMMIT:-73a2a180061113ac124683e5cc492ba07df33d4c}"
+
 install_kubespray () {
   # Cleanup Old Kubespray Installations
   echo "Cleaning Up Old Kubespray Installation"
@@ -27,12 +29,18 @@ install_kubespray () {
 
   # Download Kubespray
   echo "Downloading Kubespray"
-  git clone https://github.com/kubernetes-incubator/kubespray.git -b "v2.4.0"
+  git clone https://github.com/kubernetes-incubator/kubespray.git
+  pushd kubespray
+  git checkout "$KS_COMMIT"
+  popd
 
   # Generate inventory and var files
   echo "Generating The Inventory File"
+
   rm -rf "inventories/${DEPLOYMENT_NAME}"
-  cp -r kubespray/inventory "inventories/${DEPLOYMENT_NAME}"
+  mkdir -p "inventories/${DEPLOYMENT_NAME}"
+
+  cp -r kubespray/inventory/sample/group_vars "inventories/${DEPLOYMENT_NAME}/group_vars"
   CONFIG_FILE="inventories/${DEPLOYMENT_NAME}/inventory.cfg" python3 kubespray/contrib/inventory_builder/inventory.py "${NODES[@]}"
 
   # Add configuration to inventory
@@ -46,16 +54,27 @@ install_kubespray () {
   echo "Installing Kubespray"
   ansible-playbook -i "inventories/${DEPLOYMENT_NAME}/inventory.cfg" kubespray/cluster.yml -b -v
 
-  # Export the Kubespray Config Location
-  echo "Loading Kubespray Configuration"
-  cp kubespray/artifacts/admin.conf "configs/${DEPLOYMENT_NAME}.conf"
 }
 
 #
 # Exports the Kubespray Config Location
 #
 source_kubeconfig () {
-  export KUBECONFIG=${PWD}/configs/${DEPLOYMENT_NAME}.conf
+
+  kubeconfig_path="${PWD}/inventories/${DEPLOYMENT_NAME}/artifacts/admin.conf"
+
+  if [ -f "$kubeconfig_path" ]
+  then
+    # these options are annoying outside of scripts
+    set +e +u +o pipefail
+
+    echo "setting KUBECONFIG=$kubeconfig_path"
+
+    export KUBECONFIG="$kubeconfig_path"
+  else
+    echo "kubernetes admin.conf not found at: '$kubeconfig_path'"
+    exit 1
+  fi
 }
 
 #
@@ -123,8 +142,8 @@ do
     -s | --source)
         check_pod_name
         source_kubeconfig
-        return 0
-         ;;
+        break
+        ;;
     --) # End of all options
         shift
         break
