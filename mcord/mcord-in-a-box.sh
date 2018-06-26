@@ -60,9 +60,14 @@ fi
 
 # Install charts for M-CORD
 cd "$CORDDIR"/helm-charts
+sudo mkdir -p /var/local/vol1
+helm upgrade --install local-persistent-volume ./local-persistent-volume \
+    --set volumeHostName="$( hostname -f )"
+
 helm dep update ./xos-core
 helm upgrade --install xos-core ./xos-core \
-    --set xos-gui.xos_projectName="M-CORD"
+    --set xos-gui.xos_projectName="M-CORD" \
+    --set needDBPersistence=true
 ~/openstack-helm/tools/deployment/common/wait-for-pods.sh default
 
 helm dep update ./xos-profiles/base-openstack
