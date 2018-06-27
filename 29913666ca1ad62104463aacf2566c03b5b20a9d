@@ -210,6 +210,30 @@
       "revId": "29913666ca1ad62104463aacf2566c03b5b20a9d",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "992cb4ab_66b83029",
+        "filename": "kubespray-installer/setup.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2018-06-27T14:40:40Z",
+      "side": 1,
+      "message": "@zdw what is admin.conf? We didn\u0027t have to deal with this before..",
+      "parentUuid": "1cac99f6_0b34d2f8",
+      "range": {
+        "startLine": 64,
+        "startChar": 0,
+        "endLine": 77,
+        "endChar": 4
+      },
+      "revId": "29913666ca1ad62104463aacf2566c03b5b20a9d",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
     }
   ]
 }
