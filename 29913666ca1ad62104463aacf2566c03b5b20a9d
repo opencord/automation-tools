@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "8715947c_c6af41f1",
+        "filename": "kubespray-installer/k8s-configs.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2018-06-27T14:09:05Z",
+      "side": 1,
+      "message": "Gopi documented how to make the changes on vanilla k8s here: https://gerrit.opencord.org/c/9990/ and here: https://gerrit.opencord.org/c/9997/\n\nEnabling the feature gate needs to happen before the installation.",
+      "parentUuid": "8d2811fc_77ec5dab",
+      "range": {
+        "startLine": 59,
+        "startChar": 4,
+        "endLine": 69,
+        "endChar": 48
+      },
+      "revId": "29913666ca1ad62104463aacf2566c03b5b20a9d",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7f64a4e1_04ad6f80",
         "filename": "kubespray-installer/setup.sh",
         "patchSetId": 3
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "8a9c024f_c3835300",
+        "filename": "kubespray-installer/setup.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2018-06-27T14:09:05Z",
+      "side": 1,
+      "message": "To use local persistent volumes, we needed 1.10, and that\u0027s not currently supported in a released version of kubespray.",
+      "parentUuid": "7f64a4e1_04ad6f80",
+      "range": {
+        "startLine": 23,
+        "startChar": 5,
+        "endLine": 23,
+        "endChar": 15
+      },
+      "revId": "29913666ca1ad62104463aacf2566c03b5b20a9d",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dea14dd5_2fee0868",
         "filename": "kubespray-installer/setup.sh",
         "patchSetId": 3
@@ -59,6 +107,30 @@
       "writtenOn": "2018-06-27T08:35:43Z",
       "side": 1,
       "message": "what is this? does it require an additional dependency?",
+      "range": {
+        "startLine": 33,
+        "startChar": 2,
+        "endLine": 33,
+        "endChar": 7
+      },
+      "revId": "29913666ca1ad62104463aacf2566c03b5b20a9d",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "47ddfa2c_10c18faa",
+        "filename": "kubespray-installer/setup.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2018-06-27T14:09:05Z",
+      "side": 1,
+      "message": "pushd/popd are shell-isms that manipulate the directory stack: https://www.gnu.org/software/bash/manual/html_node/Directory-Stack-Builtins.html\n\nKind of like using `cd -` to go to the previous directory, you don\u0027t have to specify the exact path back.",
+      "parentUuid": "dea14dd5_2fee0868",
       "range": {
         "startLine": 33,
         "startChar": 2,
@@ -105,6 +177,30 @@
       "writtenOn": "2018-06-27T08:35:43Z",
       "side": 1,
       "message": "can you explain what we do here?",
+      "range": {
+        "startLine": 64,
+        "startChar": 0,
+        "endLine": 77,
+        "endChar": 4
+      },
+      "revId": "29913666ca1ad62104463aacf2566c03b5b20a9d",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1cac99f6_0b34d2f8",
+        "filename": "kubespray-installer/setup.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2018-06-27T14:09:05Z",
+      "side": 1,
+      "message": "1. The admin.conf location changed in the newer commit of kubespray\n\n2. Check the path to the KUBECONFIG file before setting it, so specifying an an incorrect name to the `-s` option prints an error and fails\n\n3. The `set ...` undoes the `set ...` at the top of the file, which make scriptwriting more reliable (bailing if unset variables, or if a command exit with non-zero).  Without this, your interactive shell will act the same way which is bad when a minor typo in a command causes it to exit non-zero and your interactive shell closes abruptly. Scott found this out by experience. :)",
+      "parentUuid": "2d760528_57db77e5",
       "range": {
         "startLine": 64,
         "startChar": 0,

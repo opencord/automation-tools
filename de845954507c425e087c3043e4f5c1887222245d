@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "3cb6ffb3_f65255f2",
+        "filename": "kubespray-installer/configs/.gitignore",
+        "patchSetId": 3
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2018-06-27T14:09:05Z",
+      "side": 0,
+      "message": "Both of these .gitignore deletions were due to changes in how a more recent kubespray handles config files - it puts the admin.conf alongside the inventory file that is generated.",
+      "parentUuid": "0b277258_bffbb69b",
+      "range": {
+        "startLine": 2,
+        "startChar": 5,
+        "endLine": 2,
+        "endChar": 11
+      },
+      "revId": "de845954507c425e087c3043e4f5c1887222245d",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f19f10e_6db0ebcd",
         "filename": "kubespray-installer/inventories/.gitignore",
         "patchSetId": 3
@@ -36,6 +60,30 @@
       "writtenOn": "2018-06-27T08:35:43Z",
       "side": 0,
       "message": "same as other comment. this file should remain if not replaced by a .gitignore in the root folder",
+      "range": {
+        "startLine": 2,
+        "startChar": 2,
+        "endLine": 2,
+        "endChar": 11
+      },
+      "revId": "de845954507c425e087c3043e4f5c1887222245d",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8e37a70a_252ba6ec",
+        "filename": "kubespray-installer/inventories/.gitignore",
+        "patchSetId": 3
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2018-06-27T14:09:05Z",
+      "side": 0,
+      "message": "Will add a .gitignore to the root folder.",
+      "parentUuid": "5f19f10e_6db0ebcd",
       "range": {
         "startLine": 2,
         "startChar": 2,
