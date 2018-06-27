@@ -234,6 +234,30 @@
       "revId": "29913666ca1ad62104463aacf2566c03b5b20a9d",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2f0a4e36_e51e9039",
+        "filename": "kubespray-installer/setup.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2018-06-27T15:17:45Z",
+      "side": 1,
+      "message": "It\u0027s the file with the kubernetes config in it, loaded with KUBECONFIG.  kubespray changed the location of where it\u0027s created to be near the inventory files - because of this, we don\u0027t have to copy it out of the kubespray directory anymore.",
+      "parentUuid": "992cb4ab_66b83029",
+      "range": {
+        "startLine": 64,
+        "startChar": 0,
+        "endLine": 77,
+        "endChar": 4
+      },
+      "revId": "29913666ca1ad62104463aacf2566c03b5b20a9d",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
     }
   ]
 }
