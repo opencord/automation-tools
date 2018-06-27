@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0b277258_bffbb69b",
+        "filename": "kubespray-installer/configs/.gitignore",
+        "patchSetId": 3
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2018-06-27T08:35:43Z",
+      "side": 0,
+      "message": "this file should remain if not replaced by a .gitignore in the root folder",
+      "range": {
+        "startLine": 2,
+        "startChar": 5,
+        "endLine": 2,
+        "endChar": 11
+      },
+      "revId": "de845954507c425e087c3043e4f5c1887222245d",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f19f10e_6db0ebcd",
+        "filename": "kubespray-installer/inventories/.gitignore",
+        "patchSetId": 3
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2018-06-27T08:35:43Z",
+      "side": 0,
+      "message": "same as other comment. this file should remain if not replaced by a .gitignore in the root folder",
+      "range": {
+        "startLine": 2,
+        "startChar": 2,
+        "endLine": 2,
+        "endChar": 11
+      },
+      "revId": "de845954507c425e087c3043e4f5c1887222245d",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
