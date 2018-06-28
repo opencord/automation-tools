@@ -413,6 +413,11 @@ class DockerImage():
         if build_tag not in self.tags:
             self.tags.append(build_tag)
 
+        # Add git tags if exists
+        if self.repo_d:
+            for git_tag in self.repo_d.git_tags:
+                self.tags.append(git_tag)
+
         # split names from tag list
         if tags is not None:
             for tag in tags:
@@ -664,11 +669,6 @@ class DockerImage():
 
                     # this is most specific tag, so pull using it
                     self.raw_name = "%s:%s" % (self.name, commit_tag)
-
-                # add all tags in git that point at the commit
-                for gt in self.repo_d.git_tags:
-                    if gt not in self.tags:
-                        self.tags.append(gt)
 
             LOG.debug("All tags: %s" % ", ".join(self.tags))
 
@@ -959,6 +959,7 @@ class DockerBuilder():
             if image.same_name(image_name):
                 LOG.debug(" found a match: %s" % image.raw_name)
                 return image
+
         return None
 
     def create_dependency(self):
@@ -984,11 +985,8 @@ class DockerBuilder():
             LOG.debug("Evaluating parent image: %s" % parent_name)
             internal_parent = False
 
-            # match on p_name, without tag
-            (p_name, p_tag) = split_name(parent_name)
-
             for image in self.images:
-                if image.same_name(p_name):  # internal image is a parent
+                if image.same_name(parent_name):  # internal image is a parent
                     internal_parent = True
                     LOG.debug(" Internal parent: %s" % image.name)
                     break
@@ -1012,16 +1010,17 @@ class DockerBuilder():
             for parent_name in image.parent_names:
 
                 parent = self.find_image(parent_name)
-                image.parents.append(parent)
+
 
                 if parent is not None:
                     LOG.debug(" internal image '%s' is parent of '%s'" %
                               (parent.name, image.name))
+                    image.parents.append(parent)
                     parent.children.append(image)
 
                 else:
                     LOG.debug(" external image '%s' is parent of '%s'" %
-                              (image.parent_name, image.name))
+                              (parent_name, image.name))
 
         # loop again now that parents are linked to create labels
         for image in self.images:
