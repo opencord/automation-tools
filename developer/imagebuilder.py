@@ -413,6 +413,11 @@ class DockerImage():
         if build_tag not in self.tags:
             self.tags.append(build_tag)
 
+        # Add git tags if exists
+        if self.repo_d:
+            for git_tag in self.repo_d.git_tags:
+                self.tags.append(git_tag)
+
         # split names from tag list
         if tags is not None:
             for tag in tags:
@@ -664,11 +669,6 @@ class DockerImage():
 
                     # this is most specific tag, so pull using it
                     self.raw_name = "%s:%s" % (self.name, commit_tag)
-
-                # add all tags in git that point at the commit
-                for gt in self.repo_d.git_tags:
-                    if gt not in self.tags:
-                        self.tags.append(gt)
 
             LOG.debug("All tags: %s" % ", ".join(self.tags))
 
