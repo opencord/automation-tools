@@ -23,9 +23,9 @@ set -xe
 
 # CORD versioning
 OPENSTACK_HELM_BRANCH="${OPENSTACK_HELM_BRANCH:-master}"
-OPENSTACK_HELM_COMMIT="${OPENSTACK_HELM_COMMIT:-5cfa1501a2e4912860f5393e81e72f37688e919f}"
+OPENSTACK_HELM_COMMIT="${OPENSTACK_HELM_COMMIT:-79128a94fc4c7e7b301497abeab094fa01efaa06}"
 OPENSTACK_HELM_INFRA_BRANCH="${OPENSTACK_HELM_BRANCH:-master}"
-OPENSTACK_HELM_INFRA_COMMIT="${OPENSTACK_HELM_INFRA_COMMIT:-b0c34c4468633af62e88a604d6e27c53343d4686}"
+OPENSTACK_HELM_INFRA_COMMIT="${OPENSTACK_HELM_INFRA_COMMIT:-5d622a806e09e19c15189081299dc3155916550b}"
 
 
 # openstack-helm steps to execute
@@ -73,6 +73,13 @@ network:
         nginx.ingress.kubernetes.io/proxy-body-size: "0"
 EOF
 export OSH_EXTRA_HELM_ARGS_GLANCE="-f /tmp/glance-cord.yaml"
+
+cat <<EOF > /tmp/libvirt-cord.yaml
+---
+network:
+  backend: []
+EOF
+export OSH_EXTRA_HELM_ARGS_LIBVIRT="-f /tmp/libvirt-cord.yaml"
 
 cat <<EOF > /tmp/nova-cord.yaml
 ---
