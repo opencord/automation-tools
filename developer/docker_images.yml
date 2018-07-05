@@ -227,7 +227,6 @@ buildable_images:
 
   - name: xosproject/mcord-synchronizer
     repo: mcord
-    path: "xos/synchronizer"
     dockerfile: "Dockerfile.synchronizer"
 
   - name: xosproject/venb-synchronizer
