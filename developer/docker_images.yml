@@ -97,6 +97,11 @@ buildable_images:
   - name: xosproject/xos-tosca
     repo: xos-tosca
 
+  - name: xosproject/tosca-loader
+    repo: xos-tosca
+    path: "loader"
+    dockerfile: "Dockerfile.tosca-loader"
+
   - name: xosproject/xos-ws
     repo: xos-rest-gw
 
