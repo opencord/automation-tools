@@ -37,8 +37,8 @@ fi
 CORDDIR="${CORDDIR:-${HOME}/cord}"
 
 [ ! -d "$CORDDIR" ] && mkdir -p "$CORDDIR"
-[ ! -d "$CORDDIR"/automation-tools ] && cd "$CORDDIR" && git clone https://gerrit.opencord.org/automation-tools
-[ ! -d "$CORDDIR"/helm-charts ] && cd "$CORDDIR" && git clone https://gerrit.opencord.org/helm-charts
+[ ! -d "$CORDDIR"/automation-tools ] && cd "$CORDDIR" && git clone -b cord-6.0 https://gerrit.opencord.org/automation-tools
+[ ! -d "$CORDDIR"/helm-charts ] && cd "$CORDDIR" && git clone -b cord-6.0 https://gerrit.opencord.org/helm-charts
 
 
 # Install K8S, Helm, Openstack
