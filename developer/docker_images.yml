@@ -190,6 +190,10 @@ buildable_images:
     repo: fabric
     dockerfile: "Dockerfile.synchronizer"
 
+  - name: xosproject/fabric-crossconnect-synchronizer
+    repo: fabric-crossconnect
+    dockerfile: "Dockerfile.synchronizer"
+
   - name: xosproject/exampleservice-synchronizer
     repo: exampleservice
     dockerfile: "Dockerfile.synchronizer"
