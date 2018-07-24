@@ -343,6 +343,13 @@ class RepoManifest():
             abs_path = os.path.abspath(os.path.join(args.repo_root,
                                        project.attrib['path']))
 
+            if 'revision' in project.attrib:
+                p_short_branch = project.attrib['revision']
+                p_remote_branch = "%s/%s" % (remote, p_short_branch)
+            else:
+                p_short_branch = self.short_branch
+                p_remote_branch = self.remote_branch
+
             if os.path.isdir(abs_path):
                 project_repos[repo_name] = rel_path
             else:
@@ -352,8 +359,8 @@ class RepoManifest():
         for repo_name, repo_path in project_repos.iteritems():
             self.repos[repo_name] = RepoRepo(repo_name, repo_path,
                                              self.remote_url,
-                                             self.remote_branch,
-                                             self.short_branch)
+                                             p_remote_branch,
+                                             p_short_branch)
 
     def get_repo(self, repo_name):
         return self.repos[repo_name]
