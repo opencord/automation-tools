@@ -231,6 +231,9 @@ class RepoRepo():
             self.git_repo_o = git.Repo(self.abspath())
             LOG.debug("Repo - %s, path: %s" % (name, path))
 
+            LOG.debug(" local branch: %s" % self.short_branch)
+            LOG.debug(" remote branch: %s" % self.remote_branch)
+
             self.head_commit = self.git_repo_o.head.commit.hexsha
             LOG.debug(" head commit: %s" % self.head_commit)
 
@@ -271,7 +274,8 @@ class RepoRepo():
         if not branch:
             branch = self.remote_branch
 
-        LOG.debug("  Looking for changes in path: %s" % test_path)
+        LOG.debug("  Looking for differences from branch '%s' in path: %s" %
+                  (branch, test_path))
 
         p_clean = True
 
@@ -335,25 +339,30 @@ class RepoManifest():
         LOG.info("Manifest is on remote branch '%s' with remote url '%s'" %
                  (self.remote_branch, self.remote_url))
 
-        project_repos = {}
-
         for project in self.manifest_xml.iter('project'):
             repo_name = project.attrib['name']
             rel_path = project.attrib['path']
             abs_path = os.path.abspath(os.path.join(args.repo_root,
                                        project.attrib['path']))
 
+            if 'revision' in project.attrib:
+                p_short_branch = project.attrib['revision']
+                p_remote_branch = "%s/%s" % (default.attrib['remote'],
+                                             p_short_branch)
+                LOG.info('revision for project %s overridden with %s' %
+                         (repo_name, p_short_branch))
+            else:
+                p_short_branch = self.short_branch
+                p_remote_branch = self.remote_branch
+
             if os.path.isdir(abs_path):
-                project_repos[repo_name] = rel_path
+                self.repos[repo_name] = RepoRepo(repo_name, rel_path,
+                                                 self.remote_url,
+                                                 p_remote_branch,
+                                                 p_short_branch)
             else:
                 LOG.debug("Repo in manifest but not checked out: %s" %
                           repo_name)
-
-        for repo_name, repo_path in project_repos.iteritems():
-            self.repos[repo_name] = RepoRepo(repo_name, repo_path,
-                                             self.remote_url,
-                                             self.remote_branch,
-                                             self.short_branch)
 
     def get_repo(self, repo_name):
         return self.repos[repo_name]
@@ -1010,7 +1019,6 @@ class DockerBuilder():
             for parent_name in image.parent_names:
 
                 parent = self.find_image(parent_name)
-
 
                 if parent is not None:
                     LOG.debug(" internal image '%s' is parent of '%s'" %
