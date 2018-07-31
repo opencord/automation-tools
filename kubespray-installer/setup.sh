@@ -18,7 +18,7 @@
 # Installs Kubespray on remote target machines.
 #
 
-set -e -u -o pipefail
+set -e -o pipefail
 
 KS_COMMIT="${KS_COMMIT:-73a2a180061113ac124683e5cc492ba07df33d4c}"
 
@@ -33,6 +33,17 @@ install_kubespray () {
   pushd kubespray
   git checkout "$KS_COMMIT"
   popd
+
+  # create a virtualenv with specific packages, if it doesn't exist
+  if [ ! -x "ks_venv/bin/activate" ]
+  then
+    virtualenv ks_venv
+    pip install ansible==2.5.3
+    pip install -f kubespray/kubespray/requirements.txt
+  fi
+
+  # shellcheck disable=SC1091
+  source ks_venv/bin/activate
 
   # Generate inventory and var files
   echo "Generating The Inventory File"
@@ -53,7 +64,6 @@ install_kubespray () {
   # Install Kubespray
   echo "Installing Kubespray"
   ansible-playbook -i "inventories/${DEPLOYMENT_NAME}/inventory.cfg" kubespray/cluster.yml -b -v
-
 }
 
 #
