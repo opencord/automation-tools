@@ -29,6 +29,7 @@
          - 'ansible_python_interpreter: /usr/bin/python2.7'
          - 'ansible_user: {{ kubespray_remote_ssh_user }}'
          - 'ansible_become: true'
+         - 'kube_feature_gates: []'
 
     # Edit k8s-cluster.yml variable file
     - name: Set Docker DNS servers strict to false
@@ -55,16 +56,4 @@
         regexp: 'docker_options'
         line: "docker_options: \"{{ item }} --insecure-registry={{ '{{' }} kube_service_addresses {{ '}}' }} --graph={{ '{{' }} docker_daemon_graph {{ '}}' }}  {{ '{{' }} docker_log_opts {{ '}}' }}\""
       with_items: "{{ k8s_nodes.split(' ') | map('regex_replace', '(.*)', '--insecure-registry=\\1/32') | join(' ') }}"
-
-    - name: Enable local volume provisioner
-      lineinfile:
-        path: inventories/{{ deployment_name }}/group_vars/k8s-cluster.yml
-        regexp: '^local_volume_provisioner_enabled.*'
-        line: 'local_volume_provisioner_enabled: true'
-
-    - name: Enable persistent volumes
-      lineinfile:
-        path: inventories/{{ deployment_name }}/group_vars/k8s-cluster.yml
-        regexp: '^persistent_volumes_enabled.*'
-        line: 'persistent_volumes_enabled: true'
 

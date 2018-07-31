@@ -1,3 +1,5 @@
 kubespray
 inventories
 *.retry
+ks_venv
+
