@@ -34,6 +34,16 @@ install_kubespray () {
   git checkout "$KS_COMMIT"
   popd
 
+  # create a virtualenv with specific packages, if it doesn't exist
+  if [ -x ks_venv/bin/activate ]
+  then
+    virtualenv ks_venv
+    pip install ansible==2.5.3
+    pip install -f kubespray/kubespray/requirements.txt
+  fi
+
+  source ks_venv/bin/activate
+
   # Generate inventory and var files
   echo "Generating The Inventory File"
 
