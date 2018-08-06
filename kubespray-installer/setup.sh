@@ -39,7 +39,7 @@ install_kubespray () {
   then
     virtualenv ks_venv
     pip install ansible==2.5.3
-    pip install -f kubespray/kubespray/requirements.txt
+    pip install -r kubespray/requirements.txt
   fi
 
   # shellcheck disable=SC1091
