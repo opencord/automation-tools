@@ -260,6 +260,10 @@ buildable_images:
     repo: hippie-oss
     dockerfile: "Dockerfile.synchronizer"
 
+  - name: xosproject/att-workflow-driver-synchronizer
+    repo: att-workflow-driver
+    dockerfile: "Dockerfile.synchronizer"
+
   - name: xosproject/xos-api-tester
     repo: cord-tester
     path: "src/test/cord-api"
