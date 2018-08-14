@@ -817,7 +817,6 @@ class DockerBuilder():
         self.failed_pull = []
         self.obsolete_pull = []
         self.built = []
-        self.failed_build = []
 
         # create dict of images, setting defaults
         for image in buildable_images:
@@ -1098,7 +1097,6 @@ class DockerBuilder():
                 "ib_obsolete_images": self.obsolete,
                 "ib_failed_pull": self.failed_pull,
                 "ib_obsolete_pull": self.obsolete_pull,
-                "ib_failed_build": self.failed_build,
                 }
 
         with open(actions_fn_abs, 'w') as a_fh:
@@ -1255,14 +1253,9 @@ class DockerBuilder():
 
                 return False
 
-            except:
-                LOG.exception("Error pulling docker image")
-
-                self.failed_pull.append({
-                        "tags": [image.raw_name, ],
-                    })
-
-                return False
+            except BaseException as e:
+                LOG.exception("Error fetching image: %s" % e)
+                sys.exit(1)
 
             # obtain the image_id by inspecting the pulled image. Seems unusual
             # that the Docker API `pull` method doesn't provide it when the
@@ -1371,14 +1364,9 @@ class DockerBuilder():
                         image.status = DI_ERROR
                         sys.exit(1)
 
-            except:
-                LOG.exception("Error building docker image")
-
-                self.failed_build.append({
-                        "tags": [image_build_tag, ],
-                    })
-
-                return
+            except DockerErrors as e:
+                LOG.exception("Error building docker image: %s" % e)
+                sys.exit(1)
 
             finally:
                 if(bl_fh):
