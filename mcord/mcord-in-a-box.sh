@@ -35,6 +35,7 @@ fi
 
 # Location of 'cord' directory for checkouts on the local system
 CORDDIR="${CORDDIR:-${HOME}/cord}"
+XOSDBDIR="/var/local/vol1"
 
 [ ! -d "$CORDDIR" ] && mkdir -p "$CORDDIR"
 [ ! -d "$CORDDIR"/automation-tools ] && cd "$CORDDIR" && git clone https://gerrit.opencord.org/automation-tools
@@ -60,20 +61,44 @@ fi
 
 # Install charts for M-CORD
 cd "$CORDDIR"/helm-charts
-sudo mkdir -p /var/local/vol1
-helm upgrade --install local-persistent-volume ./local-persistent-volume \
-    --set volumeHostName="$( hostname -f )"
+
+cat <<EOF > /tmp/xos-values.yaml
+---
+xos-db:
+  needDBPersistence: true
+  storageClassName: local-directory
+
+xos-gui:
+  xos_projectName: "M-CORD"
+
+volumes:
+  - name: "db-pv"
+    size: "2Gi"
+    host: "$( hostname -f )"
+    directory: "${XOSDBDIR}"
+
+computeNodes:
+  master:
+    name: "$( hostname )"
+
+vtn-service:
+  sshUser: "$( whoami )"
+
+global:
+  proxySshUser: "$( whoami )"
+EOF
+sudo mkdir -p "${XOSDBDIR}"
+helm upgrade --install local-directory ./storage/local-directory \
+    -f /tmp/xos-values.yaml
 
 helm dep update ./xos-core
 helm upgrade --install xos-core ./xos-core \
-    --set xos-gui.xos_projectName="M-CORD" \
-    --set needDBPersistence=true
+    -f /tmp/xos-values.yaml
 ~/openstack-helm/tools/deployment/common/wait-for-pods.sh default
 
 helm dep update ./xos-profiles/base-openstack
 helm upgrade --install base-openstack ./xos-profiles/base-openstack \
-    --set computeNodes.master.name="$( hostname )" \
-    --set vtn-service.sshUser="$( whoami )"
+    -f /tmp/xos-values.yaml
 ~/openstack-helm/tools/deployment/common/wait-for-pods.sh default
 
 helm upgrade --install onos-cord ./onos
@@ -81,7 +106,7 @@ helm upgrade --install onos-cord ./onos
 
 helm dep update ./xos-profiles/mcord
 helm upgrade --install mcord ./xos-profiles/mcord \
-    --set global.proxySshUser="$( whoami )"
+    -f /tmp/xos-values.yaml
 ~/openstack-helm/tools/deployment/common/wait-for-pods.sh default
 
 
