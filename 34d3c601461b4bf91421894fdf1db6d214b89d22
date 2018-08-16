@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6015b9b5_ff97cf36",
+        "filename": "mcord/mcord-in-a-box.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2018-08-16T14:42:25Z",
+      "side": 1,
+      "message": "Might make this a variable?",
+      "range": {
+        "startLine": 89,
+        "startChar": 14,
+        "endLine": 89,
+        "endChar": 29
+      },
+      "revId": "34d3c601461b4bf91421894fdf1db6d214b89d22",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e66f3894_88326ece",
+        "filename": "mcord/mcord-in-a-box.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2018-08-16T14:42:25Z",
+      "side": 1,
+      "message": "directory",
+      "range": {
+        "startLine": 90,
+        "startChar": 29,
+        "endLine": 90,
+        "endChar": 37
+      },
+      "revId": "34d3c601461b4bf91421894fdf1db6d214b89d22",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": true
+    }
+  ]
+}
