@@ -33,21 +33,23 @@ display_help () {
   echo " "
   echo "   docker-registry         The address of the registry"
   echo "   tag                     The tag to be used"
+  echo "   filter                  The filter to be used (used as docker images | grep FILTER)"
   echo " "
   echo "Example usages:"
   echo "   ./tag_and_push.sh -r 192.168.10.100:30500"
   echo "   ./tag_and_push.sh -r 192.168.10.100:30500 devel"
+  echo "   ./tag_and_push.sh -r 192.168.10.100:30500 devel xosproject"
 }
 
 #
 # Tag and push all the locally available docker images
 #
 tag_and_push () {
-  echo "Pushing images to $DOCKER_REGISTRY with tag $DOCKER_TAG"
+  echo "Pushing images to $DOCKER_REGISTRY with tag $DOCKER_TAG and filter $FILTER"
   echo " "
 
   # reading docker images
-  DOCKER_IMAGES=$(docker images --format="{{.Repository}}:{{.Tag}}" --filter "dangling=false" | grep -v none | grep "xosproject")
+  DOCKER_IMAGES=$(docker images --format="{{.Repository}}:{{.Tag}}" --filter "dangling=false" | grep -v none | grep "$FILTER")
 
   # split string to list only on newlines
   IFS=$'\n'
@@ -65,6 +67,7 @@ tag_and_push () {
 CLI_OPT=$1
 DOCKER_REGISTRY=$2
 DOCKER_TAG=${3:-"candidate"}
+FILTER=${4:-"xosproject"}
 
 while :
 do
