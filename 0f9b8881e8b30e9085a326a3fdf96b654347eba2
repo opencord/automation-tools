@@ -22,6 +22,30 @@
       "revId": "0f9b8881e8b30e9085a326a3fdf96b654347eba2",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "73b08588_02af3c85",
+        "filename": "developer/docker_images.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2018-08-31T17:05:24Z",
+      "side": 1,
+      "message": "Alternatively, `vepcservice-synchronizer` might be a better choice, since that\u0027s how it is named in the dockerfile, synchronizer config file, etc.",
+      "parentUuid": "f8f65bb7_d32349ae",
+      "range": {
+        "startLine": 233,
+        "startChar": 10,
+        "endLine": 233,
+        "endChar": 38
+      },
+      "revId": "0f9b8881e8b30e9085a326a3fdf96b654347eba2",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
     }
   ]
 }
