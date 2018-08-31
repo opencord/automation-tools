@@ -231,7 +231,7 @@ buildable_images:
     dockerfile: "Dockerfile.synchronizer"
 
   - name: xosproject/vepc-synchronizer
-    repo: epc-service
+    repo: k8sepcservice
     dockerfile: "Dockerfile.synchronizer"
 
   - name: xosproject/mcord-synchronizer
