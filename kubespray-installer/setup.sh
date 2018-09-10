@@ -20,7 +20,7 @@
 
 set -e -o pipefail
 
-KS_COMMIT="${KS_COMMIT:-73a2a180061113ac124683e5cc492ba07df33d4c}"
+KS_COMMIT="${KS_COMMIT:-v2.7.0}"
 
 install_kubespray () {
   # Cleanup Old Kubespray Installations
