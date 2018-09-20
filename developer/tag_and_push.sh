@@ -24,68 +24,42 @@
 # Displays the help menu.
 #
 display_help () {
-  echo "Tags and pushes to a remote registry all the images present in the local docker registry." >&2
+  echo "Tags and pushes to a remote registry all the images present in the local docker registry."
+  echo "Note that this script won't change the tag on the container"
   echo " "
-  echo "Usage: $0 {--push|--help} [docker-registry] [tag=candidate] " >&2
+  echo "Usage: $0 [filter] [docker-registry] "
   echo " "
-  echo "   -h, --help              Displays this help message."
-  echo "   -r, --registry          Tags and pushes all the local docker images to the remote <docker-registry>"
-  echo " "
+  echo "   filter                  A string used to filter the images (used as 'grep -E \"^$FILTER\"')"
   echo "   docker-registry         The address of the registry"
-  echo "   tag                     The tag to be used"
   echo " "
   echo "Example usages:"
-  echo "   ./tag_and_push.sh -r 192.168.10.100:30500"
-  echo "   ./tag_and_push.sh -r 192.168.10.100:30500 devel"
+  echo "   ./tag_and_push.sh xosproject 192.168.10.100:30500" # tag all the xosproject images and push them to the registry
+  echo "   ./tag_and_push.sh . 192.168.10.100:30500" # tag all the images and push them to the registry
+  echo "   ./tag_and_push.sh xosproject" # push the xosproject images to dockerhub
 }
 
 #
 # Tag and push all the locally available docker images
 #
-tag_and_push () {
-  echo "Pushing images to $DOCKER_REGISTRY with tag $DOCKER_TAG"
-  echo " "
+FILTER=$1
+REGISTRY=$2
 
-  # reading docker images
-  DOCKER_IMAGES=$(docker images --format="{{.Repository}}:{{.Tag}}" --filter "dangling=false" | grep -v none | grep "xosproject")
-
-  # split string to list only on newlines
-  IFS=$'\n'
-  for image in $DOCKER_IMAGES;
-  do
-    echo "Tagging $image with $DOCKER_REGISTRY/$image"
-    docker tag "$image" "$DOCKER_REGISTRY/$image"
-    docker push "$DOCKER_REGISTRY/$image"
+if [ "$FILTER" == "-h" ]; then
+  display_help
+else
+  echo "REGISTRY: $REGISTRY"
+  echo "FILTER:   $FILTER"
+  if [ "$FILTER" != "" ]; then
+    images=$(docker images | awk '{if (NR!=1) {print}}' | grep -E "^$FILTER" | awk '{ a=$1":"$2; print a }')
+  else
+    images=$(docker images | awk '{if (NR!=1) {print}}' | awk '{ a=$1":"$2; print a }')
+  fi
+  for i in $images; do
+    if [ "$REGISTRY" != "" ]; then
+      docker tag "$i" "$REGISTRY/$i"
+      docker push "$REGISTRY/$i"
+    else
+      docker push "$i"
+    fi
   done
-}
-
-#
-# Init
-#
-CLI_OPT=$1
-DOCKER_REGISTRY=$2
-DOCKER_TAG=${3:-"candidate"}
-
-while :
-do
-  case $CLI_OPT in
-    -r | --registry)
-        tag_and_push
-        exit 0
-        ;;
-    -h | --help)
-        display_help
-        exit 0
-        ;;
-    --) # End of all options
-        shift
-        break
-        ;;
-    *)
-        echo Error: Unknown option: "$CLI_OPT" >&2
-        echo " "
-        display_help
-        exit -1
-        ;;
-  esac
-done
+fi
