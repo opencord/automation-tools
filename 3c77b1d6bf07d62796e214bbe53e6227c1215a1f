@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c1822c28_94dffbc4",
+        "filename": "seba-in-a-box/Makefile",
+        "patchSetId": 7
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2018-09-21T15:30:45Z",
+      "side": 1,
+      "message": "Maybe download and include this rather than referencing it so we\u0027re sure it doesn\u0027t change?",
+      "range": {
+        "startLine": 44,
+        "startChar": 18,
+        "endLine": 44,
+        "endChar": 124
+      },
+      "revId": "3c77b1d6bf07d62796e214bbe53e6227c1215a1f",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7f8eed31_438ca1a5",
+        "filename": "seba-in-a-box/Makefile",
+        "patchSetId": 7
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2018-09-21T15:30:45Z",
+      "side": 1,
+      "message": "Not sure we want to assume that ~/cord is where the checkout will happen. \n\nIn most other scripts I assumed that the `WORKSPACE` directory would be set and where checkouts would happen (this is a Jenkins-ism) but you can always default that to be the same as $HOME when it\u0027s not set.",
+      "range": {
+        "startLine": 62,
+        "startChar": 14,
+        "endLine": 62,
+        "endChar": 21
+      },
+      "revId": "3c77b1d6bf07d62796e214bbe53e6227c1215a1f",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c5e15bb4_80cb8cbf",
+        "filename": "seba-in-a-box/Makefile",
+        "patchSetId": 7
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2018-09-21T15:30:45Z",
+      "side": 1,
+      "message": "parameterize? or put in another file?",
+      "range": {
+        "startLine": 74,
+        "startChar": 128,
+        "endLine": 74,
+        "endChar": 164
+      },
+      "revId": "3c77b1d6bf07d62796e214bbe53e6227c1215a1f",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2cc095ca_2f6960ee",
+        "filename": "seba-in-a-box/Makefile",
+        "patchSetId": 7
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2018-09-21T15:30:45Z",
+      "side": 1,
+      "message": "Again, parameterize or put in a file",
+      "range": {
+        "startLine": 132,
+        "startChar": 111,
+        "endLine": 132,
+        "endChar": 161
+      },
+      "revId": "3c77b1d6bf07d62796e214bbe53e6227c1215a1f",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": true
+    }
+  ]
+}
