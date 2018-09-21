@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "1c50d25c_5185a8da",
+        "filename": "developer/tag_and_push.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1000007
+      },
+      "writtenOn": "2018-09-21T19:54:52Z",
+      "side": 1,
+      "message": "correct",
+      "parentUuid": "5349b15b_e99f005b",
+      "range": {
+        "startLine": 28,
+        "startChar": 52,
+        "endLine": 28,
+        "endChar": 61
+      },
+      "revId": "9ab700e94b2ff65005e67c73b2595a3c8a577ac8",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "910eca8a_0e3a4a5c",
         "filename": "developer/tag_and_push.sh",
         "patchSetId": 4
@@ -36,6 +60,30 @@
       "writtenOn": "2018-09-21T18:59:49Z",
       "side": 1,
       "message": "we shuold be able to filter based on multiple names. Can we make it work such in a way that the operator can pass a list of names (comma separated)?",
+      "range": {
+        "startLine": 32,
+        "startChar": 36,
+        "endLine": 32,
+        "endChar": 97
+      },
+      "revId": "9ab700e94b2ff65005e67c73b2595a3c8a577ac8",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "08ea8b0b_88b86654",
+        "filename": "developer/tag_and_push.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1000007
+      },
+      "writtenOn": "2018-09-21T19:54:52Z",
+      "side": 1,
+      "message": "feel free :)\nfor now I don\u0027t think it\u0027s a big issue to run the command twice",
+      "parentUuid": "910eca8a_0e3a4a5c",
       "range": {
         "startLine": 32,
         "startChar": 36,
