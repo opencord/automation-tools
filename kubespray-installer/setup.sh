@@ -38,12 +38,16 @@ install_kubespray () {
   if [ ! -x "ks_venv/bin/activate" ]
   then
     virtualenv ks_venv
+    # shellcheck disable=SC1091
+    source ks_venv/bin/activate
+
     pip install ansible==2.5.3
     pip install -r kubespray/requirements.txt
+  else
+    # shellcheck disable=SC1091
+    source ks_venv/bin/activate
   fi
 
-  # shellcheck disable=SC1091
-  source ks_venv/bin/activate
 
   # Generate inventory and var files
   echo "Generating The Inventory File"
