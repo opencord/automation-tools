@@ -108,6 +108,7 @@ $(M)/voltha-running: | $(M)/etcd-cluster
 	touch $@
 
 $(M)/ponsim: | $(M)/voltha
+	sudo iptables -P FORWARD ACCEPT
 	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install ponnet ponnet
 	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh kube-system
 	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install ponsimv2 ponsimv2 -f $(SEBAVALUES)
@@ -164,7 +165,6 @@ $(M)/authenticate: $(M)/siab
 	touch $@
 
 $(M)/dhclient: $(M)/authenticate
-	sudo iptables -P FORWARD ACCEPT
 	timeout 60s bash -c "until http -a admin@opencord.org:letmein GET http://127.0.0.1:30001/xosapi/v1/fabric-crossconnect/fabriccrossconnectserviceinstances |jq '.items[0].backend_status'|grep OK; do echo 'waiting for fabric-crossconnect to be synchronized';sleep 5; done"
 	kubectl -n voltha exec $(shell kubectl -n voltha get pod|grep "^rg-"|cut -d' ' -f1) -- dhclient
 	kubectl -n voltha exec $(shell kubectl -n voltha get pod|grep "^rg-"|cut -d' ' -f1) -- dhclient -r
@@ -189,6 +189,6 @@ teardown-charts: remove-chart-milestones
 	helm delete --purge $(shell helm ls -q)
 
 reset-kubeadm: remove-chart-milestones remove-kube-milestones
-	sudo kubeadm reset
+	sudo kubeadm reset -f
 	sudo iptables -F && sudo iptables -t nat -F && sudo iptables -t mangle -F && sudo iptables -X
 
