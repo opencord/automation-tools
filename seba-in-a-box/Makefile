@@ -6,9 +6,15 @@ WORKSPACE       ?= $(HOME)
 VIRTUALENV      ?= $(WORKSPACE)/cord/test
 SEBAVALUES      ?= configs/seba-ponsim.yaml
 
+# used to start logging/monitoring and other infrastructure charts
+INFRA_CHARTS    ?=
+INFRA_PREREQS   = $(foreach chart,$(INFRA_CHARTS),$(M)/$(chart))
+
 HELM_VERSION    ?= "2.10.0"
 HELM_SHA256SUM  ?= "0fa2ed4983b1e4a3f90f776d08b88b0c73fd83f305b5b634175cb15e61342ffe"
 HELM_PLATFORM   ?= "linux-amd64"
+
+KAFKA_CHART_VERSION  ?= 0.8.8
 
 all: $(M)/siab
 
@@ -58,6 +64,7 @@ $(M)/helm-init: | $(M)/kubeadm /usr/local/bin/helm
 		echo "Waiting for Helm to be ready"; \
 		sleep 5; \
 	done
+	helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com/
 	touch $@
 
 $(WORKSPACE)/cord/helm-charts: | $(M)/setup
@@ -65,21 +72,35 @@ $(WORKSPACE)/cord/helm-charts: | $(M)/setup
 	cd $(WORKSPACE)/cord; git clone https://gerrit.opencord.org/helm-charts
 
 $(M)/kafka: | $(WORKSPACE)/cord/helm-charts $(M)/helm-init
-	helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com/
-	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install cord-kafka -f examples/kafka-single.yaml incubator/kafka
+	cd $(WORKSPACE)/cord/helm-charts && \
+	helm upgrade --install cord-kafka --version $(KAFKA_CHART_VERSION) -f examples/kafka-single.yaml incubator/kafka
 	touch $@
 
 $(M)/kafka-running: | $(M)/kafka
 	kubectl wait pod/cord-kafka-0 --for condition=Ready --timeout=180s
 	touch $@
 
+$(M)/nem-monitoring: | $(M)/kafka-running
+	cd $(WORKSPACE)/cord/helm-charts && \
+	helm dep up nem-monitoring  && \
+	helm upgrade --install nem-monitoring nem-monitoring
+	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh
+	touch $@
+
+$(M)/logging: | $(M)/kafka-running
+	cd $(WORKSPACE)/cord/helm-charts && \
+	helm dep up logging && \
+	helm upgrade --install logging -f examples/logging-single.yaml logging
+	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh
+	touch $@
+
 # Dependency on NEM is there to force ordering for parallel install
 # The idea is to install VOLTHA / ONOS / Mininet while NEM is initializing
-$(M)/onos: | $(M)/kafka-running $(M)/nem
+$(M)/onos: | $(M)/kafka-running $(M)/nem $(INFRA_PREREQS)
 	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install onos onos -f configs/onos.yaml -f $(SEBAVALUES)
 	touch $@
 
-$(M)/voltha: | $(M)/kafka-running
+$(M)/voltha: | $(M)/kafka-running $(INFRA_PREREQS)
 	cd $(WORKSPACE)/cord/helm-charts; helm dep up voltha
 	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install voltha -f $(SEBAVALUES) \
     	--set etcd-operator.customResources.createEtcdClusterCRD=false \
@@ -130,7 +151,7 @@ $(M)/mininet: | $(M)/onos $(M)/ponsim $(M)/pon0_fwd
 	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install mininet mininet
 	touch $@
 
-$(M)/nem: $(M)/kafka-running
+$(M)/nem: $(M)/kafka-running $(INFRA_PREREQS)
 	cd $(WORKSPACE)/cord/helm-charts; helm dep update xos-core
 	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install xos-core xos-core
 	cd $(WORKSPACE)/cord/helm-charts; helm dep update xos-profiles/att-workflow
