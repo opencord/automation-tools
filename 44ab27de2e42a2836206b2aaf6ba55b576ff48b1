@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "31994eaf_8f84c814",
+        "filename": "seba-in-a-box/Makefile",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1000010
+      },
+      "writtenOn": "2018-09-27T23:14:38Z",
+      "side": 1,
+      "message": "chart?",
+      "range": {
+        "startLine": 10,
+        "startChar": 57,
+        "endLine": 10,
+        "endChar": 61
+      },
+      "revId": "44ab27de2e42a2836206b2aaf6ba55b576ff48b1",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
