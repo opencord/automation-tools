@@ -22,11 +22,13 @@
 #
 # After running script, `repo diff` will show the updated files.
 #
-# To undo changes: `repo forall -c git checkout *Dockerfile*`
+# To undo changes: `repo forall -c "git checkout *Dockerfile*"`
 
 set -eu -o pipefail
 
 WORKSPACE=${WORKSPACE:-../../..}
+
+NEW_COMMIT=${NEW_COMMIT:0}
 
 XOS_MAJOR=$(cut -b 1 "${WORKSPACE}/cord/orchestration/xos/VERSION")
 
@@ -42,8 +44,33 @@ do
   if [[ "$df_contents" =~ "FROM xosproject/xos-synchronizer-base:${XOS_MAJOR}" ||
         "$df_contents" =~ "FROM xosproject/xos-synchronizer-base:master" ]]
   then
+    pushd "$(dirname "$df")"
+
     echo "Updating synchronizer Dockerfile: ${df}"
-    sed -i -- "s/^FROM\\(.*\\):.*$/FROM\\1:$XOS_VERSION/" "$df"
+
+    perl -pi -e "s/^FROM(.*):.*$/FROM\\1:$XOS_VERSION/" Dockerfile.synchronizer
+
+    # if NEW_COMMIT is nonzero, create a new GIT commit with these changes
+    if $NEW_COMMIT
+    then
+      # check if previous version is semver for patch version bump
+      OLD_VERSION=$(head -n1 "VERSION")
+      if [[ "$OLD_VERSION" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]
+      then
+        repo start "bump$XOS_VERSION"
+
+        # Increment patch by 1
+        perl -pi -e 's/(\d+)$/ 1 + $1/ge' VERSION
+
+        git add VERSION Dockerfile.synchronizer
+
+        git commit -m "Updated service to use new XOS core version: $XOS_VERSION"
+      else
+        echo "This service isn't on a released version, manual intervention required"
+      fi
+    fi
+
+    popd
   fi
 done
 
@@ -52,5 +79,5 @@ for df in ${WORKSPACE}/cord/orchestration/xos/containers/*/Dockerfile* \
           ${WORKSPACE}/cord/orchestration/xos-tosca/Dockerfile
 do
   echo "Updating core Dockerfile: ${df}"
-  sed -i -- "s/^FROM xos\\(.*\\):.*$/FROM xos\\1:$XOS_VERSION/" "$df"
+  perl -pi -e "s/^FROM xos(.*):.*$/FROM xos\\1:$XOS_VERSION/" "$df"
 done
