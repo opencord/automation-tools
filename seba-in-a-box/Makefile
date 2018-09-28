@@ -40,9 +40,9 @@ $(M)/setup:
 
 $(M)/kubeadm: | $(M)/setup /usr/bin/kubeadm
 	sudo kubeadm init --pod-network-cidr=192.168.0.0/16
-	mkdir -p $(WORKSPACE)/.kube
-	sudo cp -f /etc/kubernetes/admin.conf $(WORKSPACE)/.kube/config
-	sudo chown $(shell id -u):$(shell id -g) $(WORKSPACE)/.kube/config
+	mkdir -p $(HOME)/.kube
+	sudo cp -f /etc/kubernetes/admin.conf $(HOME)/.kube/config
+	sudo chown $(shell id -u):$(shell id -g) $(HOME)/.kube/config
 	kubectl apply -f https://docs.projectcalico.org/v2.6/getting-started/kubernetes/installation/hosted/kubeadm/1.6/calico.yaml
 	kubectl taint nodes --all node-role.kubernetes.io/master-
 	touch $@
