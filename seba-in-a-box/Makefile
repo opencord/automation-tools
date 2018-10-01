@@ -156,23 +156,22 @@ $(M)/siab: | $(M)/voltha-running $(M)/mininet $(M)/ponsim-tosca
 	touch $@
 	echo "SEBA-in-a-Box installation finished!"
 
-run-tests: $(M)/pingtest
+run-tests: $(M)/qatests
 
-$(M)/authenticate: $(M)/siab
-	timeout 60s bash -c "until http -a admin@opencord.org:letmein GET http://127.0.0.1:30001/xosapi/v1/att-workflow-driver/attworkflowdriverserviceinstances |jq '.items[0].authentication_state'|grep AWAITING; do echo 'waiting for att-workflow-driver to be in AWAITING state'; sleep 5; done"
-	kubectl -n voltha exec $(shell kubectl -n voltha get pod|grep "^rg-"|cut -d' ' -f1) -- wpa_supplicant -i eth0 -Dwired -c /etc/wpa_supplicant/wpa_supplicant.conf -B
-	timeout 60s bash -c "until http -a admin@opencord.org:letmein GET http://127.0.0.1:30001/xosapi/v1/att-workflow-driver/attworkflowdriverserviceinstances |jq '.items[0].authentication_state'|grep APPROVED; do echo 'waiting for att-workflow-driver to be in APPROVED state'; sleep 5; done"
+$(M)/qatests-prereqs:
+	sudo apt install -y python-pip virtualenv
 	touch $@
 
-$(M)/dhclient: $(M)/authenticate
-	timeout 60s bash -c "until http -a admin@opencord.org:letmein GET http://127.0.0.1:30001/xosapi/v1/fabric-crossconnect/fabriccrossconnectserviceinstances |jq '.items[0].backend_status'|grep OK; do echo 'waiting for fabric-crossconnect to be synchronized';sleep 5; done"
-	kubectl -n voltha exec $(shell kubectl -n voltha get pod|grep "^rg-"|cut -d' ' -f1) -- dhclient
-	kubectl -n voltha exec $(shell kubectl -n voltha get pod|grep "^rg-"|cut -d' ' -f1) -- dhclient -r
-	kubectl -n voltha exec $(shell kubectl -n voltha get pod|grep "^rg-"|cut -d' ' -f1) -- dhclient
-	touch $@
+$(WORKSPACE)/cord/test/cord-tester: | $(M)/setup
+	mkdir -p $(WORKSPACE)/cord/test
+	cd $(WORKSPACE)/cord/test && git clone https://gerrit.opencord.org/cord-tester
 
-$(M)/pingtest: $(M)/dhclient
-	kubectl -n voltha exec $(shell kubectl -n voltha get pod|grep "^rg-"|cut -d' ' -f1) -- ping -c 3 172.18.0.10
+$(M)/qatests: $(M)/siab $(M)/qatests-prereqs $(WORKSPACE)/cord/test/cord-tester
+	cd $(WORKSPACE)/cord/test/cord-tester/src/test/cord-api/ && \
+		./setup_venv.sh && \
+		source ./venv-cord-tester/bin/activate && \
+		cd Tests/WorkflowValidations/ && \
+		pybot -e notready SIAB.robot
 	touch $@
 
 remove-chart-milestones:
@@ -183,7 +182,7 @@ remove-kube-milestones:
 	cd $(M); rm -f kubeadm helm-init
 
 remove-test-milestones:
-	cd $(M); rm -f authenticate dhclient pingtest
+	cd $(M); rm -f qatests
 
 teardown-charts: remove-chart-milestones
 	helm delete --purge $(shell helm ls -q)
