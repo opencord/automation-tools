@@ -3,6 +3,7 @@ BUILD           ?= /tmp
 M               ?= $(BUILD)/milestones
 MAKEDIR         := $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
 WORKSPACE       ?= $(HOME)
+VIRTUALENV      ?= $(WORKSPACE)/cord/test
 SEBAVALUES      ?= configs/seba-ponsim.yaml
 
 HELM_VERSION    ?= "2.10.0"
@@ -168,8 +169,8 @@ $(WORKSPACE)/cord/test/cord-tester: | $(M)/setup
 
 $(M)/qatests: $(M)/siab $(M)/qatests-prereqs $(WORKSPACE)/cord/test/cord-tester
 	cd $(WORKSPACE)/cord/test/cord-tester/src/test/cord-api/ && \
-		WORKSPACE=. bash ./setup_venv.sh && \
-		source ./venv-cord-tester/bin/activate && \
+		WORKSPACE=$(VIRTUALENV) bash ./setup_venv.sh && \
+		source $(VIRTUALENV)/venv-cord-tester/bin/activate && \
 		cd Tests/WorkflowValidations/ && \
 		pybot -e notready SIAB.robot
 	touch $@
