@@ -168,7 +168,7 @@ $(WORKSPACE)/cord/test/cord-tester: | $(M)/setup
 
 $(M)/qatests: $(M)/siab $(M)/qatests-prereqs $(WORKSPACE)/cord/test/cord-tester
 	cd $(WORKSPACE)/cord/test/cord-tester/src/test/cord-api/ && \
-		./setup_venv.sh && \
+		bash ./setup_venv.sh && \
 		source ./venv-cord-tester/bin/activate && \
 		cd Tests/WorkflowValidations/ && \
 		pybot -e notready SIAB.robot
