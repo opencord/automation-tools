@@ -17,6 +17,7 @@ $(M)/setup:
 	sudo apt update
 	sudo apt install -y httpie jq software-properties-common
 	sudo swapoff -a
+	sudo iptables -P FORWARD ACCEPT
 	touch $@
 
 /usr/bin/docker: | $(M)/setup
@@ -109,7 +110,6 @@ $(M)/voltha-running: | $(M)/etcd-cluster
 	touch $@
 
 $(M)/ponsim: | $(M)/voltha
-	sudo iptables -P FORWARD ACCEPT
 	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install ponnet ponnet
 	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh kube-system
 	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install ponsimv2 ponsimv2 -f $(SEBAVALUES)
