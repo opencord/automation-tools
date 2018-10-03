@@ -154,6 +154,7 @@ $(M)/siab: | $(M)/voltha-running $(M)/mininet $(M)/ponsim-tosca
 		sleep 5; \
 	done
 	http -a karaf:karaf --ignore-stdin POST http://127.0.0.1:30120/onos/v1/configuration/org.opencord.olt.impl.Olt defaultVlan=65535
+	timeout 60s bash -c "until http -a admin@opencord.org:letmein GET http://127.0.0.1:30001/xosapi/v1/att-workflow-driver/attworkflowdriverserviceinstances |jq '.items[0].authentication_state'|grep AWAITING; do echo 'waiting for att-workflow-driver to be in AWAITING state'; sleep 5; done"
 	touch $@
 	echo "SEBA-in-a-Box installation finished!"
 
