@@ -22,6 +22,30 @@
       "revId": "e49a00074a0887cc3bf5405fe25eefecc68bdbc5",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "aca1e273_5ed59625",
+        "filename": "developer/tag_and_push.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1000007
+      },
+      "writtenOn": "2018-10-09T20:45:02Z",
+      "side": 1,
+      "message": "\"$REGISTRY\" is optional, so the script should continue if it\u0027s not set",
+      "parentUuid": "453269d7_84e22f41",
+      "range": {
+        "startLine": 44,
+        "startChar": 0,
+        "endLine": 45,
+        "endChar": 11
+      },
+      "revId": "e49a00074a0887cc3bf5405fe25eefecc68bdbc5",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": true
     }
   ]
 }
