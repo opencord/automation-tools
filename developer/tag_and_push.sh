@@ -50,10 +50,14 @@ else
   echo "REGISTRY: $REGISTRY"
   echo "FILTER:   $FILTER"
   if [ "$FILTER" != "" ]; then
-    images=$(docker images | awk '{if (NR!=1) {print}}' | grep -E "^$FILTER" | awk '{ a=$1":"$2; print a }')
+    images=$(docker images | grep -E "$FILTER" | grep -v "$REGISTRY" | awk '{if (NR!=1) {print}}' | awk '{ a=$1":"$2; print a }')
   else
+    # NOTE I don't this is ever used
     images=$(docker images | awk '{if (NR!=1) {print}}' | awk '{ a=$1":"$2; print a }')
   fi
+  echo "Tagging Images:"
+  echo "$images"
+  echo " "
   for i in $images; do
     if [ "$REGISTRY" != "" ]; then
       docker tag "$i" "$REGISTRY/$i"
