@@ -18,6 +18,13 @@ KAFKA_CHART_VERSION  ?= 0.8.8
 
 all: $(M)/siab
 
+# https://ftp.gnu.org/old-gnu/Manuals/make-3.79.1/html_chapter/make_6.html#SEC69
+latest: SEBAVALUES := configs/seba-ponsim-latest.yaml
+latest: all
+
+stable: SEBAVALUES := configs/seba-ponsim.yaml
+stable: all
+
 $(M)/setup:
 	mkdir -p $(M)
 	sudo apt update
@@ -124,6 +131,7 @@ $(M)/etcd-cluster: | $(M)/etcd-operator-ready
 	cd $(WORKSPACE)/cord/helm-charts; helm upgrade voltha -f $(SEBAVALUES) \
     	--set etcd-operator.customResources.createEtcdClusterCRD=true \
     	voltha
+	timeout 180s bash -c "until kubectl wait pod/etcd-cluster-0000 --for condition=ready; do echo 'Waiting for etcd-cluster-0000 to be ready'; done"
 	touch $@
 
 $(M)/voltha-running: | $(M)/etcd-cluster
@@ -153,7 +161,7 @@ $(M)/mininet: | $(M)/onos $(M)/ponsim $(M)/pon0_fwd
 
 $(M)/nem: $(M)/kafka-running $(INFRA_PREREQS)
 	cd $(WORKSPACE)/cord/helm-charts; helm dep update xos-core
-	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install xos-core xos-core
+	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install xos-core xos-core -f $(SEBAVALUES)
 	cd $(WORKSPACE)/cord/helm-charts; helm dep update xos-profiles/att-workflow
 	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install att-workflow xos-profiles/att-workflow -f $(SEBAVALUES)
 	touch $@
@@ -166,7 +174,7 @@ $(M)/ponsim-tosca: $(M)/nem-running
 	timeout 60s bash -c "until ! http -a admin@opencord.org:letmein GET http://127.0.0.1:30001/xosapi/v1/core/serviceinstanceattributes|jq '.items[].backend_status'|grep -v OK; do echo 'waiting for ONOS config to sync'; sleep 5; done"
 	timeout 60s bash -c "until ! http -a admin@opencord.org:letmein GET http://127.0.0.1:30001/xosapi/v1/onos/onosapps|jq '.items[].backend_status'|grep -v OK; do echo 'waiting for ONOS apps to sync'; sleep 5; done"
 	timeout 60s bash -c "until http -a karaf:karaf GET http://127.0.0.1:30120/onos/v1/applications/org.opencord.kafka|jq '.state'|grep -q ACTIVE; do echo 'Waiting for Kafka app to become ACTIVE'; sleep 5; done"
-	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install ponsim-pod xos-profiles/ponsim-pod
+	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install ponsim-pod xos-profiles/ponsim-pod -f $(SEBAVALUES)
 	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh
 	touch $@
 
