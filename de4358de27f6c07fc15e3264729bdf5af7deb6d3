@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e39f2f5b_3944ff55",
+        "filename": "seba-in-a-box/Makefile",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2018-10-19T20:03:06Z",
+      "side": 1,
+      "message": "should the `-i` be both here and on line 215?",
+      "range": {
+        "startLine": 27,
+        "startChar": 21,
+        "endLine": 27,
+        "endChar": 23
+      },
+      "revId": "de4358de27f6c07fc15e3264729bdf5af7deb6d3",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": true
+    }
+  ]
+}
