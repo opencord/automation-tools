@@ -5,6 +5,7 @@ MAKEDIR         := $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
 WORKSPACE       ?= $(HOME)
 VIRTUALENV      ?= $(WORKSPACE)/cord/test
 SEBAVALUES      ?= configs/seba-ponsim.yaml
+TESTTAGS        ?= stable
 
 # used to start logging/monitoring and other infrastructure charts
 INFRA_CHARTS    ?=
@@ -210,7 +211,7 @@ $(M)/qatests: $(M)/siab $(M)/qatests-prereqs $(WORKSPACE)/cord/test/cord-tester
 		WORKSPACE=$(VIRTUALENV) bash ./setup_venv.sh && \
 		source $(VIRTUALENV)/venv-cord-tester/bin/activate && \
 		cd Tests/WorkflowValidations/ && \
-		pybot -e notready SIAB.robot
+		pybot -e notready -i $(TESTTAGS) SIAB.robot
 	touch $@
 
 remove-chart-milestones:
