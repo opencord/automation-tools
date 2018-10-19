@@ -20,9 +20,11 @@ all: $(M)/siab
 
 # https://ftp.gnu.org/old-gnu/Manuals/make-3.79.1/html_chapter/make_6.html#SEC69
 latest: SEBAVALUES := configs/seba-ponsim-latest.yaml
+latest: TESTTAGS ?= "-i latest"
 latest: all
 
 stable: SEBAVALUES := configs/seba-ponsim.yaml
+stable: TESTTAGS ?= "-i stable"
 stable: all
 
 $(M)/setup:
@@ -210,7 +212,7 @@ $(M)/qatests: $(M)/siab $(M)/qatests-prereqs $(WORKSPACE)/cord/test/cord-tester
 		WORKSPACE=$(VIRTUALENV) bash ./setup_venv.sh && \
 		source $(VIRTUALENV)/venv-cord-tester/bin/activate && \
 		cd Tests/WorkflowValidations/ && \
-		pybot -e notready SIAB.robot
+		pybot -e notready -i $(TESTTAGS) SIAB.robot
 	touch $@
 
 remove-chart-milestones:
