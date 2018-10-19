@@ -23,9 +23,9 @@ set -xe
 
 # CORD versioning
 OPENSTACK_HELM_BRANCH="${OPENSTACK_HELM_BRANCH:-master}"
-OPENSTACK_HELM_COMMIT="${OPENSTACK_HELM_COMMIT:-79128a94fc4c7e7b301497abeab094fa01efaa06}"
+OPENSTACK_HELM_COMMIT="${OPENSTACK_HELM_COMMIT:-b7c8ba6d8148696463592231af313572176cc40c}"
 OPENSTACK_HELM_INFRA_BRANCH="${OPENSTACK_HELM_BRANCH:-master}"
-OPENSTACK_HELM_INFRA_COMMIT="${OPENSTACK_HELM_INFRA_COMMIT:-5d622a806e09e19c15189081299dc3155916550b}"
+OPENSTACK_HELM_INFRA_COMMIT="${OPENSTACK_HELM_INFRA_COMMIT:-27ea2a53a69d8c2820e2f4343c47ca093270392b}"
 
 
 # openstack-helm steps to execute
@@ -60,7 +60,7 @@ then
     cd openstack-helm
     git reset --hard "${OPENSTACK_HELM_COMMIT}"
   fi
-  sed -i 's/--remote=db:Open_vSwitch,Open_vSwitch,manager_options/--remote=db:Open_vSwitch,Open_vSwitch,manager_options --remote=ptcp:6641/' ~/openstack-helm/openvswitch/templates/bin/_openvswitch-db-server.sh.tpl
+  sed -i 's/--remote=db:Open_vSwitch,Open_vSwitch,manager_options/--remote=db:Open_vSwitch,Open_vSwitch,manager_options --remote=ptcp:6641/' ~/openstack-helm-infra/openvswitch/templates/bin/_openvswitch-db-server.sh.tpl
 fi
 
 # Customizations for CORD
