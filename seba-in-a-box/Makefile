@@ -15,6 +15,12 @@ HELM_VERSION    ?= "2.10.0"
 HELM_SHA256SUM  ?= "0fa2ed4983b1e4a3f90f776d08b88b0c73fd83f305b5b634175cb15e61342ffe"
 HELM_PLATFORM   ?= "linux-amd64"
 
+# Arguments passed to helm install/upgrade for all or specific charts
+HELM_GLOBAL_ARGS ?=
+HELM_NEM_ARGS    ?= $(HELM_GLOBAL_ARGS)
+HELM_ONOS_ARGS   ?= $(HELM_GLOBAL_ARGS)
+HELM_VOLTHA_ARGS ?= $(HELM_GLOBAL_ARGS)
+
 KAFKA_CHART_VERSION  ?= 0.8.8
 
 all: $(M)/siab
@@ -81,7 +87,7 @@ $(WORKSPACE)/cord/helm-charts: | $(M)/setup
 
 $(M)/kafka: | $(WORKSPACE)/cord/helm-charts $(M)/helm-init
 	cd $(WORKSPACE)/cord/helm-charts && \
-	helm upgrade --install cord-kafka --version $(KAFKA_CHART_VERSION) -f examples/kafka-single.yaml incubator/kafka
+	helm upgrade --install $(HELM_GLOBAL_ARGS) cord-kafka --version $(KAFKA_CHART_VERSION) -f examples/kafka-single.yaml incubator/kafka
 	touch $@
 
 $(M)/kafka-running: | $(M)/kafka
@@ -91,26 +97,26 @@ $(M)/kafka-running: | $(M)/kafka
 $(M)/nem-monitoring: | $(M)/kafka-running
 	cd $(WORKSPACE)/cord/helm-charts && \
 	helm dep up nem-monitoring  && \
-	helm upgrade --install nem-monitoring nem-monitoring
+	helm upgrade --install $(HELM_GLOBAL_ARGS) nem-monitoring nem-monitoring
 	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh
 	touch $@
 
 $(M)/logging: | $(M)/kafka-running
 	cd $(WORKSPACE)/cord/helm-charts && \
 	helm dep up logging && \
-	helm upgrade --install logging -f examples/logging-single.yaml logging
+	helm upgrade --install $(HELM_GLOBAL_ARGS) logging -f examples/logging-single.yaml logging
 	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh
 	touch $@
 
 # Dependency on NEM is there to force ordering for parallel install
 # The idea is to install VOLTHA / ONOS / Mininet while NEM is initializing
 $(M)/onos: | $(M)/kafka-running $(M)/nem $(INFRA_PREREQS)
-	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install onos onos -f configs/onos.yaml -f $(SEBAVALUES)
+	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_ONOS_ARGS) onos onos -f configs/onos.yaml -f $(SEBAVALUES)
 	touch $@
 
 $(M)/voltha: | $(M)/kafka-running $(INFRA_PREREQS)
 	cd $(WORKSPACE)/cord/helm-charts; helm dep up voltha
-	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install voltha -f $(SEBAVALUES) \
+	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_VOLTHA_ARGS) voltha -f $(SEBAVALUES) \
     	--set etcd-operator.customResources.createEtcdClusterCRD=false \
     	voltha
 	touch $@
@@ -129,7 +135,7 @@ $(M)/etcd-operator-ready: | $(M)/voltha
 	touch $@
 
 $(M)/etcd-cluster: | $(M)/etcd-operator-ready
-	cd $(WORKSPACE)/cord/helm-charts; helm upgrade voltha -f $(SEBAVALUES) \
+	cd $(WORKSPACE)/cord/helm-charts; helm upgrade $(HELM_VOLTHA_ARGS) voltha -f $(SEBAVALUES) \
     	--set etcd-operator.customResources.createEtcdClusterCRD=true \
     	voltha
 	timeout 180s bash -c "until kubectl wait pod/etcd-cluster-0000 --for condition=ready; do echo 'Waiting for etcd-cluster-0000 to be ready'; done"
@@ -140,9 +146,9 @@ $(M)/voltha-running: | $(M)/etcd-cluster
 	touch $@
 
 $(M)/ponsim: | $(M)/voltha
-	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install ponnet ponnet
+	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) ponnet ponnet
 	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh kube-system
-	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install ponsimv2 ponsimv2 -f $(SEBAVALUES)
+	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) ponsimv2 ponsimv2 -f $(SEBAVALUES)
 	touch $@
 
 $(M)/pon0_fwd: | $(M)/ponsim
@@ -157,14 +163,14 @@ $(M)/pon0_fwd: | $(M)/ponsim
 
 $(M)/mininet: | $(M)/onos $(M)/ponsim $(M)/pon0_fwd
 	sudo modprobe openvswitch
-	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install mininet mininet
+	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) mininet mininet
 	touch $@
 
 $(M)/nem: $(M)/kafka-running $(INFRA_PREREQS)
 	cd $(WORKSPACE)/cord/helm-charts; helm dep update xos-core
-	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install xos-core xos-core -f $(SEBAVALUES)
+	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_XOS_ARGS) xos-core xos-core -f $(SEBAVALUES)
 	cd $(WORKSPACE)/cord/helm-charts; helm dep update xos-profiles/att-workflow
-	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install att-workflow xos-profiles/att-workflow -f $(SEBAVALUES)
+	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_XOS_ARGS) att-workflow xos-profiles/att-workflow -f $(SEBAVALUES)
 	touch $@
 
 $(M)/nem-running: $(M)/nem
@@ -175,7 +181,7 @@ $(M)/ponsim-tosca: $(M)/nem-running
 	timeout 60s bash -c "until ! http -a admin@opencord.org:letmein GET http://127.0.0.1:30001/xosapi/v1/core/serviceinstanceattributes|jq '.items[].backend_status'|grep -v OK; do echo 'waiting for ONOS config to sync'; sleep 5; done"
 	timeout 60s bash -c "until ! http -a admin@opencord.org:letmein GET http://127.0.0.1:30001/xosapi/v1/onos/onosapps|jq '.items[].backend_status'|grep -v OK; do echo 'waiting for ONOS apps to sync'; sleep 5; done"
 	timeout 60s bash -c "until http -a karaf:karaf GET http://127.0.0.1:30120/onos/v1/applications/org.opencord.kafka|jq '.state'|grep -q ACTIVE; do echo 'Waiting for Kafka app to become ACTIVE'; sleep 5; done"
-	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install ponsim-pod xos-profiles/ponsim-pod -f $(SEBAVALUES)
+	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) ponsim-pod xos-profiles/ponsim-pod -f $(SEBAVALUES)
 	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh
 	touch $@
 
