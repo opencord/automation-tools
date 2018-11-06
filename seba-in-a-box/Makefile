@@ -108,34 +108,22 @@ $(M)/onos: | $(M)/kafka-running $(M)/nem $(INFRA_PREREQS)
 	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install onos onos -f configs/onos.yaml -f $(SEBAVALUES)
 	touch $@
 
-$(M)/voltha: | $(M)/kafka-running $(INFRA_PREREQS)
+$(M)/voltha: | $(M)/kafka-running $(INFRA_PREREQS) $(M)/etcd-operator-ready
 	cd $(WORKSPACE)/cord/helm-charts; helm dep up voltha
-	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install voltha -f $(SEBAVALUES) \
-    	--set etcd-operator.customResources.createEtcdClusterCRD=false \
-    	voltha
+	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install voltha voltha -f $(SEBAVALUES)
 	touch $@
 
-$(M)/etcd-operator-ready: | $(M)/voltha
-	until kubectl api-versions | grep etcd.database.coreos.com/v1beta2; \
+$(M)/etcd-operator-ready: | $(WORKSPACE)/cord/helm-charts $(M)/helm-init
+	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install etcd-operator stable/etcd-operator -f $(SEBAVALUES)
+	until kubectl get crd | grep etcdclusters; \
 	do \
-		echo "Waiting for etcd.database.coreos.com/v1beta2 to be available"; \
-		sleep 5; \
-	done
-	until kubectl api-resources | grep EtcdCluster; \
-	do \
-		echo "Waiting for EtcdCluster API resource to be available"; \
+		echo "Waiting for etcdclusters CRD to be available"; \
 		sleep 5; \
 	done
 	touch $@
 
-$(M)/etcd-cluster: | $(M)/etcd-operator-ready
-	cd $(WORKSPACE)/cord/helm-charts; helm upgrade voltha -f $(SEBAVALUES) \
-    	--set etcd-operator.customResources.createEtcdClusterCRD=true \
-    	voltha
-	timeout 180s bash -c "until kubectl wait pod/etcd-cluster-0000 --for condition=ready; do echo 'Waiting for etcd-cluster-0000 to be ready'; done"
-	touch $@
-
-$(M)/voltha-running: | $(M)/etcd-cluster
+$(M)/voltha-running: | $(M)/voltha
+	timeout 180s bash -c "until kubectl get pod|grep etcd-cluster|grep 1/1; do echo 'Waiting for etcd-cluster to be ready'; sleep 10; done"
 	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh voltha
 	touch $@
 
