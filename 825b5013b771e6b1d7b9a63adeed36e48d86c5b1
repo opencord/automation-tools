@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "85419c87_028483b2",
+        "filename": "developer/tag_and_push.sh",
+        "patchSetId": 4
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1000007
+      },
+      "writtenOn": "2018-11-08T23:51:20Z",
+      "side": 1,
+      "message": "A tag to replace the existing one?",
+      "range": {
+        "startLine": 40,
+        "startChar": 35,
+        "endLine": 40,
+        "endChar": 112
+      },
+      "revId": "825b5013b771e6b1d7b9a63adeed36e48d86c5b1",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
