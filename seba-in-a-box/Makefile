@@ -123,7 +123,7 @@ $(M)/etcd-operator-ready: | $(WORKSPACE)/cord/helm-charts $(M)/helm-init
 	touch $@
 
 $(M)/voltha-running: | $(M)/voltha
-	timeout 180s bash -c "until kubectl get pod|grep etcd-cluster|grep 1/1; do echo 'Waiting for etcd-cluster to be ready'; sleep 10; done"
+	timeout 300s bash -c "until kubectl get pod|grep etcd-cluster|grep 1/1; do echo 'Waiting for etcd-cluster to be ready'; sleep 10; done"
 	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh voltha
 	touch $@
 
