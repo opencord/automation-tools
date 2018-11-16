@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1b8e84b5_f318d5ed",
+        "filename": "seba-in-a-box/Makefile",
+        "patchSetId": 4
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2018-11-16T22:33:41Z",
+      "side": 1,
+      "message": "Should probably specify the version of etcd-operator as we do with the kafka chart.",
+      "range": {
+        "startLine": 117,
+        "startChar": 34,
+        "endLine": 117,
+        "endChar": 93
+      },
+      "revId": "1e3e95276dcee58ba62c5aef0cbff2ff7e6ce709",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": true
+    }
+  ]
+}
