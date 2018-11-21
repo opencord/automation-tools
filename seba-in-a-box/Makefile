@@ -17,7 +17,11 @@ HELM_PLATFORM   ?= "linux-amd64"
 
 KAFKA_CHART_VERSION  ?= 0.8.8
 
+# Targets
+
 all: $(M)/siab
+
+bbsim: $(M)/bbsim
 
 # https://ftp.gnu.org/old-gnu/Manuals/make-3.79.1/html_chapter/make_6.html#SEC69
 latest: SEBAVALUES := configs/seba-ponsim-latest.yaml
@@ -184,6 +188,17 @@ $(M)/siab: | $(M)/voltha-running $(M)/mininet $(M)/ponsim-tosca
 	touch $@
 	echo "SEBA-in-a-Box installation finished!"
 
+# BBSim support
+BBSIM_TOSCA ?= examples/bbsim-16.yaml
+
+$(M)/bbsim: | $(M)/onos $(M)/voltha-running $(M)/nem-running
+	cd $(WORKSPACE)/cord/helm-charts && \
+	helm upgrade --install bbsim bbsim -f $(SEBAVALUES) && \
+	echo "Loading BBSim TOSCA: $(BBSIM_TOSCA)" && \
+	curl -H "xos-username: admin@opencord.org" -H "xos-password: letmein" -X POST --data-binary @$(BBSIM_TOSCA) http://127.0.0.1:30007/run
+	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh voltha
+	touch $@
+
 run-tests: $(M)/qatests
 
 $(M)/qatests-prereqs:
@@ -204,7 +219,8 @@ $(M)/qatests: $(M)/siab $(M)/qatests-prereqs $(WORKSPACE)/cord/test/cord-tester
 
 remove-chart-milestones:
 	cd $(M); rm -f kafka kafka-running onos voltha etcd-operator-ready etcd-cluster \
-		voltha-running ponsim mininet nem nem-running ponsim-tosca siab
+		voltha-running ponsim mininet nem nem-running ponsim-tosca siab bbsim logging \
+		nem-monitoring
 
 remove-kube-milestones:
 	cd $(M); rm -f kubeadm helm-init
