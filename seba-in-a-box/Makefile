@@ -17,7 +17,13 @@ HELM_PLATFORM   ?= "linux-amd64"
 
 KAFKA_CHART_VERSION  ?= 0.8.8
 
-all: $(M)/siab
+# Targets
+ponsim: $(M)/siab
+
+bbsim: $(M)/bbsim-tosca
+
+both: BBSIM_DHCP_TOSCA =
+both: $(M)/siab $(M)/bbsim-tosca
 
 # https://ftp.gnu.org/old-gnu/Manuals/make-3.79.1/html_chapter/make_6.html#SEC69
 latest: SEBAVALUES := configs/seba-ponsim-latest.yaml
@@ -148,7 +154,7 @@ $(M)/mininet: | $(M)/onos $(M)/ponsim $(M)/pon0_fwd
 	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install mininet mininet
 	touch $@
 
-$(M)/nem: $(M)/kafka-running $(INFRA_PREREQS)
+$(M)/nem: | $(M)/kafka-running $(INFRA_PREREQS)
 	cd $(WORKSPACE)/cord/helm-charts; helm dep update xos-core
 	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install xos-core xos-core -f $(SEBAVALUES)
 	cd $(WORKSPACE)/cord/helm-charts; helm dep update xos-profiles/att-workflow
@@ -157,11 +163,11 @@ $(M)/nem: $(M)/kafka-running $(INFRA_PREREQS)
 	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install base-kubernetes xos-profiles/base-kubernetes -f $(SEBAVALUES)
 	touch $@
 
-$(M)/nem-running: $(M)/nem
+$(M)/nem-running: | $(M)/nem
 	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh
 	touch $@
 
-$(M)/ponsim-tosca: $(M)/nem-running
+$(M)/ponsim-tosca: | $(M)/nem-running
 	timeout 60s bash -c "until ! http -a admin@opencord.org:letmein GET http://127.0.0.1:30001/xosapi/v1/core/serviceinstanceattributes|jq '.items[].backend_status'|grep -v OK; do echo 'waiting for ONOS config to sync'; sleep 5; done"
 	timeout 60s bash -c "until ! http -a admin@opencord.org:letmein GET http://127.0.0.1:30001/xosapi/v1/onos/onosapps|jq '.items[].backend_status'|grep -v OK; do echo 'waiting for ONOS apps to sync'; sleep 5; done"
 	timeout 60s bash -c "until http -a karaf:karaf GET http://127.0.0.1:30120/onos/v1/applications/org.opencord.kafka|jq '.state'|grep -q ACTIVE; do echo 'Waiting for Kafka app to become ACTIVE'; sleep 5; done"
@@ -186,7 +192,25 @@ $(M)/siab: | $(M)/voltha-running $(M)/mininet $(M)/ponsim-tosca
 	touch $@
 	echo "SEBA-in-a-Box installation finished!"
 
-run-tests: $(M)/qatests
+# BBSim support
+BBSIM_OLT_TOSCA ?= examples/bbsim-16.yaml
+BBSIM_DHCP_TOSCA ?= examples/bbsim-dhcp.yaml
+
+$(M)/bbsim: | $(M)/onos $(M)/voltha-running $(M)/nem-running
+	cd $(WORKSPACE)/cord/helm-charts && \
+	helm upgrade --install bbsim bbsim -f $(SEBAVALUES) && \
+	scripts/wait_for_pods.sh voltha && \
+	touch $@
+
+$(M)/bbsim-tosca: | $(M)/bbsim
+	cd $(WORKSPACE)/cord/helm-charts && \
+	echo "Loading BBSim TOSCA: $(BBSIM_DHCP_TOSCA) $(BBSIM_OLT_TOSCA)" && \
+	for tosca in $(BBSIM_DHCP_TOSCA) $(BBSIM_OLT_TOSCA) ; do \
+		curl -H "xos-username: admin@opencord.org" -H "xos-password: letmein" -X POST --data-binary @$$tosca http://127.0.0.1:30007/run ; \
+	done && \
+	touch $@
+
+run-tests: | $(M)/qatests
 
 $(M)/qatests-prereqs:
 	sudo apt install -y python-pip virtualenv
@@ -196,17 +220,19 @@ $(WORKSPACE)/cord/test/cord-tester: | $(M)/setup
 	mkdir -p $(WORKSPACE)/cord/test
 	cd $(WORKSPACE)/cord/test && git clone https://gerrit.opencord.org/cord-tester
 
-$(M)/qatests: $(M)/siab $(M)/qatests-prereqs $(WORKSPACE)/cord/test/cord-tester
+PYBOT_ARGS ?=
+$(M)/qatests: | $(M)/siab $(M)/qatests-prereqs $(WORKSPACE)/cord/test/cord-tester
 	cd $(WORKSPACE)/cord/test/cord-tester/src/test/cord-api/ && \
 		WORKSPACE=$(VIRTUALENV) bash ./setup_venv.sh && \
 		source $(VIRTUALENV)/venv-cord-tester/bin/activate && \
 		cd Tests/WorkflowValidations/ && \
-		pybot -e notready -i $(TESTTAGS) SIAB.robot
+		pybot $(PYBOT_ARGS) -e notready -i $(TESTTAGS) SIAB.robot
 	touch $@
 
 remove-chart-milestones:
 	cd $(M); rm -f kafka kafka-running onos voltha etcd-operator-ready etcd-cluster \
-		voltha-running ponsim mininet nem nem-running ponsim-tosca siab
+		voltha-running ponsim mininet nem nem-running ponsim-tosca siab bbsim bbsim-tosca \
+		logging nem-monitoring
 
 remove-kube-milestones:
 	cd $(M); rm -f kubeadm helm-init
