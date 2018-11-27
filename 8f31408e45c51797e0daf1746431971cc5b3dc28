@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "22e3ffcf_f91afe31",
+        "filename": "developer/tag_and_push.sh",
+        "patchSetId": 8
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2018-11-27T06:00:03Z",
+      "side": 1,
+      "message": "Should this be different from the line above?",
+      "range": {
+        "startLine": 40,
+        "startChar": 34,
+        "endLine": 40,
+        "endChar": 113
+      },
+      "revId": "8f31408e45c51797e0daf1746431971cc5b3dc28",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f29b7a2d_9e96ae0c",
+        "filename": "developer/tag_and_push.sh",
+        "patchSetId": 8
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2018-11-27T06:00:03Z",
+      "side": 1,
+      "message": "Is this supposed to be \u0027candidate\u0027?",
+      "range": {
+        "startLine": 44,
+        "startChar": 68,
+        "endLine": 44,
+        "endChar": 74
+      },
+      "revId": "8f31408e45c51797e0daf1746431971cc5b3dc28",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9abad2ac_09627e33",
+        "filename": "developer/tag_and_push.sh",
+        "patchSetId": 8
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2018-11-27T06:00:03Z",
+      "side": 1,
+      "message": "You might use getopts to simplify the arg parsing - (ex: https://github.com/opencord/cord/blob/master/scripts/cord-bootstrap.sh#L208-L235 )",
+      "range": {
+        "startLine": 50,
+        "startChar": 0,
+        "endLine": 97,
+        "endChar": 4
+      },
+      "revId": "8f31408e45c51797e0daf1746431971cc5b3dc28",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": true
+    }
+  ]
+}
