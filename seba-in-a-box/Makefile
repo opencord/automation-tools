@@ -153,6 +153,8 @@ $(M)/nem: $(M)/kafka-running $(INFRA_PREREQS)
 	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install xos-core xos-core -f $(SEBAVALUES)
 	cd $(WORKSPACE)/cord/helm-charts; helm dep update xos-profiles/att-workflow
 	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install att-workflow xos-profiles/att-workflow -f $(SEBAVALUES)
+	cd $(WORKSPACE)/cord/helm-charts; helm dep update xos-profiles/base-kubernetes
+	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install base-kubernetes xos-profiles/base-kubernetes -f $(SEBAVALUES)
 	touch $@
 
 $(M)/nem-running: $(M)/nem
