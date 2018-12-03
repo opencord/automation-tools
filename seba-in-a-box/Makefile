@@ -210,7 +210,7 @@ $(M)/bbsim-tosca: | $(M)/bbsim
 	done && \
 	touch $@
 
-run-tests: | $(M)/qatests
+run-tests: $(M)/qatests
 
 $(M)/qatests-prereqs:
 	sudo apt install -y python-pip virtualenv
