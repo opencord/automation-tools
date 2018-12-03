@@ -238,7 +238,7 @@ remove-kube-milestones:
 	cd $(M); rm -f kubeadm helm-init
 
 remove-test-milestones:
-	cd $(M); rm -f qatests
+	cd $(M); rm -f qatests qatests-prereqs
 
 teardown-charts: remove-chart-milestones
 	helm delete --purge $(shell helm ls -q)
