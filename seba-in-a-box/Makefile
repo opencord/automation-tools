@@ -238,12 +238,12 @@ remove-kube-milestones:
 	cd $(M); rm -f kubeadm helm-init
 
 remove-test-milestones:
-	cd $(M); rm -f qatests
+	cd $(M); rm -f qatests qatests-prereqs
 
 teardown-charts: remove-chart-milestones
 	helm delete --purge $(shell helm ls -q)
 
-reset-kubeadm: remove-chart-milestones remove-kube-milestones
+reset-kubeadm: remove-chart-milestones remove-kube-milestones remove-test-milestones
 	sudo kubeadm reset -f
 	sudo iptables -F && sudo iptables -t nat -F && sudo iptables -t mangle -F && sudo iptables -X
 
