@@ -226,7 +226,7 @@ $(M)/qatests: | $(M)/siab $(M)/qatests-prereqs $(WORKSPACE)/cord/test/cord-teste
 		WORKSPACE=$(VIRTUALENV) bash ./setup_venv.sh && \
 		source $(VIRTUALENV)/venv-cord-tester/bin/activate && \
 		cd Tests/WorkflowValidations/ && \
-		pybot $(PYBOT_ARGS) --removekeywords wuks -e notready -i $(TESTTAGS) SIAB.robot
+		robot $(PYBOT_ARGS) --removekeywords wuks -e notready -i $(TESTTAGS) SIAB.robot
 	touch $@
 
 remove-chart-milestones:
