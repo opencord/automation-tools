@@ -43,9 +43,9 @@ display_help () {
   echo "   echo onosproject/onos:1.13.5 | ./tag_and_push.sh" # push the local onosproject/onos:1.13.5 image given in input and pushes it to DockerHub
   echo "   cat images | ./tag_and_push.sh -t my_tag" # tag with "my_tag" the images in the file images given in input and push them to DockerHub
   echo "   ./tag_and_push.sh -s images.txt -t my_tag" # tag with "my_tag" the images in the file images.txt and push them to DockerHub
-  echo "   ./tag_and_push.sh -f xosproject 192.168.10.100:30500" # tag all the xosproject images and push them to the registry 192.168.10.100:30500
+  echo "   ./tag_and_push.sh -f xosproject -r 192.168.10.100:30500" # tag all the xosproject images and push them to the registry 192.168.10.100:30500
   echo "   ./tag_and_push.sh -r 192.168.10.100:30500" # tag all local images and push them to the registry 192.168.10.100:30500
-  echo "   ./tag_and_push.sh --f xosproject" # push all local images containing xosproject in the name and pushes them to dockerhub
+  echo "   ./tag_and_push.sh -f xosproject" # push all local images containing xosproject in the name and pushes them to dockerhub
 }
 
 # Parse params
