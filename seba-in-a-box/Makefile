@@ -111,7 +111,7 @@ $(M)/logging: | $(M)/kafka-running
 # Dependency on NEM is there to force ordering for parallel install
 # The idea is to install VOLTHA / ONOS / Mininet while NEM is initializing
 $(M)/onos: | $(M)/kafka-running $(M)/nem $(INFRA_PREREQS)
-	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install onos onos -f configs/onos.yaml -f $(SEBAVALUES)
+	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install onos onos -f $(SEBAVALUES)
 	touch $@
 
 $(M)/voltha: | $(M)/kafka-running $(INFRA_PREREQS) $(M)/etcd-operator-ready
