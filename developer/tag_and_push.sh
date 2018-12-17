@@ -110,19 +110,29 @@ fi
 # Filter images
 if [[ ! -z "$filter" ]]
 then
-  images=$(echo -e "${images}" | grep -E "${filter}" | grep -v "${registry}")
+  images=$(echo -e "${images}" | grep -E "${filter}")
+fi
+
+if [[ ! -z "$registry" ]]
+then
+  images=$(echo $images | grep -v "${registry}")
 fi
 
 for image in $(echo -e "${images}"); do
   new_image=""
 
   # Set registry
-  new_image+="${registry}"
+  if [[ ! -z "$registry" ]]
+  then
+    new_image+="${registry}/"
+  else
+    new_image=""
+  fi
 
   IFS=':' read -r -a image_tag_splitted <<< "$image"
 
   # Set image name
-  new_image+="/${image_tag_splitted[0]}:"
+  new_image+="${image_tag_splitted[0]}:"
 
   # Set tag
   splitted_tag="${image_tag_splitted[1]}"
