@@ -115,7 +115,7 @@ fi
 
 if [[ ! -z "$registry" ]]
 then
-  images=$(echo $images | grep -v "${registry}")
+  images=$(echo "${images}" | grep -v "${registry}")
 fi
 
 for image in $(echo -e "${images}"); do

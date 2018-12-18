@@ -160,7 +160,7 @@ $(M)/nem: | $(M)/kafka-running $(INFRA_PREREQS)
 	cd $(WORKSPACE)/cord/helm-charts; helm dep update xos-profiles/seba-services
 	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install seba-services xos-profiles/seba-services -f $(SEBAVALUES)
 	cd $(WORKSPACE)/cord/helm-charts; helm dep update workflows/att-workflow
-	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install att-workflow workflows/att-workflow -f $(SEBAVALUES)
+	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install att-workflow workflows/att-workflow --set att-workflow-driver.kafkaService=cord-kafka -f $(SEBAVALUES)
 	cd $(WORKSPACE)/cord/helm-charts; helm dep update xos-profiles/base-kubernetes
 	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install base-kubernetes xos-profiles/base-kubernetes -f $(SEBAVALUES)
 	touch $@
