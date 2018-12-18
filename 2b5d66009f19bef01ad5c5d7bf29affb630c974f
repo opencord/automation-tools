@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b97d2351_b5eb7778",
+        "filename": "seba-in-a-box/Makefile",
+        "patchSetId": 2
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2018-12-18T21:43:59Z",
+      "side": 1,
+      "message": "Should this be in the $(SEBAVALUES) file?",
+      "range": {
+        "startLine": 163,
+        "startChar": 94,
+        "endLine": 163,
+        "endChar": 143
+      },
+      "revId": "2b5d66009f19bef01ad5c5d7bf29affb630c974f",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": true
+    }
+  ]
+}
