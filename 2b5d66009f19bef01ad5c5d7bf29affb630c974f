@@ -22,6 +22,30 @@
       "revId": "2b5d66009f19bef01ad5c5d7bf29affb630c974f",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e9e94bd2_baba178c",
+        "filename": "seba-in-a-box/Makefile",
+        "patchSetId": 2
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1000007
+      },
+      "writtenOn": "2018-12-18T21:56:53Z",
+      "side": 1,
+      "message": "We can put it there, but this is mandatory for this configuration to work, that\u0027s why I placed it there",
+      "parentUuid": "b97d2351_b5eb7778",
+      "range": {
+        "startLine": 163,
+        "startChar": 94,
+        "endLine": 163,
+        "endChar": 143
+      },
+      "revId": "2b5d66009f19bef01ad5c5d7bf29affb630c974f",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": true
     }
   ]
 }
