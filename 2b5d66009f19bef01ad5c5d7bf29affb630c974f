@@ -46,6 +46,30 @@
       "revId": "2b5d66009f19bef01ad5c5d7bf29affb630c974f",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "43d46d50_03388b02",
+        "filename": "seba-in-a-box/Makefile",
+        "patchSetId": 2
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1000010
+      },
+      "writtenOn": "2018-12-18T22:03:00Z",
+      "side": 1,
+      "message": "I would prefer it in the SEBAVALUES file (maybe with a comment that it\u0027s mandatory) just to have all the configuration in one place.",
+      "parentUuid": "e9e94bd2_baba178c",
+      "range": {
+        "startLine": 163,
+        "startChar": 94,
+        "endLine": 163,
+        "endChar": 143
+      },
+      "revId": "2b5d66009f19bef01ad5c5d7bf29affb630c974f",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": true
     }
   ]
 }
