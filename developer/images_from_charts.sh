@@ -30,7 +30,8 @@
 output=""
 for chart in "$@";
 do
-  if [ "${chart}" = "etcd-cluster" ]; then
+
+  if [[ "${chart}" =~ "etcd-cluster" ]]; then
     # shellcheck disable=SC1117
     output+=$(helm template "${chart}" | grep "busyboxImage:\|version:\|repository:" | sed 's/busyboxImage://g' | sed 's/version://g'| sed 's/repository://g' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | tr -d \" | awk '(NR%2){print$0p}{p=":"$0}')
     # shellcheck disable=SC1117
