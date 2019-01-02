@@ -16,6 +16,7 @@ HELM_SHA256SUM  ?= "0fa2ed4983b1e4a3f90f776d08b88b0c73fd83f305b5b634175cb15e6134
 HELM_PLATFORM   ?= "linux-amd64"
 
 KAFKA_CHART_VERSION  ?= 0.8.8
+KAFKA_POD := "pod/cord-kafka-0"
 
 # Targets
 ponsim: $(M)/siab
@@ -31,6 +32,11 @@ latest: all
 
 stable: SEBAVALUES := configs/seba-ponsim.yaml
 stable: all
+
+siab-1.0: SEBAVALUES := configs/siab-v1.0.0.yaml
+siab-1.0: KAFKA_POD := "pod/cord-platform-kafka-0"
+# Parallel make won't work here; need to install seba-1.0.0 before siab
+siab-1.0: $(M)/seba-1.0.0 $(M)/siab
 
 $(M)/setup:
 	mkdir -p $(M)
@@ -79,6 +85,7 @@ $(M)/helm-init: | $(M)/kubeadm /usr/local/bin/helm
 		sleep 5; \
 	done
 	helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com/
+	helm repo add cord https://charts.opencord.org
 	touch $@
 
 $(WORKSPACE)/cord/helm-charts: | $(M)/setup
@@ -91,7 +98,7 @@ $(M)/kafka: | $(WORKSPACE)/cord/helm-charts $(M)/helm-init
 	touch $@
 
 $(M)/kafka-running: | $(M)/kafka
-	kubectl wait pod/cord-kafka-0 --for condition=Ready --timeout=180s
+	kubectl wait $(KAFKA_POD) --for condition=Ready --timeout=180s
 	touch $@
 
 $(M)/nem-monitoring: | $(M)/kafka-running
@@ -151,7 +158,7 @@ $(M)/pon0_fwd: | $(M)/ponsim
 
 $(M)/mininet: | $(M)/onos $(M)/ponsim $(M)/pon0_fwd
 	sudo modprobe openvswitch
-	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install mininet mininet
+	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install mininet mininet -f $(SEBAVALUES)
 	touch $@
 
 $(M)/nem: | $(M)/kafka-running $(INFRA_PREREQS)
@@ -194,6 +201,22 @@ $(M)/siab: | $(M)/voltha-running $(M)/mininet $(M)/ponsim-tosca
 	touch $@
 	echo "SEBA-in-a-Box installation finished!"
 
+$(M)/seba-1.0.0: | $(WORKSPACE)/cord/helm-charts $(M)/helm-init
+	helm install -n cord-platform cord/cord-platform --version=6.1.0 -f $(WORKSPACE)/cord/helm-charts/$(SEBAVALUES)
+	until kubectl get crd | grep etcdclusters; \
+	do \
+		echo "Waiting for etcdclusters CRD to be available"; \
+		sleep 5; \
+	done
+	touch $(M)/kafka
+	touch $(M)/onos
+	touch $(M)/etcd-operator-ready
+	helm install -n seba cord/seba --version=1.0.0 -f $(WORKSPACE)/cord/helm-charts/$(SEBAVALUES)
+	helm install -n att-workflow cord/att-workflow --version=1.0.2 -f $(WORKSPACE)/cord/helm-charts/$(SEBAVALUES)
+	touch $(M)/voltha
+	touch $(M)/nem
+	touch $@
+
 # BBSim support
 BBSIM_OLT_TOSCA ?= examples/bbsim-16.yaml
 BBSIM_DHCP_TOSCA ?= examples/bbsim-dhcp.yaml
@@ -234,7 +257,7 @@ $(M)/qatests: | $(M)/siab $(M)/qatests-prereqs $(WORKSPACE)/cord/test/cord-teste
 remove-chart-milestones:
 	cd $(M); rm -f kafka kafka-running onos voltha etcd-operator-ready etcd-cluster \
 		voltha-running ponsim mininet nem nem-running ponsim-tosca siab bbsim bbsim-tosca \
-		logging nem-monitoring
+		logging nem-monitoring seba-1.0.0
 
 remove-kube-milestones:
 	cd $(M); rm -f kubeadm helm-init
