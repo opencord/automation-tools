@@ -22,6 +22,30 @@
       "revId": "84fe2a1448b09015b22716d7e06609518d19c7fc",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5949102a_3b979340",
+        "filename": "kubespray-installer/setup.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2019-01-07T16:57:09Z",
+      "side": 1,
+      "message": "17.06 generally works, and allows people to build multi-stage Dockerfiles locally if required.",
+      "parentUuid": "12297eb6_2c2d45b9",
+      "range": {
+        "startLine": 70,
+        "startChar": 69,
+        "endLine": 70,
+        "endChar": 94
+      },
+      "revId": "84fe2a1448b09015b22716d7e06609518d19c7fc",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
     }
   ]
 }
