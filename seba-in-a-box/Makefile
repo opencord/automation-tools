@@ -11,11 +11,13 @@ TESTTAGS        ?= stable
 INFRA_CHARTS    ?=
 INFRA_PREREQS   = $(foreach chart,$(INFRA_CHARTS),$(M)/$(chart))
 
-HELM_VERSION    ?= "2.10.0"
-HELM_SHA256SUM  ?= "0fa2ed4983b1e4a3f90f776d08b88b0c73fd83f305b5b634175cb15e61342ffe"
+K8S_VERSION     ?= "1.13.1"
+
+HELM_VERSION    ?= "2.12.1"
+HELM_SHA256SUM  ?= "891004bec55431b39515e2cedc4f4a06e93782aa03a4904f2bd742b168160451"
 HELM_PLATFORM   ?= "linux-amd64"
 
-KAFKA_CHART_VERSION  ?= 0.8.8
+KAFKA_CHART_VERSION  ?= 0.13.3
 KAFKA_POD := "pod/cord-kafka-0"
 
 # Targets
@@ -50,14 +52,14 @@ $(M)/setup:
 	sudo apt-key adv --keyserver keyserver.ubuntu.com --recv 0EBFCD88
 	sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(shell lsb_release -cs) stable"
 	sudo apt update
-	sudo apt install -y "docker-ce=17.03*"
+	sudo apt install -y "docker-ce=17.06*"
 
 /usr/bin/kubeadm: | $(M)/setup /usr/bin/docker
 	curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
 	echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" > /tmp/kubernetes.list
 	sudo cp /tmp/kubernetes.list /etc/apt/sources.list.d/kubernetes.list
 	sudo apt update
-	sudo apt install -y "kubeadm=1.11.3-*" "kubelet=1.11.3-*" "kubectl=1.11.3-*"
+	sudo apt install -y "kubeadm=${K8S_VERSION}-*" "kubelet=${K8S_VERSION}-*" "kubectl=${K8S_VERSION}-*"
 
 /usr/local/bin/helm:
 	curl -L -o /tmp/helm.tgz "https://storage.googleapis.com/kubernetes-helm/helm-v${HELM_VERSION}-${HELM_PLATFORM}.tar.gz"
