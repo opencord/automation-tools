@@ -28,10 +28,10 @@ both: $(M)/siab $(M)/bbsim-tosca
 
 # https://ftp.gnu.org/old-gnu/Manuals/make-3.79.1/html_chapter/make_6.html#SEC69
 latest: SEBAVALUES := configs/seba-ponsim-latest.yaml
-latest: all
+latest: ponsim
 
 stable: SEBAVALUES := configs/seba-ponsim.yaml
-stable: all
+stable: ponsim
 
 siab-1.0: SEBAVALUES := configs/siab-v1.0.0.yaml
 siab-1.0: KAFKA_POD := "pod/cord-platform-kafka-0"
