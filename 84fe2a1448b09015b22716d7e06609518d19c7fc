@@ -46,6 +46,30 @@
       "revId": "84fe2a1448b09015b22716d7e06609518d19c7fc",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b5ac259d_84353878",
+        "filename": "kubespray-installer/setup.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1000007
+      },
+      "writtenOn": "2019-01-08T21:22:37Z",
+      "side": 1,
+      "message": "We have a bunch of multi-stage builds, so if we can install a docker version supports that it would be better.",
+      "parentUuid": "5949102a_3b979340",
+      "range": {
+        "startLine": 70,
+        "startChar": 69,
+        "endLine": 70,
+        "endChar": 94
+      },
+      "revId": "84fe2a1448b09015b22716d7e06609518d19c7fc",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
     }
   ]
 }
