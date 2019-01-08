@@ -70,6 +70,54 @@
       "revId": "84fe2a1448b09015b22716d7e06609518d19c7fc",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b5f1ca5a_c0006472",
+        "filename": "kubespray-installer/setup.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2019-01-08T21:25:46Z",
+      "side": 1,
+      "message": "Again, this is the version tested by the community with this version of Kubespray. For a bug is not automatically selected the right value, and it needs to be input manually. That\u0027s why I chose this specific version",
+      "parentUuid": "b5ac259d_84353878",
+      "range": {
+        "startLine": 70,
+        "startChar": 69,
+        "endLine": 70,
+        "endChar": 94
+      },
+      "revId": "84fe2a1448b09015b22716d7e06609518d19c7fc",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7e41c694_cc748ca7",
+        "filename": "kubespray-installer/setup.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1000000
+      },
+      "writtenOn": "2019-01-08T21:25:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5949102a_3b979340",
+      "range": {
+        "startLine": 70,
+        "startChar": 69,
+        "endLine": 70,
+        "endChar": 94
+      },
+      "revId": "84fe2a1448b09015b22716d7e06609518d19c7fc",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
     }
   ]
 }
