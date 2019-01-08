@@ -23,37 +23,38 @@
     # Edit all.yml variable file
     - name: Add lines to the all.yaml variable file
       lineinfile:
-        path: inventories/{{ deployment_name }}/group_vars/all.yml
+        path: inventories/{{ deployment_name }}/group_vars/all/all.yml
         line: "{{ item }}"
       with_items:
          - 'ansible_python_interpreter: /usr/bin/python2.7'
          - 'ansible_user: {{ kubespray_remote_ssh_user }}'
          - 'ansible_become: true'
          - 'kube_feature_gates: []'
+         - 'kube_network_plugin: calico'
+         - 'kube_network_plugin_multus: true'
 
     # Edit k8s-cluster.yml variable file
     - name: Set Docker DNS servers strict to false
       lineinfile:
-        path: inventories/{{ deployment_name }}/group_vars/k8s-cluster.yml
+        path: inventories/{{ deployment_name }}/group_vars/k8s-cluster/k8s-cluster.yml
         regexp: '^#\s*docker_dns_servers_strict.*$'
         line: 'docker_dns_servers_strict: false'
 
     - name: Set Helm enabled to true
       lineinfile:
-        path: inventories/{{ deployment_name }}/group_vars/k8s-cluster.yml
+        path: inventories/{{ deployment_name }}/group_vars/k8s-cluster/k8s-cluster.yml
         regexp: '^helm_enabled.*$'
         line: 'helm_enabled: true'
 
     - name: Set kubeconfig localhost to true
       lineinfile:
-        path: inventories/{{ deployment_name }}/group_vars/k8s-cluster.yml
+        path: inventories/{{ deployment_name }}/group_vars/k8s-cluster/k8s-cluster.yml
         regexp: '^#\s*kubeconfig_localhost.*$'
         line: 'kubeconfig_localhost: true'
 
     - name: Allow insecure registry access
       lineinfile:
-        path: inventories/{{ deployment_name }}/group_vars/k8s-cluster.yml
+        path: inventories/{{ deployment_name }}/group_vars/k8s-cluster/k8s-cluster.yml
         regexp: 'docker_options'
         line: "docker_options: \"{{ item }} --insecure-registry={{ '{{' }} kube_service_addresses {{ '}}' }} --graph={{ '{{' }} docker_daemon_graph {{ '}}' }}  {{ '{{' }} docker_log_opts {{ '}}' }}\""
       with_items: "{{ k8s_nodes.split(' ') | map('regex_replace', '(.*)', '--insecure-registry=\\1/32') | join(' ') }}"
-
