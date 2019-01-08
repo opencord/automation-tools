@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "28276d95_6f9179af",
+        "filename": "developer/containers/Dockerfile.onos-apps.seba-1.0.0",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2019-01-08T21:57:49Z",
+      "side": 1,
+      "message": "should specify a tag",
+      "range": {
+        "startLine": 35,
+        "startChar": 5,
+        "endLine": 35,
+        "endChar": 27
+      },
+      "revId": "5d389fe8938ad784f6bdd9e617839531224c9c78",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "dabca19d_a5b49e29",
+        "filename": "developer/containers/Dockerfile.onos-apps.seba-1.0.0",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2019-01-08T21:57:49Z",
+      "side": 1,
+      "message": "cleanup:\n\n\nRUN apt-get update \u0026\u0026 apt-get install -y curl \\\n \u0026\u0026 rm -rf /var/lib/apt/lists/*",
+      "range": {
+        "startLine": 39,
+        "startChar": 0,
+        "endLine": 39,
+        "endChar": 45
+      },
+      "revId": "5d389fe8938ad784f6bdd9e617839531224c9c78",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "dad47296_cd64f0ca",
+        "filename": "developer/containers/Dockerfile.onos-apps.seba-1.0.0",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2019-01-08T21:57:49Z",
+      "side": 1,
+      "message": "fewer layers: \n\nENV OAR_REPO \"https://oss.sonatype.org/service/local/repositories/releases/content/org/opencord/\"\n\nRUN curl -L \"$OAR_REPO/olt-app/2.1.0/olt-app-2.1.0.oar\"  \u003e olt.oar \\\n \u0026\u0026 curl -L \"$OAR_REPO/sadis-app/2.2.0/sadis-app-2.1.0.oar\" \u003e sadis.oar \\\n \u0026\u0026 curl -L \"$OAR_REPO/dhcpl2relay/1.5.0/dhcpl2relay-1.5.0.oar\" \u003e dhcpl2relay.oar \\\n \u0026\u0026 curl -L \"$OAR_REPO/aaa/1.8.0/aaa-1.8.0.oar\" \u003e aaa.oar \\\n \u0026\u0026 curl -L \"$OAR_REPO/kafka/1.0.0/kafka-1.0.0.oar\" \u003e kafka.oar \\\n \u0026\u0026 chown nginx:nginx -R /usr/share/nginx/html/repository",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 47,
+        "endChar": 57
+      },
+      "revId": "5d389fe8938ad784f6bdd9e617839531224c9c78",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": true
+    }
+  ]
+}
