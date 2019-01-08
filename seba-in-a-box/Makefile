@@ -22,6 +22,8 @@ HELM_PLATFORM   ?= "linux-amd64"
 KAFKA_CHART_VERSION  ?= 0.13.3
 KAFKA_POD := "pod/cord-kafka-0"
 
+ETCD_OPERATOR_VERSION ?= 0.8.3
+
 # Targets
 ponsim: $(M)/siab
 
@@ -132,7 +134,8 @@ $(M)/voltha: | $(M)/kafka-running $(INFRA_PREREQS) $(M)/etcd-operator-ready
 	touch $@
 
 $(M)/etcd-operator-ready: | $(WORKSPACE)/cord/helm-charts $(M)/helm-init
-	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install etcd-operator stable/etcd-operator -f $(SEBAVALUES)
+	cd $(WORKSPACE)/cord/helm-charts; \
+	helm upgrade --install etcd-operator --version $(ETCD_OPERATOR_VERSION) stable/etcd-operator -f $(SEBAVALUES)
 	until kubectl get crd | grep etcdclusters; \
 	do \
 		echo "Waiting for etcdclusters CRD to be available"; \
