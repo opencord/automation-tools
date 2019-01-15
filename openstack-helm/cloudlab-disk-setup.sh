@@ -1,5 +1,5 @@
-#!/bin/bash
-#
+#!/usr/bin/env bash
+
 # Copyright 2017-present Open Networking Foundation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,7 +26,7 @@ if [ ! -d /mnt/extra ]
 then
     sudo mkdir -p /mnt/extra
 
-    # for NVME SSD on Utah Cloudlab, not supported by mkextrafs
+    # for NVME SSD on Utah m510, not supported by mkextrafs
     if df | grep -q nvme0n1p1 && [ -e /usr/testbed/bin/mkextrafs ]
     then
         # set partition type of 4th partition to Linux, ignore errors
@@ -37,22 +37,32 @@ then
         sudo mount /mnt/extra
         mount | grep nvme0n1p4 || (echo "ERROR: NVME mkfs/mount failed, exiting!" && exit 1)
 
-    elif [ -e /usr/testbed/bin/mkextrafs ]  # if on Clemson/Wisconsin Cloudlab
+    elif [ -e /usr/testbed/bin/mkextrafs ] && [ -b /dev/sdb ] # if on Clemson/Wisconsin Cloudlab
     then
         # Sometimes this command fails on the first try
         sudo /usr/testbed/bin/mkextrafs -s 1 -r /dev/sdb -qf "/mnt/extra/" || sudo /usr/testbed/bin/mkextrafs -s 1 -r /dev/sdb -qf "/mnt/extra/"
 
         # Check that the mount succeeded (sometimes mkextrafs succeeds but device not mounted)
         mount | grep sdb || (echo "ERROR: mkextrafs failed, exiting!" && exit 1)
+
+    elif [ -e /usr/testbed/bin/mkextrafs ] && [ -b /dev/sda4 ] # if on Utah xl170
+    then
+        # set partition type of 4th partition to Linux, ignore errors
+        printf "t\\n4\\n83\\np\\nw\\nq" | sudo fdisk /dev/sda || true
+
+        sudo mkfs.ext4 /dev/sda4
+        echo "/dev/sda4 /mnt/extra/ ext4 defaults 0 0" | sudo tee -a /etc/fstab
+        sudo mount /mnt/extra
+        mount | grep sda4 || (echo "ERROR: mkfs/mount failed, exiting!" && exit 1)
     fi
 fi
 
 for DIR in docker kubelet openstack-helm nova
 do
-    sudo mkdir -p /mnt/extra/$DIR
-    sudo chmod -R a+rwx /mnt/extra/$DIR
-    if [ ! -e /var/lib/$DIR ]
+    sudo mkdir -p "/mnt/extra/$DIR"
+    sudo chmod -R a+rwx "/mnt/extra/$DIR"
+    if [ ! -e "/var/lib/$DIR" ]
     then
-        sudo ln -s /mnt/extra/$DIR /var/lib/$DIR
+        sudo ln -s "/mnt/extra/$DIR" "/var/lib/$DIR"
     fi
 done
