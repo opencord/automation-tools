@@ -277,6 +277,8 @@ teardown-charts: remove-chart-milestones
 	helm delete --purge $(shell helm ls -q | grep -v docker-registry)
 
 reset-kubeadm: remove-chart-milestones remove-kube-milestones remove-test-milestones
-	sudo kubeadm reset -f
+	sudo kubeadm reset -f || true
 	sudo iptables -F && sudo iptables -t nat -F && sudo iptables -t mangle -F && sudo iptables -X
-
+	sudo rm -f /var/lib/cni/networks/pon0/* || true
+	sudo rm -f /var/lib/cni/networks/pon1/* || true
+	sudo rm -f /var/lib/cni/networks/k8s-pod-network/* || true
