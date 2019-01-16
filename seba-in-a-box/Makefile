@@ -276,4 +276,6 @@ teardown-charts: remove-chart-milestones
 reset-kubeadm: remove-chart-milestones remove-kube-milestones remove-test-milestones
 	sudo kubeadm reset -f
 	sudo iptables -F && sudo iptables -t nat -F && sudo iptables -t mangle -F && sudo iptables -X
-
+	sudo rm -f /var/lib/cni/networks/pon0/*
+	sudo rm -f /var/lib/cni/networks/pon1/*
+	sudo rm -f /var/lib/cni/networks/k8s-pod-network/*
