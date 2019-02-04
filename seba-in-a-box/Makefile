@@ -134,19 +134,28 @@ $(M)/onos: | $(M)/kafka-running $(M)/nem $(INFRA_PREREQS)
 	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_ONOS_ARGS) onos onos -f $(SEBAVALUES)
 	touch $@
 
+# SEBA-440 Sometimes VOLTHA install fails with 'namespaces "voltha" not found'
+# Work around by repeatedly trying to install the chart until it succeeds
 $(M)/voltha: | $(M)/kafka-running $(INFRA_PREREQS) $(M)/etcd-operator-ready
 	cd $(WORKSPACE)/cord/helm-charts; helm dep up voltha
-	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_VOLTHA_ARGS) voltha voltha -f $(SEBAVALUES)
+	cd $(WORKSPACE)/cord/helm-charts; \
+		for i in 1 2 3; \
+		do \
+			helm upgrade --install $(HELM_VOLTHA_ARGS) voltha voltha -f $(SEBAVALUES) && break; \
+			echo "VOLTHA chart install failed; cleaning up and trying again"; \
+			helm delete --purge voltha; \
+			until ! kubectl get namespace voltha; \
+			do \
+				sleep 5; \
+			done; \
+			sleep 5; \
+		done
 	touch $@
 
 $(M)/etcd-operator-ready: | $(WORKSPACE)/cord/helm-charts $(M)/helm-init
 	cd $(WORKSPACE)/cord/helm-charts; \
 	helm upgrade --install etcd-operator --version $(ETCD_OPERATOR_VERSION) stable/etcd-operator -f $(SEBAVALUES)
-	until kubectl get crd | grep etcdclusters; \
-	do \
-		echo "Waiting for etcdclusters CRD to be available"; \
-		sleep 5; \
-	done
+	timeout 120s bash -c "until kubectl get crd | grep etcdclusters; do echo 'Waiting for etcdclusters CRD to be available'; sleep 5; done"
 	touch $@
 
 $(M)/voltha-running: | $(M)/voltha
