@@ -137,6 +137,17 @@ $(M)/onos: | $(M)/kafka-running $(M)/nem $(INFRA_PREREQS)
 $(M)/voltha: | $(M)/kafka-running $(INFRA_PREREQS) $(M)/etcd-operator-ready
 	cd $(WORKSPACE)/cord/helm-charts; helm dep up voltha
 	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_VOLTHA_ARGS) voltha voltha -f $(SEBAVALUES)
+	cd $(WORKSPACE)/cord/helm-charts; \
+		until helm upgrade --install $(HELM_VOLTHA_ARGS) voltha voltha -f $(SEBAVALUES); \
+		do \
+			echo "VOLTHA install failed; cleaning up and trying again"; \
+			helm delete --purge voltha; \
+			until ! kubectl get namespace voltha; \
+			do \
+				sleep 5; \
+			done; \
+			sleep 5; \
+		done
 	touch $@
 
 $(M)/etcd-operator-ready: | $(WORKSPACE)/cord/helm-charts $(M)/helm-init
