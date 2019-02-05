@@ -36,22 +36,30 @@
         - python-pycurl
         - software-properties-common
         - python-netaddr
+      register: task_result
+      until: task_result is success
+      retries: 3
+      delay: 5
 
     - name: Add Ansible PPA
       apt_repository:
         repo={{ item }}
       with_items:
         - "{{ ansible_apt_repo | default('ppa:ansible/ansible') }}"
-      register: result
-      until: result | success
+      register: task_result
+      until: task_result is success
       retries: 3
-      delay: 10
+      delay: 5
 
     - name: Make sure Ansible is newest version
       apt:
         name: "ansible"
         update_cache: yes
         cache_valid_time: 3600
+      register: task_result
+      until: task_result is success
+      retries: 3
+      delay: 5
 
     - name: Enable ip forwarding
       sysctl:
