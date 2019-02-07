@@ -137,6 +137,7 @@ $(M)/onos: | $(M)/kafka-running $(M)/nem $(INFRA_PREREQS)
 # SEBA-440 Sometimes VOLTHA install fails with 'namespaces "voltha" not found'
 # Work around by repeatedly trying to install the chart until it succeeds
 $(M)/voltha: | $(M)/kafka-running $(INFRA_PREREQS) $(M)/etcd-operator-ready
+	sudo sh -c "echo 1048576 > /proc/sys/fs/inotify/max_user_watches"
 	cd $(WORKSPACE)/cord/helm-charts; helm dep up voltha
 	cd $(WORKSPACE)/cord/helm-charts; \
 		for i in 1 2 3; \
