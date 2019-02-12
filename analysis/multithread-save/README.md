@@ -12,6 +12,15 @@ in the model that were saved from code in two or more files, it will print out
 the file paths.  The idea is that these files should be scrutinized to make
 sure the object is being updated in a safe way.
 
+## Prerequisites
+
+In order to run this tool you need to install the `pyparsing` package.
+You can do that via this command:
+
+```bash
+pip install pyparsing
+```
+
 ## Usage
 
 ```bash
