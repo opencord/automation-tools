@@ -29,9 +29,11 @@
          - 'ansible_python_interpreter: /usr/bin/python2.7'
          - 'ansible_user: {{ kubespray_remote_ssh_user }}'
          - 'ansible_become: true'
-         - 'kube_feature_gates: []'
+         - 'kube_feature_gates: [SCTPSupport=true]'
          - 'kube_network_plugin: calico'
          - 'kube_network_plugin_multus: true'
+         - 'calico_version: v3.4.0'
+         - 'calico_cni_version: v3.4.0'
 
     # Edit k8s-cluster.yml variable file
     - name: Set Docker DNS servers strict to false
