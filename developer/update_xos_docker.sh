@@ -35,8 +35,7 @@ XOS_MAJOR=$(cut -b 1 "${WORKSPACE}/cord/orchestration/xos/VERSION")
 XOS_VERSION=$(cat "${WORKSPACE}/cord/orchestration/xos/VERSION")
 
 # Update Synchronizer FROM parent versions
-for df in ${WORKSPACE}/cord/orchestration/xos_services/*/Dockerfile.synchronizer \
-          ${WORKSPACE}/cord/orchestration/profiles/*/Dockerfile.synchronizer
+for df in ${WORKSPACE}/cord/orchestration/xos_services/*/Dockerfile.synchronizer
 do
   df_contents=$(cat "$df")
 
