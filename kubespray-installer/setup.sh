@@ -20,7 +20,7 @@
 
 set -e -o pipefail
 
-KS_COMMIT="${KS_COMMIT:-v2.8.1}"
+KS_COMMIT="${KS_COMMIT:-master}"
 
 install_kubespray () {
   # Cleanup Old Kubespray Installations
@@ -67,7 +67,7 @@ install_kubespray () {
 
   # Install Kubespray
   echo "Installing Kubespray"
-  ansible-playbook -i "inventories/${DEPLOYMENT_NAME}/inventory.cfg" -e docker_version='17.03' kubespray/cluster.yml -b -v
+  ansible-playbook -i "inventories/${DEPLOYMENT_NAME}/inventory.cfg" -e docker_version='17.03' -e kubelet_custom_flags="--protect-kernel-defaults"  kubespray/cluster.yml -b -v
 }
 
 #
