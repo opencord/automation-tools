@@ -3,4 +3,3 @@ host=gerrit.opencord.org
 port=29418
 project=automation-tools.git
 defaultremote=origin
-defaultbrach=mcord
