@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a3d467a_09d4b33b",
+        "filename": "seba-in-a-box/Makefile",
+        "patchSetId": 1
+      },
+      "lineNbr": 273,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2019-03-06T16:36:28Z",
+      "side": 1,
+      "message": "should this be a specific branch/version ?",
+      "range": {
+        "startLine": 273,
+        "startChar": 20,
+        "endLine": 273,
+        "endChar": 64
+      },
+      "revId": "d606110216c0b170acd416e88f914e12d1a9349f",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": true
+    }
+  ]
+}
