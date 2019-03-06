@@ -270,15 +270,16 @@ $(WORKSPACE)/cord/test/cord-tester: | $(M)/setup
 	cd $(WORKSPACE)/cord/test && git clone https://gerrit.opencord.org/cord-tester
 
 $(WORKSPACE)/voltha: | $(M)/setup
-	cd $(WORKSPACE) && git clone https://gerrit.opencord.org/voltha
+    mkdir -p $(WORKSPACE)/incubator
+    cd $(WORKSPACE)/incubator && git clone https://gerrit.opencord.org/voltha
 
 PYBOT_ARGS ?=
 $(M)/qatests: | $(M)/siab $(M)/qatests-prereqs $(WORKSPACE)/cord/test/cord-tester $(WORKSPACE)/voltha
 	cd $(WORKSPACE)/cord/test/cord-tester/src/test/cord-api/ && \
 		WORKSPACE=$(VIRTUALENV) bash ./setup_venv.sh && \
-		source $(VIRTUALENV)/venv-cord-tester/bin/activate && \
-		cd Tests/WorkflowValidations/ && \
-		robot $(PYBOT_ARGS) --removekeywords wuks -e notready -i $(TESTTAGS) -v WORKSPACE_DIR:$(HOME) SIAB.robot
+        source $(VIRTUALENV)/venv-cord-tester/bin/activate && \
+        cd Tests/WorkflowValidations/ && \
+		robot $(PYBOT_ARGS) --removekeywords wuks -e notready -i $(TESTTAGS) -v WORKSPACE_DIR:$(HOME)/incubator SIAB.robot
 	touch $@
 
 remove-chart-milestones:
