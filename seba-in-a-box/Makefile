@@ -269,8 +269,11 @@ $(WORKSPACE)/cord/test/cord-tester: | $(M)/setup
 	mkdir -p $(WORKSPACE)/cord/test
 	cd $(WORKSPACE)/cord/test && git clone https://gerrit.opencord.org/cord-tester
 
+$(WORKSPACE)/voltha: | $(M)/setup
+	cd $(WORKSPACE) && git clone https://gerrit.opencord.org/voltha
+
 PYBOT_ARGS ?=
-$(M)/qatests: | $(M)/siab $(M)/qatests-prereqs $(WORKSPACE)/cord/test/cord-tester
+$(M)/qatests: | $(M)/siab $(M)/qatests-prereqs $(WORKSPACE)/cord/test/cord-tester $(WORKSPACE)/voltha
 	cd $(WORKSPACE)/cord/test/cord-tester/src/test/cord-api/ && \
 		WORKSPACE=$(VIRTUALENV) bash ./setup_venv.sh && \
 		source $(VIRTUALENV)/venv-cord-tester/bin/activate && \
