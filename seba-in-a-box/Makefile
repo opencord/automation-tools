@@ -56,7 +56,6 @@ $(M)/setup:
 	sudo apt update
 	sudo apt install -y httpie jq software-properties-common
 	sudo swapoff -a
-	sudo iptables -P FORWARD ACCEPT
 	touch $@
 
 /usr/bin/docker: | $(M)/setup
@@ -223,6 +222,8 @@ $(M)/siab: | $(M)/voltha-running $(M)/mininet $(M)/ponsim-tosca
 	echo "[passed] VOLTHA logical device and agg switch are available in ONOS"
 	timeout 2m bash -c "until http -a admin@opencord.org:letmein GET http://127.0.0.1:30001/xosapi/v1/att-workflow-driver/attworkflowdriverserviceinstances |jq '.items[0].authentication_state'|grep -q AWAITING; do echo 'waiting for ATT Workflow Driver ServiceInstance to be in AWAITING state'; sleep 10; done"
 	echo "[passed] ATT Workflow Driver ServiceInstance is in AWAITING state"
+	sudo iptables -P FORWARD ACCEPT
+	sudo apparmor_parser -R /etc/apparmor.d/sbin.dhclient || true
 	touch $@
 	echo "SEBA-in-a-Box installation finished!"
 
