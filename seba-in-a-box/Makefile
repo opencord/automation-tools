@@ -51,7 +51,7 @@ siab-1.0: KAFKA_POD := "pod/cord-platform-kafka-0"
 siab-1.0: $(M)/seba-1.0.0 $(M)/siab
 
 $(M)/setup:
-	sudo $(WORKSPACE)/cord/automation-tools/scripts/portcheck.sh
+	sudo $(MAKEDIR)/../scripts/portcheck.sh
 	mkdir -p $(M)
 	sudo apt update
 	sudo apt install -y httpie jq software-properties-common
