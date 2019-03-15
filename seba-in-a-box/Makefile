@@ -30,6 +30,8 @@ HELM_NEM_ARGS    ?= $(HELM_GLOBAL_ARGS)
 HELM_ONOS_ARGS   ?= $(HELM_GLOBAL_ARGS)
 HELM_VOLTHA_ARGS ?= $(HELM_GLOBAL_ARGS)
 
+NEM_WORKFLOW ?= att-workflow
+
 # Targets
 ponsim: $(M)/siab
 
@@ -190,8 +192,8 @@ $(M)/nem: | $(M)/kafka-running $(INFRA_PREREQS)
 	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_NEM_ARGS) xos-core xos-core -f $(SEBAVALUES)
 	cd $(WORKSPACE)/cord/helm-charts; helm dep update xos-profiles/seba-services
 	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_NEM_ARGS) seba-services xos-profiles/seba-services -f $(SEBAVALUES)
-	cd $(WORKSPACE)/cord/helm-charts; helm dep update workflows/att-workflow
-	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_NEM_ARGS) att-workflow workflows/att-workflow -f $(SEBAVALUES)
+	cd $(WORKSPACE)/cord/helm-charts; helm dep update workflows/$(NEM_WORKFLOW)
+	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_NEM_ARGS) $(NEM_WORKFLOW) workflows/$(NEM_WORKFLOW) -f $(SEBAVALUES)
 	cd $(WORKSPACE)/cord/helm-charts; helm dep update xos-profiles/base-kubernetes
 	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_NEM_ARGS) base-kubernetes xos-profiles/base-kubernetes -f $(SEBAVALUES)
 	touch $@
