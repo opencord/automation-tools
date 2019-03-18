@@ -206,7 +206,7 @@ $(M)/ponsim-tosca: | $(M)/nem-running
 	timeout 60s bash -c "until ! http -a admin@opencord.org:letmein GET http://127.0.0.1:30001/xosapi/v1/core/serviceinstanceattributes|jq '.items[].backend_status'|grep -v OK; do echo 'waiting for ONOS config to sync'; sleep 5; done"
 	timeout 60s bash -c "until ! http -a admin@opencord.org:letmein GET http://127.0.0.1:30001/xosapi/v1/onos/onosapps|jq '.items[].backend_status'|grep -v OK; do echo 'waiting for ONOS apps to sync'; sleep 5; done"
 	timeout 60s bash -c "until http -a karaf:karaf GET http://127.0.0.1:30120/onos/v1/applications/org.opencord.kafka|jq '.state'|grep -q ACTIVE; do echo 'Waiting for Kafka app to become ACTIVE'; sleep 5; done"
-	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) ponsim-pod xos-profiles/ponsim-pod -f $(SEBAVALUES)
+	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) ponsim-pod xos-profiles/ponsim-pod -f $(SEBAVALUES) --set workflow=$(NEM_WORKFLOW)
 	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh
 	touch $@
 
@@ -222,8 +222,14 @@ $(M)/siab: | $(M)/voltha-running $(M)/mininet $(M)/ponsim-tosca
 	echo "[passed] OLT and ONU are enabled in VOLTHA"
 	timeout 2m bash -c "until http -a karaf:karaf GET http://127.0.0.1:30120/onos/v1/devices|jq '.devices[].available'|grep true|wc -l|grep -q 2; do echo 'Waiting for VOLTHA logical device and agg switch to be available in ONOS'; sleep 10; done"
 	echo "[passed] VOLTHA logical device and agg switch are available in ONOS"
+ifeq ($(NEM_WORKFLOW),att-workflow)
 	timeout 2m bash -c "until http -a admin@opencord.org:letmein GET http://127.0.0.1:30001/xosapi/v1/att-workflow-driver/attworkflowdriverserviceinstances |jq '.items[0].authentication_state'|grep -q AWAITING; do echo 'waiting for ATT Workflow Driver ServiceInstance to be in AWAITING state'; sleep 10; done"
 	echo "[passed] ATT Workflow Driver ServiceInstance is in AWAITING state"
+endif
+ifeq ($(NEM_WORKFLOW),tt-workflow)
+	timeout 2m bash -c "until http -a admin@opencord.org:letmein GET http://127.0.0.1:30001/xosapi/v1/tt-workflow-driver/ttworkflowdriverserviceinstances |jq '.items[0].dhcp_state'|grep -q AWAITING; do echo 'waiting for TT Workflow Driver ServiceInstance to be in AWAITING state'; sleep 10; done"
+	echo "[passed] TT Workflow Driver ServiceInstance is in AWAITING state"
+endif
 	sudo iptables -P FORWARD ACCEPT
 	sudo apparmor_parser -R /etc/apparmor.d/sbin.dhclient || true
 	touch $@
