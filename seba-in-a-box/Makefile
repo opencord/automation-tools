@@ -182,8 +182,10 @@ $(M)/pon0_fwd: | $(M)/ponsim
 	rm /tmp/pon0_group_fwd_mask
 	touch $@
 
-$(M)/mininet: | $(M)/onos $(M)/ponsim $(M)/pon0_fwd
+$(M)/mininet: | $(M)/onos $(M)/ponsim $(M)/pon0_fwd $(M)/ponsim-tosca
 	sudo modprobe openvswitch
+	timeout 60s bash -c "until ! http -a admin@opencord.org:letmein GET http://127.0.0.1:30001/xosapi/v1/fabric/switches|jq '.items[].driver'|grep -v ofdpa-ovs ; do echo 'waiting for switch driver == ofdpa-ovs'; sleep 5; done"
+	timeout 60s bash -c "until ! http -a admin@opencord.org:letmein GET http://127.0.0.1:30001/xosapi/v1/fabric/switches|jq '.items[].backend_status'|grep -v OK; do echo 'waiting for switch driver to sync'; sleep 5; done"
 	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) mininet mininet -f $(SEBAVALUES)
 	touch $@
 
