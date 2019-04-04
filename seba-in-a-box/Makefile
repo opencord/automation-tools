@@ -182,8 +182,11 @@ $(M)/pon0_fwd: | $(M)/ponsim
 	rm /tmp/pon0_group_fwd_mask
 	touch $@
 
-$(M)/mininet: | $(M)/onos $(M)/ponsim $(M)/pon0_fwd
+# Make sure that we're using the ofdpa-ovs driver with OvS.
+$(M)/mininet: | $(M)/onos $(M)/ponsim $(M)/pon0_fwd $(M)/ponsim-tosca
 	sudo modprobe openvswitch
+	timeout 60s bash -c "until ! http -a admin@opencord.org:letmein GET http://127.0.0.1:30001/xosapi/v1/fabric/switches|jq '.items[].driver'|grep -v ofdpa-ovs ; do echo 'waiting for switch driver == ofdpa-ovs'; sleep 5; done"
+	timeout 60s bash -c "until ! http -a admin@opencord.org:letmein GET http://127.0.0.1:30001/xosapi/v1/fabric/switches|jq '.items[].backend_status'|grep -v OK; do echo 'waiting for switch driver to sync'; sleep 5; done"
 	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) mininet mininet -f $(SEBAVALUES)
 	touch $@
 
@@ -202,7 +205,7 @@ $(M)/nem-running: | $(M)/nem
 	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh
 	touch $@
 
-$(M)/ponsim-tosca: | $(M)/nem-running
+$(M)/ponsim-tosca: | $(M)/onos $(M)/nem-running
 	timeout 60s bash -c "until ! http -a admin@opencord.org:letmein GET http://127.0.0.1:30001/xosapi/v1/core/serviceinstanceattributes|jq '.items[].backend_status'|grep -v OK; do echo 'waiting for ONOS config to sync'; sleep 5; done"
 	timeout 60s bash -c "until ! http -a admin@opencord.org:letmein GET http://127.0.0.1:30001/xosapi/v1/onos/onosapps|jq '.items[].backend_status'|grep -v OK; do echo 'waiting for ONOS apps to sync'; sleep 5; done"
 	timeout 60s bash -c "until http -a karaf:karaf GET http://127.0.0.1:30120/onos/v1/applications/org.opencord.kafka|jq '.state'|grep -q ACTIVE; do echo 'Waiting for Kafka app to become ACTIVE'; sleep 5; done"
@@ -222,6 +225,11 @@ $(M)/siab: | $(M)/voltha-running $(M)/mininet $(M)/ponsim-tosca
 	echo "[passed] OLT and ONU are enabled in VOLTHA"
 	timeout 2m bash -c "until http -a karaf:karaf GET http://127.0.0.1:30120/onos/v1/devices|jq '.devices[].available'|grep true|wc -l|grep -q 2; do echo 'Waiting for VOLTHA logical device and agg switch to be available in ONOS'; sleep 10; done"
 	echo "[passed] VOLTHA logical device and agg switch are available in ONOS"
+	# For some reason the dhcpl2relay app needs to be restarted after connecting the switch to ONOS's ofdpa-ovs driver.
+	# Without this step the DHCP trap flow is not added to the agg switch.
+	http -a karaf:karaf --ignore-stdin DELETE http://127.0.0.1:30120/onos/v1/applications/org.opencord.dhcpl2relay/active
+	http -a karaf:karaf --ignore-stdin POST http://127.0.0.1:30120/onos/v1/applications/org.opencord.dhcpl2relay/active
+	http -a karaf:karaf --ignore-stdin POST http://127.0.0.1:30120/onos/v1/applications/org.opencord.kafka/active
 ifeq ($(NEM_WORKFLOW),att-workflow)
 	timeout 2m bash -c "until http -a admin@opencord.org:letmein GET http://127.0.0.1:30001/xosapi/v1/att-workflow-driver/attworkflowdriverserviceinstances |jq '.items[0].authentication_state'|grep -q AWAITING; do echo 'waiting for ATT Workflow Driver ServiceInstance to be in AWAITING state'; sleep 10; done"
 	echo "[passed] ATT Workflow Driver ServiceInstance is in AWAITING state"
