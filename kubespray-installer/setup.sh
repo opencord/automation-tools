@@ -37,12 +37,12 @@ install_kubespray () {
   # create a virtualenv with specific packages, if it doesn't exist
   if [ ! -x "ks_venv/bin/activate" ]
   then
-    virtualenv ks_venv
+    virtualenv ks_venv --python=python3
     # shellcheck disable=SC1091
     source ks_venv/bin/activate
 
-    pip install ansible==2.5.3
-    pip install -r kubespray/requirements.txt
+    pip3 install ansible==2.7
+    pip3 install -r kubespray/requirements.txt
   else
     # shellcheck disable=SC1091
     source ks_venv/bin/activate
@@ -56,18 +56,18 @@ install_kubespray () {
   mkdir -p "inventories/${DEPLOYMENT_NAME}"
 
   cp -r kubespray/inventory/sample/group_vars "inventories/${DEPLOYMENT_NAME}/group_vars"
-  CONFIG_FILE="inventories/${DEPLOYMENT_NAME}/inventory.cfg" python3 kubespray/contrib/inventory_builder/inventory.py "${NODES[@]}"
+  CONFIG_FILE="inventories/${DEPLOYMENT_NAME}/inventory.yml" python3 kubespray/contrib/inventory_builder/inventory.py "${NODES[@]}"
 
   # Add configuration to inventory
   ansible-playbook k8s-configs.yaml --extra-vars "deployment_name=${DEPLOYMENT_NAME} k8s_nodes='${NODES[*]}' kubespray_remote_ssh_user='${REMOTE_SSH_USER}'"
 
   # Prepare Target Machines
   echo "Installing Prerequisites On Remote Machines"
-  ansible-playbook -i "inventories/${DEPLOYMENT_NAME}/inventory.cfg" k8s-requirements.yaml
+  ansible-playbook -i "inventories/${DEPLOYMENT_NAME}/inventory.yml" k8s-requirements.yaml
 
   # Install Kubespray
   echo "Installing Kubespray"
-  ansible-playbook -i "inventories/${DEPLOYMENT_NAME}/inventory.cfg" -e docker_version='17.03' kubespray/cluster.yml -b -v
+  ansible-playbook -i "inventories/${DEPLOYMENT_NAME}/inventory.yml" kubespray/cluster.yml -b -v
 }
 
 #
