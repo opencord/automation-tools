@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "718ef280_bbeb0f54",
+        "filename": "kubespray-installer/index.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1000162
+      },
+      "writtenOn": "2019-04-12T01:19:01Z",
+      "side": 1,
+      "message": "can you \"mcord\" this to something more generic ? Maybe \"pod1\" would be better",
+      "revId": "d5f20aa4983fa09dfd9ec26a2f5de73f6cac2afa",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d601b54_c7eb3403",
+        "filename": "kubespray-installer/index.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1000162
+      },
+      "writtenOn": "2019-04-12T01:19:01Z",
+      "side": 1,
+      "message": "change to more generic pod name",
+      "revId": "d5f20aa4983fa09dfd9ec26a2f5de73f6cac2afa",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
