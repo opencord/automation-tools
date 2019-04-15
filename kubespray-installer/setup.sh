@@ -37,7 +37,7 @@ install_kubespray () {
   # create a virtualenv with specific packages, if it doesn't exist
   if [ ! -x "ks_venv/bin/activate" ]
   then
-    virtualenv ks_venv
+    virtualenv -p python3 ks_venv
     # shellcheck disable=SC1091
     source ks_venv/bin/activate
 
