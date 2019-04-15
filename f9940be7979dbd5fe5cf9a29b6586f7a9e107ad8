@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b914c73b_41a03b79",
+        "filename": "kubespray-installer/setup.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2019-04-15T22:33:06Z",
+      "side": 0,
+      "message": "What version of Docker gets installed when this is removed?   17.06 is advantageous as it allows for local multi-stage builds.",
+      "range": {
+        "startLine": 70,
+        "startChar": 69,
+        "endLine": 70,
+        "endChar": 94
+      },
+      "revId": "f9940be7979dbd5fe5cf9a29b6586f7a9e107ad8",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": true
+    }
+  ]
+}
