@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "435cc99c_fb4723f8",
+        "filename": "seba-in-a-box/Makefile",
+        "patchSetId": 3
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2019-04-15T18:11:43Z",
+      "side": 1,
+      "message": "Are you attempting to change the driver for the device after it has already established a connection to ONOS? If this is the case could we instead start ONOS with a config that expects the device with the assigned driver?",
+      "revId": "f9a426d03fed1fc554cba3fb83f237d924a0d222",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
