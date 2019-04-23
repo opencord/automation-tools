@@ -31,7 +31,6 @@ HELM_ONOS_ARGS   ?= $(HELM_GLOBAL_ARGS)
 HELM_VOLTHA_ARGS ?= $(HELM_GLOBAL_ARGS)
 
 NEM_WORKFLOW ?= att-workflow
-ADD_TRAP_FLOW := false
 
 # Targets
 ponsim: $(M)/siab
@@ -43,7 +42,6 @@ both: $(M)/siab $(M)/bbsim-tosca
 
 # https://ftp.gnu.org/old-gnu/Manuals/make-3.79.1/html_chapter/make_6.html#SEC69
 latest: SEBAVALUES := configs/seba-ponsim-latest.yaml
-latest: ADD_TRAP_FLOW := true
 latest: ponsim
 
 stable: SEBAVALUES := configs/seba-ponsim.yaml
@@ -240,7 +238,6 @@ ifeq ($(NEM_WORKFLOW),tt-workflow)
 	timeout 2m bash -c "until http -a admin@opencord.org:letmein GET http://127.0.0.1:30001/xosapi/v1/tt-workflow-driver/ttworkflowdriverserviceinstances |jq '.items[0].dhcp_state'|grep -q AWAITING; do echo 'waiting for TT Workflow Driver ServiceInstance to be in AWAITING state'; sleep 10; done"
 	echo "[passed] TT Workflow Driver ServiceInstance is in AWAITING state"
 endif
-	if $(ADD_TRAP_FLOW); then $(WORKSPACE)/cord/helm-charts/examples/add-trap-flow.sh; fi
 	sudo iptables -P FORWARD ACCEPT
 	sudo apparmor_parser -R /etc/apparmor.d/sbin.dhclient || true
 	touch $@
