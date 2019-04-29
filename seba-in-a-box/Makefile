@@ -42,6 +42,7 @@ both: $(M)/siab $(M)/bbsim-tosca
 
 # https://ftp.gnu.org/old-gnu/Manuals/make-3.79.1/html_chapter/make_6.html#SEC69
 latest: SEBAVALUES := configs/seba-ponsim-latest.yaml
+latest: PYBOT_ARGS := -v SUBSCRIBER_FILENAME:SIABSubscriberLatest
 latest: ponsim
 
 stable: SEBAVALUES := configs/seba-ponsim.yaml
