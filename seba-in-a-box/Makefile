@@ -6,6 +6,7 @@ WORKSPACE       ?= $(HOME)
 VIRTUALENV      ?= $(WORKSPACE)/cord/test
 SEBAVALUES      ?= configs/seba-ponsim.yaml
 TESTTAGS        ?= stable
+PYBOT_ARGS      ?=
 
 # used to start logging/monitoring and other infrastructure charts
 INFRA_CHARTS    ?=
@@ -43,6 +44,7 @@ both: $(M)/siab $(M)/bbsim-tosca
 # https://ftp.gnu.org/old-gnu/Manuals/make-3.79.1/html_chapter/make_6.html#SEC69
 latest: SEBAVALUES := configs/seba-ponsim-latest.yaml
 latest: ponsim
+latest: PYBOT_ARGS := "-v SUBSCRIBER_FILENAME:SIABSubscriberLatest"
 
 stable: SEBAVALUES := configs/seba-ponsim.yaml
 stable: ponsim
@@ -291,7 +293,6 @@ $(WORKSPACE)/cord/incubator/voltha: | $(M)/setup
 	mkdir -p $(WORKSPACE)/cord/incubator
 	cd $(WORKSPACE)/cord/incubator && git clone https://gerrit.opencord.org/voltha
 
-PYBOT_ARGS ?=
 $(M)/qatests: | $(M)/siab $(M)/qatests-prereqs $(WORKSPACE)/cord/test/cord-tester $(WORKSPACE)/cord/incubator/voltha
 	cd $(WORKSPACE)/cord/test/cord-tester/src/test/cord-api/ && \
 	WORKSPACE=$(VIRTUALENV) bash ./setup_venv.sh && \
