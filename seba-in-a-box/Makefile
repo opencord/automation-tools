@@ -167,10 +167,14 @@ $(M)/voltha-running: | $(M)/voltha
 	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh voltha
 	touch $@
 
-$(M)/ponsim: | $(M)/voltha
+$(M)/ponnet: | $(M)/voltha
 	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) ponnet ponnet
 	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh kube-system
+	touch $@
+
+$(M)/ponsim: | $(M)/ponnet $(M)/voltha
 	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) ponsimv2 ponsimv2 -f $(SEBAVALUES)
+	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh voltha
 	touch $@
 
 $(M)/pon0_fwd: | $(M)/ponsim
@@ -305,7 +309,7 @@ $(M)/qatests: | $(M)/siab $(M)/qatests-prereqs $(WORKSPACE)/cord/test/cord-teste
 	touch $@
 
 remove-chart-milestones:
-	cd $(M); rm -f kafka kafka-running onos voltha etcd-operator-ready etcd-cluster \
+	cd $(M); rm -f kafka-running onos voltha etcd-operator-ready etcd-cluster \
 		voltha-running ponsim mininet nem nem-running ponsim-tosca siab bbsim bbsim-tosca \
 		logging nem-monitoring seba-1.0.0
 
@@ -316,9 +320,11 @@ remove-test-milestones:
 	cd $(M); rm -f qatests qatests-prereqs
 
 teardown-charts: remove-chart-milestones
-	helm delete --purge $(shell helm ls -q | grep -v docker-registry)
+	helm delete --purge $(shell helm ls -q | grep -v -E "docker-registry|mavenrepo|ponnet|kafka")
+	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh
 
 reset-kubeadm: remove-chart-milestones remove-kube-milestones remove-test-milestones
+	cd $(M); rm -f kafka ponnet
 	sudo kubeadm reset -f || true
 	sudo iptables -F && sudo iptables -t nat -F && sudo iptables -t mangle -F && sudo iptables -X
 	sudo rm -f /var/lib/cni/networks/pon0/* || true
