@@ -304,7 +304,7 @@ $(M)/qatests: | $(M)/siab $(M)/qatests-prereqs $(WORKSPACE)/cord/test/cord-teste
 	touch $@
 
 remove-chart-milestones:
-	cd $(M); rm -f kafka kafka-running onos voltha etcd-operator-ready etcd-cluster \
+	cd $(M); rm -f kafka-running onos voltha etcd-operator-ready etcd-cluster \
 		voltha-running ponsim mininet nem nem-running ponsim-tosca siab bbsim bbsim-tosca \
 		logging nem-monitoring seba-1.0.0
 
@@ -315,7 +315,7 @@ remove-test-milestones:
 	cd $(M); rm -f qatests qatests-prereqs
 
 teardown-charts: remove-chart-milestones
-	helm delete --purge $(shell helm ls -q | grep -v docker-registry)
+	helm delete --purge $(shell helm ls -q | grep -v -E "docker-registry|mavenrepo|ponnet|kafka")
 
 reset-kubeadm: remove-chart-milestones remove-kube-milestones remove-test-milestones
 	sudo kubeadm reset -f || true
