@@ -315,7 +315,7 @@ remove-test-milestones:
 	cd $(M); rm -f qatests qatests-prereqs
 
 teardown-charts: remove-chart-milestones
-	helm delete --purge $(shell helm ls -q | grep -v docker-registry)
+	helm delete --purge $(shell helm ls -q | grep -v -E "docker-registry|mavenrepo|ponnet|kafka")
 
 reset-kubeadm: remove-chart-milestones remove-kube-milestones remove-test-milestones
 	sudo kubeadm reset -f || true
