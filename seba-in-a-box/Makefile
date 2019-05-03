@@ -58,6 +58,7 @@ $(M)/setup:
 	sudo apt update
 	sudo apt install -y httpie jq software-properties-common
 	sudo swapoff -a
+	[ -d /usr/local/etc/emulab ] && $(MAKEDIR)/../openstack-helm/cloudlab-disk-setup.sh
 	touch $@
 
 /usr/bin/docker: | $(M)/setup
