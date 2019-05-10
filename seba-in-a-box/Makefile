@@ -284,7 +284,7 @@ $(M)/bbsim-tosca: | $(M)/bbsim
 
 run-tests: | $(M)/qatests
 
-run-tests-latest: PYBOT_ARGS := '-v SUBSCRIBER_FILENAME:SIABSubscriberLatest'
+run-tests-latest: PYBOT_ARGS := -v SUBSCRIBER_FILENAME:SIABSubscriberLatest -v ONU_STATE_VAR:oper_onu_status
 run-tests-latest: run-tests
 
 $(M)/qatests-prereqs:
