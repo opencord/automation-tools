@@ -283,10 +283,10 @@ $(M)/bbsim-tosca: | $(M)/bbsim
 	touch $@
 
 run-tests: | $(M)/qatests
-
 run-tests: PYBOT_ARGS := -v ONU_STATE_VAR:onu_state
+
+run-tests-latest: | $(M)/qatests
 run-tests-latest: PYBOT_ARGS := -v SUBSCRIBER_FILENAME:SIABSubscriberLatest
-run-tests-latest: run-tests
 
 $(M)/qatests-prereqs:
 	sudo apt install -y python-pip virtualenv
