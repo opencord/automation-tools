@@ -245,6 +245,7 @@ ifeq ($(NEM_WORKFLOW),tt-workflow)
 endif
 	sudo iptables -P FORWARD ACCEPT
 	sudo apparmor_parser -R /etc/apparmor.d/sbin.dhclient || true
+	sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.tcpdump || true
 	touch $@
 	echo "SEBA-in-a-Box installation finished!"
 
