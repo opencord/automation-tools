@@ -37,7 +37,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 if [ -d /usr/local/etc/emulab ]
 then
   sudo delgroup docker || true
-  "$DIR"/cloudlab-disk-setup.sh
+  "$DIR"/../scripts/cloudlab-disksetup.sh
 fi
 
 if [ ! -e ~/openstack-helm-infra ]
