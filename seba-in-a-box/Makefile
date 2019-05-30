@@ -31,6 +31,8 @@ HELM_ONOS_ARGS   ?= $(HELM_GLOBAL_ARGS)
 HELM_VOLTHA_ARGS ?= $(HELM_GLOBAL_ARGS)
 
 NEM_WORKFLOW ?= att-workflow
+NUM_OLTS ?= 1
+NUM_ONUS_PER_OLT ?= 1
 
 # Targets
 ponsim: $(M)/siab
@@ -168,31 +170,36 @@ $(M)/voltha-running: | $(M)/voltha
 	touch $@
 
 $(M)/ponnet: | $(M)/voltha
-	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) ponnet ponnet
+	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) ponnet ponnet --set numOlts=$(NUM_OLTS)
 	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh kube-system
 	touch $@
 
 $(M)/ponsim: | $(M)/ponnet $(M)/voltha
-	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) ponsimv2 ponsimv2 -f $(SEBAVALUES)
+	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) ponsimv2 ponsimv2 -f $(SEBAVALUES) --set numOlts=$(NUM_OLTS)
 	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh voltha
 	touch $@
 
+# For each OLT, set up forwarding on the ponX bridge
 $(M)/pon0_fwd: | $(M)/ponsim
-	echo 8 > /tmp/pon0_group_fwd_mask
-	until sudo cp /tmp/pon0_group_fwd_mask /sys/class/net/pon0/bridge/group_fwd_mask; \
+	echo 8 > /tmp/group_fwd_mask
+	for (( i=0; i<=$(NUM_OLTS)-1; i++ )); \
 	do \
-		echo "waiting for pon0..."; \
-		sleep 5; \
+	    until sudo cp /tmp/group_fwd_mask /sys/class/net/pon$$i/bridge/group_fwd_mask; \
+	    do \
+		    echo "waiting for pon$$i..."; \
+		    sleep 5; \
+	    done; \
 	done
-	rm /tmp/pon0_group_fwd_mask
+	rm /tmp/group_fwd_mask
 	touch $@
 
 # Make sure that we're using the ofdpa-ovs driver with OvS.
+# Need to customize the topology so that each nniX bridge is a port on Mininet's OVS switch?  That's what it would look like in a real deployment.
 $(M)/mininet: | $(M)/onos $(M)/ponsim $(M)/pon0_fwd $(M)/ponsim-tosca
 	sudo modprobe openvswitch
 	timeout 60s bash -c "until ! http -a admin@opencord.org:letmein GET http://127.0.0.1:30001/xosapi/v1/fabric/switches|jq '.items[].driver'|grep -v ofdpa-ovs ; do echo 'waiting for switch driver == ofdpa-ovs'; sleep 5; done"
 	timeout 60s bash -c "until ! http -a admin@opencord.org:letmein GET http://127.0.0.1:30001/xosapi/v1/fabric/switches|jq '.items[].backend_status'|grep -v OK; do echo 'waiting for switch driver to sync'; sleep 5; done"
-	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) mininet mininet -f $(SEBAVALUES)
+	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) mininet mininet -f $(SEBAVALUES) --set numOlts=$(NUM_OLTS)
 	touch $@
 
 $(M)/nem: | $(M)/kafka-running $(INFRA_PREREQS)
@@ -214,7 +221,7 @@ $(M)/ponsim-tosca: | $(M)/onos $(M)/nem-running
 	timeout 60s bash -c "until ! http -a admin@opencord.org:letmein GET http://127.0.0.1:30001/xosapi/v1/core/serviceinstanceattributes|jq '.items[].backend_status'|grep -v OK; do echo 'waiting for ONOS config to sync'; sleep 5; done"
 	timeout 60s bash -c "until ! http -a admin@opencord.org:letmein GET http://127.0.0.1:30001/xosapi/v1/onos/onosapps|jq '.items[].backend_status'|grep -v OK; do echo 'waiting for ONOS apps to sync'; sleep 5; done"
 	timeout 60s bash -c "until http -a karaf:karaf GET http://127.0.0.1:30120/onos/v1/applications/org.opencord.kafka|jq '.state'|grep -q ACTIVE; do echo 'Waiting for Kafka app to become ACTIVE'; sleep 5; done"
-	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) ponsim-pod xos-profiles/ponsim-pod -f $(SEBAVALUES) --set workflow=$(NEM_WORKFLOW)
+	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) ponsim-pod xos-profiles/ponsim-pod -f $(SEBAVALUES) --set workflow=$(NEM_WORKFLOW) --set numOlts=$(NUM_OLTS)
 	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh
 	touch $@
 
@@ -329,6 +336,6 @@ reset-kubeadm: remove-chart-milestones remove-kube-milestones remove-test-milest
 	cd $(M); rm -f kafka ponnet
 	sudo kubeadm reset -f || true
 	sudo iptables -F && sudo iptables -t nat -F && sudo iptables -t mangle -F && sudo iptables -X
-	sudo rm -f /var/lib/cni/networks/pon0/* || true
-	sudo rm -f /var/lib/cni/networks/pon1/* || true
+	sudo rm -f /var/lib/cni/networks/pon*/* || true
+	sudo rm -f /var/lib/cni/networks/nni*/* || true
 	sudo rm -f /var/lib/cni/networks/k8s-pod-network/* || true
