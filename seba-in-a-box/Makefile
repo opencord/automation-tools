@@ -31,6 +31,8 @@ HELM_ONOS_ARGS   ?= $(HELM_GLOBAL_ARGS)
 HELM_VOLTHA_ARGS ?= $(HELM_GLOBAL_ARGS)
 
 NEM_WORKFLOW ?= att-workflow
+NUM_OLTS ?= 1
+NUM_ONUS_PER_OLT ?= 1
 
 # Targets
 ponsim: $(M)/siab
@@ -168,31 +170,35 @@ $(M)/voltha-running: | $(M)/voltha
 	touch $@
 
 $(M)/ponnet: | $(M)/voltha
-	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) ponnet ponnet
+	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) ponnet ponnet --set numOlts=$(NUM_OLTS)
 	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh kube-system
 	touch $@
 
 $(M)/ponsim: | $(M)/ponnet $(M)/voltha
-	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) ponsimv2 ponsimv2 -f $(SEBAVALUES)
+	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) ponsimv2 ponsimv2 -f $(SEBAVALUES) --set numOlts=$(NUM_OLTS)
 	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh voltha
 	touch $@
 
-$(M)/pon0_fwd: | $(M)/ponsim
-	echo 8 > /tmp/pon0_group_fwd_mask
-	until sudo cp /tmp/pon0_group_fwd_mask /sys/class/net/pon0/bridge/group_fwd_mask; \
+# For each OLT, set up forwarding on the ponX bridge
+$(M)/ponX_fwd: | $(M)/ponsim
+	echo 8 > /tmp/group_fwd_mask
+	for (( i=0; i<=$(NUM_OLTS)-1; i++ )); \
 	do \
-		echo "waiting for pon0..."; \
-		sleep 5; \
+	    until sudo cp /tmp/group_fwd_mask /sys/class/net/pon$$i/bridge/group_fwd_mask; \
+	    do \
+		    echo "waiting for pon$$i..."; \
+		    sleep 5; \
+	    done; \
 	done
-	rm /tmp/pon0_group_fwd_mask
+	rm /tmp/group_fwd_mask
 	touch $@
 
 # Make sure that we're using the ofdpa-ovs driver with OvS.
-$(M)/mininet: | $(M)/onos $(M)/ponsim $(M)/pon0_fwd $(M)/ponsim-tosca
+$(M)/mininet: | $(M)/onos $(M)/ponsim $(M)/ponX_fwd $(M)/ponsim-tosca
 	sudo modprobe openvswitch
 	timeout 60s bash -c "until ! http -a admin@opencord.org:letmein GET http://127.0.0.1:30001/xosapi/v1/fabric/switches|jq '.items[].driver'|grep -v ofdpa-ovs ; do echo 'waiting for switch driver == ofdpa-ovs'; sleep 5; done"
 	timeout 60s bash -c "until ! http -a admin@opencord.org:letmein GET http://127.0.0.1:30001/xosapi/v1/fabric/switches|jq '.items[].backend_status'|grep -v OK; do echo 'waiting for switch driver to sync'; sleep 5; done"
-	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) mininet mininet -f $(SEBAVALUES)
+	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) mininet mininet -f $(SEBAVALUES) --set numOlts=$(NUM_OLTS)
 	touch $@
 
 $(M)/nem: | $(M)/kafka-running $(INFRA_PREREQS)
@@ -214,7 +220,7 @@ $(M)/ponsim-tosca: | $(M)/onos $(M)/nem-running
 	timeout 60s bash -c "until ! http -a admin@opencord.org:letmein GET http://127.0.0.1:30001/xosapi/v1/core/serviceinstanceattributes|jq '.items[].backend_status'|grep -v OK; do echo 'waiting for ONOS config to sync'; sleep 5; done"
 	timeout 60s bash -c "until ! http -a admin@opencord.org:letmein GET http://127.0.0.1:30001/xosapi/v1/onos/onosapps|jq '.items[].backend_status'|grep -v OK; do echo 'waiting for ONOS apps to sync'; sleep 5; done"
 	timeout 60s bash -c "until http -a karaf:karaf GET http://127.0.0.1:30120/onos/v1/applications/org.opencord.kafka|jq '.state'|grep -q ACTIVE; do echo 'Waiting for Kafka app to become ACTIVE'; sleep 5; done"
-	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) ponsim-pod xos-profiles/ponsim-pod -f $(SEBAVALUES) --set workflow=$(NEM_WORKFLOW)
+	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) ponsim-pod xos-profiles/ponsim-pod -f $(SEBAVALUES) --set workflow=$(NEM_WORKFLOW) --set numOlts=$(NUM_OLTS)
 	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh
 	touch $@
 
@@ -226,9 +232,9 @@ $(M)/siab: | $(M)/voltha-running $(M)/mininet $(M)/ponsim-tosca
 	http -a karaf:karaf --ignore-stdin POST http://127.0.0.1:30120/onos/v1/configuration/org.opencord.olt.impl.Olt defaultVlan=65535
 	timeout 1m bash -c "until http GET http://127.0.0.1:30125/health|jq '.state'|grep -q HEALTHY; do echo 'Waiting for VOLTHA to be HEALTHY'; sleep 10; done"
 	echo "[passed] VOLTHA is HEALTHY"
-	timeout 2m bash -c "until http GET http://127.0.0.1:30125/api/v1/devices|jq '.items[].admin_state'|grep ENABLED|wc -l|grep -q 2; do echo 'Waiting for OLT and ONU to be enabled in VOLTHA'; sleep 10; done"
+	timeout 2m bash -c "until http GET http://127.0.0.1:30125/api/v1/devices|jq '.items[].admin_state'|grep ENABLED|wc -l|grep -q $$(( 2 * $(NUM_OLTS) )); do echo 'Waiting for OLT and ONU to be enabled in VOLTHA'; sleep 10; done"
 	echo "[passed] OLT and ONU are enabled in VOLTHA"
-	timeout 2m bash -c "until http -a karaf:karaf GET http://127.0.0.1:30120/onos/v1/devices|jq '.devices[].available'|grep true|wc -l|grep -q 2; do echo 'Waiting for VOLTHA logical device and agg switch to be available in ONOS'; sleep 10; done"
+	timeout 2m bash -c "until http -a karaf:karaf GET http://127.0.0.1:30120/onos/v1/devices|jq '.devices[].available'|grep true|wc -l|grep -q $$(( $(NUM_OLTS) + 1 )); do echo 'Waiting for VOLTHA logical device and agg switch to be available in ONOS'; sleep 10; done"
 	echo "[passed] VOLTHA logical device and agg switch are available in ONOS"
 	# For some reason the dhcpl2relay app needs to be restarted after connecting the switch to ONOS's ofdpa-ovs driver.
 	# Without this step the DHCP trap flow is not added to the agg switch.
@@ -287,7 +293,7 @@ run-tests: | $(M)/qatests
 run-tests: PYBOT_ARGS := -v ONU_STATE_VAR:onu_state
 
 run-tests-latest: | $(M)/qatests
-run-tests-latest: PYBOT_ARGS := -v SUBSCRIBER_FILENAME:SIABSubscriberLatest
+run-tests-latest: PYBOT_ARGS := -v SUBSCRIBER_FILENAME:SIABSubscriberLatest -v WHITELIST_FILENAME:SIABWhitelistLatest -v OLT_DEVICE_FILENAME:SIABOLT0Device
 
 $(M)/qatests-prereqs:
 	sudo apt install -y python-pip virtualenv
@@ -313,7 +319,7 @@ $(M)/qatests: | $(M)/siab $(M)/qatests-prereqs $(WORKSPACE)/cord/test/cord-teste
 remove-chart-milestones:
 	cd $(M); rm -f kafka-running onos voltha etcd-operator-ready etcd-cluster \
 		voltha-running ponsim mininet nem nem-running ponsim-tosca siab bbsim bbsim-tosca \
-		logging nem-monitoring seba-1.0.0
+		logging nem-monitoring seba-1.0.0 ponX_fwd
 
 remove-kube-milestones:
 	cd $(M); rm -f kubeadm helm-init
@@ -329,6 +335,6 @@ reset-kubeadm: remove-chart-milestones remove-kube-milestones remove-test-milest
 	cd $(M); rm -f kafka ponnet
 	sudo kubeadm reset -f || true
 	sudo iptables -F && sudo iptables -t nat -F && sudo iptables -t mangle -F && sudo iptables -X
-	sudo rm -f /var/lib/cni/networks/pon0/* || true
-	sudo rm -f /var/lib/cni/networks/pon1/* || true
+	sudo rm -f /var/lib/cni/networks/pon*/* || true
+	sudo rm -f /var/lib/cni/networks/nni*/* || true
 	sudo rm -f /var/lib/cni/networks/k8s-pod-network/* || true
