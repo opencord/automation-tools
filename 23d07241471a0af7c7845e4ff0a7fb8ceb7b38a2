@@ -45,6 +45,30 @@
       "revId": "23d07241471a0af7c7845e4ff0a7fb8ceb7b38a2",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dcfbfbe8_5507b516",
+        "filename": "seba-in-a-box/Makefile",
+        "patchSetId": 4
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 1000010
+      },
+      "writtenOn": "2019-06-03T21:52:06Z",
+      "side": 1,
+      "message": "You\u0027re right that we\u0027ll need to do that once the charts can support multiple ONUs per OLT.  However, with the other SEBA-686 patches we\u0027ll still only support one.  I was going to try to get someone from the community to add multiple ONUs per OLT, using the SEBA-686 changes as a template.",
+      "parentUuid": "5d94113d_2fcc9d0f",
+      "range": {
+        "startLine": 201,
+        "startChar": 111,
+        "endLine": 201,
+        "endChar": 136
+      },
+      "revId": "23d07241471a0af7c7845e4ff0a7fb8ceb7b38a2",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
     }
   ]
 }
