@@ -19,6 +19,10 @@ HELM_VERSION    ?= "2.12.1"
 HELM_SHA256SUM  ?= "891004bec55431b39515e2cedc4f4a06e93782aa03a4904f2bd742b168160451"
 HELM_PLATFORM   ?= "linux-amd64"
 
+CORDCTL_VERSION    ?= 1.0.0
+CORDCTL_SHA256SUM  ?= 126a5423c0f34872389eab03a5a81807e95bb6e681a1ef0d52eb4c4ec92290c7
+CORDCTL_PLATFORM   ?= linux-amd64
+
 KAFKA_CHART_VERSION  ?= 0.13.3
 KAFKA_POD := "pod/cord-kafka-0"
 
@@ -82,6 +86,14 @@ $(M)/setup:
 	cd /tmp; tar -xzvf helm.tgz; sudo mv ${HELM_PLATFORM}/helm /usr/local/bin/helm
 	sudo chmod a+x /usr/local/bin/helm
 	rm -rf /tmp/helm.tgz /tmp/${HELM_PLATFORM}
+
+/usr/local/bin/cordctl:
+	curl -L -o /tmp/cordctl "https://github.com/opencord/cordctl/releases/download/${CORDCTL_VERSION}/cordctl-${CORDCTL_PLATFORM}"
+	echo "${CORDCTL_SHA256SUM}  /tmp/cordctl" | sha256sum -c -
+	sudo mv /tmp/cordctl /usr/local/bin/cordctl
+	sudo chmod a+x /usr/local/bin/cordctl
+	mkdir -p ~/.cord
+	printf "server: localhost:30011\nusername: admin@opencord.org\npassword: letmein\ngrpc:\n  timeout: 10s\n" > ~/.cord/config
 
 $(M)/kubeadm: | $(M)/setup /usr/bin/kubeadm
 	sudo kubeadm init --pod-network-cidr=192.168.0.0/16
@@ -196,8 +208,7 @@ $(M)/ponX_fwd: | $(M)/ponsim
 # Make sure that we're using the ofdpa-ovs driver with OvS.
 $(M)/mininet: | $(M)/onos $(M)/ponsim $(M)/ponX_fwd $(M)/ponsim-tosca
 	sudo modprobe openvswitch
-	timeout 60s bash -c "until ! http -a admin@opencord.org:letmein GET http://127.0.0.1:30001/xosapi/v1/fabric/switches|jq '.items[].driver'|grep -v ofdpa-ovs ; do echo 'waiting for switch driver == ofdpa-ovs'; sleep 5; done"
-	timeout 60s bash -c "until ! http -a admin@opencord.org:letmein GET http://127.0.0.1:30001/xosapi/v1/fabric/switches|jq '.items[].backend_status'|grep -v OK; do echo 'waiting for switch driver to sync'; sleep 5; done"
+	timeout 60s bash -c "cordctl model sync Switch -f 'driver=ofdpa-ovs'"
 	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) mininet mininet -f $(SEBAVALUES) --set numOlts=$(NUM_OLTS)
 	touch $@
 
@@ -217,8 +228,8 @@ $(M)/nem-running: | $(M)/nem
 	touch $@
 
 $(M)/ponsim-tosca: | $(M)/onos $(M)/nem-running
-	timeout 60s bash -c "until ! http -a admin@opencord.org:letmein GET http://127.0.0.1:30001/xosapi/v1/core/serviceinstanceattributes|jq '.items[].backend_status'|grep -v OK; do echo 'waiting for ONOS config to sync'; sleep 5; done"
-	timeout 60s bash -c "until ! http -a admin@opencord.org:letmein GET http://127.0.0.1:30001/xosapi/v1/onos/onosapps|jq '.items[].backend_status'|grep -v OK; do echo 'waiting for ONOS apps to sync'; sleep 5; done"
+	timeout 60s bash -c "cordctl model sync ServiceInstanceAttribute -f 'id>0' -y"
+	timeout 60s bash -c "cordctl model sync ONOSApp -f 'id>0' -y"
 	timeout 60s bash -c "until http -a karaf:karaf GET http://127.0.0.1:30120/onos/v1/applications/org.opencord.kafka|jq '.state'|grep -q ACTIVE; do echo 'Waiting for Kafka app to become ACTIVE'; sleep 5; done"
 	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) ponsim-pod xos-profiles/ponsim-pod -f $(SEBAVALUES) --set workflow=$(NEM_WORKFLOW) --set numOlts=$(NUM_OLTS)
 	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh
@@ -236,17 +247,12 @@ $(M)/siab: | $(M)/voltha-running $(M)/mininet $(M)/ponsim-tosca
 	echo "[passed] OLT and ONU are enabled in VOLTHA"
 	timeout 2m bash -c "until http -a karaf:karaf GET http://127.0.0.1:30120/onos/v1/devices|jq '.devices[].available'|grep true|wc -l|grep -q $$(( $(NUM_OLTS) + 1 )); do echo 'Waiting for VOLTHA logical device and agg switch to be available in ONOS'; sleep 10; done"
 	echo "[passed] VOLTHA logical device and agg switch are available in ONOS"
-	# For some reason the dhcpl2relay app needs to be restarted after connecting the switch to ONOS's ofdpa-ovs driver.
-	# Without this step the DHCP trap flow is not added to the agg switch.
-	http -a karaf:karaf --ignore-stdin DELETE http://127.0.0.1:30120/onos/v1/applications/org.opencord.dhcpl2relay/active
-	http -a karaf:karaf --ignore-stdin POST http://127.0.0.1:30120/onos/v1/applications/org.opencord.dhcpl2relay/active
-	http -a karaf:karaf --ignore-stdin POST http://127.0.0.1:30120/onos/v1/applications/org.opencord.kafka/active
 ifeq ($(NEM_WORKFLOW),att-workflow)
-	timeout 2m bash -c "until http -a admin@opencord.org:letmein GET http://127.0.0.1:30001/xosapi/v1/att-workflow-driver/attworkflowdriverserviceinstances |jq '.items[0].authentication_state'|grep -q AWAITING; do echo 'waiting for ATT Workflow Driver ServiceInstance to be in AWAITING state'; sleep 10; done"
+	timeout 2m bash -c "until cordctl model list AttWorkflowDriverServiceInstance -q -f 'authentication_state=AWAITING' | wc -l | grep -q $(NUM_OLTS) ; do echo 'waiting for ATT Workflow Driver ServiceInstance to be in AWAITING state'; sleep 10; done"
 	echo "[passed] ATT Workflow Driver ServiceInstance is in AWAITING state"
 endif
 ifeq ($(NEM_WORKFLOW),tt-workflow)
-	timeout 2m bash -c "until http -a admin@opencord.org:letmein GET http://127.0.0.1:30001/xosapi/v1/tt-workflow-driver/ttworkflowdriverserviceinstances |jq '.items[0].dhcp_state'|grep -q AWAITING; do echo 'waiting for TT Workflow Driver ServiceInstance to be in AWAITING state'; sleep 10; done"
+	timeout 2m bash -c "until cordctl model list TtWorkflowDriverServiceInstance -q -f 'dhcp_state=AWAITING' | wc -l | grep -q $(NUM_OLTS) ; do echo 'waiting for TT Workflow Driver ServiceInstance to be in AWAITING state'; sleep 10; done"
 	echo "[passed] TT Workflow Driver ServiceInstance is in AWAITING state"
 endif
 	sudo iptables -P FORWARD ACCEPT
