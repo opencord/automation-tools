@@ -38,10 +38,18 @@ NEM_WORKFLOW ?= att-workflow
 NUM_OLTS ?= 1
 NUM_ONUS_PER_OLT ?= 1
 
+# BBSim related Arguments
+BBSIM_OLT_TOSCA ?= examples/bbsim-16.yaml
+BBSIM_DHCP_TOSCA ?= examples/bbsim-dhcp.yaml
+
 # Targets
 ponsim: $(M)/siab
 
 bbsim: $(M)/bbsim-tosca
+
+bbsim-latest: SEBAVALUES := configs/seba-ponsim-latest.yaml
+bbsim-latest: BBSIM_OLT_TOSCA := examples/bbsim-16-latest.yaml
+bbsim-latest: $(M)/bbsim-tosca
 
 both: BBSIM_DHCP_TOSCA =
 both: $(M)/siab $(M)/bbsim-tosca
@@ -277,9 +285,7 @@ $(M)/seba-1.0.0: | $(WORKSPACE)/cord/helm-charts $(M)/helm-init
 	touch $(M)/nem
 	touch $@
 
-# BBSim support
-BBSIM_OLT_TOSCA ?= examples/bbsim-16.yaml
-BBSIM_DHCP_TOSCA ?= examples/bbsim-dhcp.yaml
+# BBSim Targets
 
 $(M)/bbsim: | $(M)/onos $(M)/voltha-running $(M)/nem-running
 	cd $(WORKSPACE)/cord/helm-charts && \
