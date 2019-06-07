@@ -212,7 +212,7 @@ $(M)/mininet: | $(M)/onos $(M)/ponsim $(M)/ponX_fwd $(M)/ponsim-tosca
 	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) mininet mininet -f $(SEBAVALUES) --set numOlts=$(NUM_OLTS)
 	touch $@
 
-$(M)/nem: | $(M)/kafka-running $(INFRA_PREREQS)
+$(M)/nem: | /usr/local/bin/cordctl $(M)/kafka-running $(INFRA_PREREQS)
 	cd $(WORKSPACE)/cord/helm-charts; helm dep update xos-core
 	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_NEM_ARGS) xos-core xos-core -f $(SEBAVALUES)
 	cd $(WORKSPACE)/cord/helm-charts; helm dep update xos-profiles/seba-services
