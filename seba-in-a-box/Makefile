@@ -101,7 +101,7 @@ $(M)/setup:
 	sudo mv /tmp/cordctl /usr/local/bin/cordctl
 	sudo chmod a+x /usr/local/bin/cordctl
 	mkdir -p ~/.cord
-	printf "server: localhost:30011\nusername: admin@opencord.org\npassword: letmein\ngrpc:\n  timeout: 10s\n" > ~/.cord/config
+	printf "server: 127.0.0.1:30011\nusername: admin@opencord.org\npassword: letmein\ngrpc:\n  timeout: 10s\n" > ~/.cord/config
 
 $(M)/kubeadm: | $(M)/setup /usr/bin/kubeadm
 	sudo kubeadm init --pod-network-cidr=192.168.0.0/16
