@@ -190,25 +190,22 @@ $(M)/voltha-running: | $(M)/voltha
 	touch $@
 
 $(M)/ponnet: | $(M)/voltha
-	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) ponnet ponnet --set numOlts=$(NUM_OLTS)
+	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) ponnet ponnet --set numOlts=$(NUM_OLTS) --set numOnus=$(NUM_ONUS_PER_OLT)
 	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh kube-system
 	touch $@
 
 $(M)/ponsim: | $(M)/ponnet $(M)/voltha
-	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) ponsimv2 ponsimv2 -f $(SEBAVALUES) --set numOlts=$(NUM_OLTS)
+	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) ponsimv2 ponsimv2 -f $(SEBAVALUES) --set numOlts=$(NUM_OLTS) --set numOnus=$(NUM_ONUS_PER_OLT)
 	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh voltha
 	touch $@
 
-# For each OLT, set up forwarding on the ponX bridge
+# For each ONU, set up forwarding on the ponX bridge
 $(M)/ponX_fwd: | $(M)/ponsim
 	echo 8 > /tmp/group_fwd_mask
-	for (( i=0; i<=$(NUM_OLTS)-1; i++ )); \
+	for bridge in /sys/class/net/pon*; \
 	do \
-	    until sudo cp /tmp/group_fwd_mask /sys/class/net/pon$$i/bridge/group_fwd_mask; \
-	    do \
-		    echo "waiting for pon$$i..."; \
-		    sleep 5; \
-	    done; \
+	    echo Setting up forwarding on `basename $$bridge`; \
+	    sudo cp /tmp/group_fwd_mask $$bridge/bridge/group_fwd_mask; \
 	done
 	rm /tmp/group_fwd_mask
 	touch $@
@@ -217,7 +214,7 @@ $(M)/ponX_fwd: | $(M)/ponsim
 $(M)/mininet: | $(M)/onos $(M)/ponsim $(M)/ponX_fwd $(M)/ponsim-tosca
 	sudo modprobe openvswitch
 	timeout 60s bash -c "cordctl model sync Switch -f 'driver=ofdpa-ovs'"
-	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) mininet mininet -f $(SEBAVALUES) --set numOlts=$(NUM_OLTS)
+	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) mininet mininet -f $(SEBAVALUES) --set numOlts=$(NUM_OLTS) --set numOlts=$(NUM_ONUS_PER_OLT)
 	touch $@
 
 $(M)/nem: | /usr/local/bin/cordctl $(M)/kafka-running $(INFRA_PREREQS)
@@ -239,7 +236,7 @@ $(M)/ponsim-tosca: | $(M)/onos $(M)/nem-running
 	timeout 60s bash -c "cordctl model sync ServiceInstanceAttribute -f 'id>0' -y"
 	timeout 60s bash -c "cordctl model sync ONOSApp -f 'id>0' -y"
 	timeout 60s bash -c "until http -a karaf:karaf GET http://127.0.0.1:30120/onos/v1/applications/org.opencord.kafka|jq '.state'|grep -q ACTIVE; do echo 'Waiting for Kafka app to become ACTIVE'; sleep 5; done"
-	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) ponsim-pod xos-profiles/ponsim-pod -f $(SEBAVALUES) --set workflow=$(NEM_WORKFLOW) --set numOlts=$(NUM_OLTS)
+	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) ponsim-pod xos-profiles/ponsim-pod -f $(SEBAVALUES) --set workflow=$(NEM_WORKFLOW) --set numOlts=$(NUM_OLTS) --set numOnus=$(NUM_ONUS_PER_OLT)
 	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh
 	touch $@
 
@@ -251,16 +248,16 @@ $(M)/siab: | $(M)/voltha-running $(M)/mininet $(M)/ponsim-tosca
 	http -a karaf:karaf --ignore-stdin POST http://127.0.0.1:30120/onos/v1/configuration/org.opencord.olt.impl.Olt defaultVlan=65535
 	timeout 1m bash -c "until http GET http://127.0.0.1:30125/health|jq '.state'|grep -q HEALTHY; do echo 'Waiting for VOLTHA to be HEALTHY'; sleep 10; done"
 	echo "[passed] VOLTHA is HEALTHY"
-	timeout 2m bash -c "until http GET http://127.0.0.1:30125/api/v1/devices|jq '.items[].admin_state'|grep ENABLED|wc -l|grep -q $$(( 2 * $(NUM_OLTS) )); do echo 'Waiting for OLT and ONU to be enabled in VOLTHA'; sleep 10; done"
+	timeout 2m bash -c "until http GET http://127.0.0.1:30125/api/v1/devices|jq '.items[].admin_state'|grep ENABLED|wc -l|grep -q $$(( $(NUM_OLTS) + $(NUM_ONUS_PER_OLT) * $(NUM_OLTS) )); do echo 'Waiting for OLT and ONU to be enabled in VOLTHA'; sleep 10; done"
 	echo "[passed] OLT and ONU are enabled in VOLTHA"
 	timeout 2m bash -c "until http -a karaf:karaf GET http://127.0.0.1:30120/onos/v1/devices|jq '.devices[].available'|grep true|wc -l|grep -q $$(( $(NUM_OLTS) + 1 )); do echo 'Waiting for VOLTHA logical device and agg switch to be available in ONOS'; sleep 10; done"
 	echo "[passed] VOLTHA logical device and agg switch are available in ONOS"
 ifeq ($(NEM_WORKFLOW),att-workflow)
-	timeout 2m bash -c "until cordctl model list AttWorkflowDriverServiceInstance -q -f 'authentication_state=AWAITING' | wc -l | grep -q $(NUM_OLTS) ; do echo 'waiting for ATT Workflow Driver ServiceInstance to be in AWAITING state'; sleep 10; done"
+	timeout 2m bash -c "until cordctl model list AttWorkflowDriverServiceInstance -q -f 'authentication_state=AWAITING' | wc -l | grep -q $$(( $(NUM_OLTS) * $(NUM_ONUS_PER_OLT) )); do echo 'waiting for ATT Workflow Driver ServiceInstance to be in AWAITING state'; sleep 10; done"
 	echo "[passed] ATT Workflow Driver ServiceInstance is in AWAITING state"
 endif
 ifeq ($(NEM_WORKFLOW),tt-workflow)
-	timeout 2m bash -c "until cordctl model list TtWorkflowDriverServiceInstance -q -f 'dhcp_state=AWAITING' | wc -l | grep -q $(NUM_OLTS) ; do echo 'waiting for TT Workflow Driver ServiceInstance to be in AWAITING state'; sleep 10; done"
+	timeout 2m bash -c "until cordctl model list TtWorkflowDriverServiceInstance -q -f 'dhcp_state=AWAITING' | wc -l | grep -q $$(( $(NUM_OLTS) * $(NUM_ONUS_PER_OLT) )); do echo 'waiting for TT Workflow Driver ServiceInstance to be in AWAITING state'; sleep 10; done"
 	echo "[passed] TT Workflow Driver ServiceInstance is in AWAITING state"
 endif
 	sudo iptables -P FORWARD ACCEPT
@@ -350,3 +347,5 @@ reset-kubeadm: remove-chart-milestones remove-kube-milestones remove-test-milest
 	sudo rm -f /var/lib/cni/networks/pon*/* || true
 	sudo rm -f /var/lib/cni/networks/nni*/* || true
 	sudo rm -f /var/lib/cni/networks/k8s-pod-network/* || true
+	for br in /sys/class/net/pon*; do sudo ip link delete `basename $$br` type bridge; done || true
+	for br in /sys/class/net/nni*; do sudo ip link delete `basename $$br` type bridge; done || true
