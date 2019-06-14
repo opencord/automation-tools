@@ -214,7 +214,7 @@ $(M)/ponX_fwd: | $(M)/ponsim
 $(M)/mininet: | $(M)/onos $(M)/ponsim $(M)/ponX_fwd $(M)/ponsim-tosca
 	sudo modprobe openvswitch
 	timeout 60s bash -c "cordctl model sync Switch -f 'driver=ofdpa-ovs'"
-	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) mininet mininet -f $(SEBAVALUES) --set numOlts=$(NUM_OLTS) --set numOlts=$(NUM_ONUS_PER_OLT)
+	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) mininet mininet -f $(SEBAVALUES) --set numOlts=$(NUM_OLTS) --set numOnus=$(NUM_ONUS_PER_OLT)
 	touch $@
 
 $(M)/nem: | /usr/local/bin/cordctl $(M)/kafka-running $(INFRA_PREREQS)
