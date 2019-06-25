@@ -43,7 +43,7 @@ BBSIM_OLT_TOSCA ?= examples/bbsim-16.yaml
 BBSIM_DHCP_TOSCA ?= examples/bbsim-dhcp.yaml
 
 # Targets
-ponsim: $(M)/siab
+ponsim: validate_args $(M)/siab
 
 bbsim: $(M)/bbsim-tosca
 
@@ -65,6 +65,18 @@ siab-1.0: SEBAVALUES := configs/siab-v1.0.0.yaml
 siab-1.0: KAFKA_POD := "pod/cord-platform-kafka-0"
 # Parallel make won't work here; need to install seba-1.0.0 before siab
 siab-1.0: $(M)/seba-1.0.0 $(M)/siab
+
+validate_args:
+	if ! ([[ $(NUM_OLTS) == ?(-)+([0-9]) ]] && [ $(NUM_OLTS) -ge 1 ] && [ $(NUM_OLTS) -le 4 ]); \
+	then \
+		echo "Invalid value: NUM_OLTS must between 1 and 4"; \
+		exit 1; \
+	fi
+	if ! ([[ $(NUM_ONUS_PER_OLT) == ?(-)+([0-9]) ]] && [ $(NUM_ONUS_PER_OLT) -ge 1 ] && [ $(NUM_ONUS_PER_OLT) -le 4 ]); \
+	then \
+		echo "Invalid value: NUM_ONUS_PER_OLT must between 1 and 4"; \
+		exit 1; \
+	fi
 
 $(M)/setup:
 	sudo $(MAKEDIR)/../scripts/portcheck.sh
