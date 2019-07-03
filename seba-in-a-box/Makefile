@@ -19,8 +19,8 @@ HELM_VERSION    ?= "2.12.1"
 HELM_SHA256SUM  ?= "891004bec55431b39515e2cedc4f4a06e93782aa03a4904f2bd742b168160451"
 HELM_PLATFORM   ?= "linux-amd64"
 
-CORDCTL_VERSION    ?= 1.0.0
-CORDCTL_SHA256SUM  ?= 126a5423c0f34872389eab03a5a81807e95bb6e681a1ef0d52eb4c4ec92290c7
+CORDCTL_VERSION    ?= 1.1.1
+CORDCTL_SHA256SUM  ?= b8e422d410d74493aa1d014e4dbda7b0532e791d10250fde523a6f141846a1c7
 CORDCTL_PLATFORM   ?= linux-amd64
 
 KAFKA_CHART_VERSION  ?= 0.13.3
@@ -61,10 +61,10 @@ latest: ponsim
 stable: SEBAVALUES := configs/seba-ponsim.yaml
 stable: ponsim
 
-siab-1.0: SEBAVALUES := configs/siab-v1.0.0.yaml
-siab-1.0: KAFKA_POD := "pod/cord-platform-kafka-0"
+siab-2.0-alpha1: SEBAVALUES := configs/siab-v1.0.0.yaml
+siab-2.0-alpha1: KAFKA_POD := "pod/cord-platform-kafka-0"
 # Parallel make won't work here; need to install seba-1.0.0 before siab
-siab-1.0: $(M)/seba-1.0.0 $(M)/siab
+siab-2.0-alpha1: $(M)/seba-2.0.0-alpha1 $(M)/siab
 
 validate_args:
 	if ! ([[ $(NUM_OLTS) == ?(-)+([0-9]) ]] && [ $(NUM_OLTS) -ge 1 ] && [ $(NUM_OLTS) -le 4 ]); \
@@ -278,8 +278,8 @@ endif
 	touch $@
 	echo "SEBA-in-a-Box installation finished!"
 
-$(M)/seba-1.0.0: | $(WORKSPACE)/cord/helm-charts $(M)/helm-init
-	helm install -n cord-platform cord/cord-platform --version=6.1.0 -f $(WORKSPACE)/cord/helm-charts/$(SEBAVALUES)
+$(M)/seba-2.0.0-alpha1: | $(WORKSPACE)/cord/helm-charts $(M)/helm-init
+	helm install -n cord-platform cord/cord-platform --version=7.0.0 -f $(WORKSPACE)/cord/helm-charts/$(SEBAVALUES)
 	until kubectl get crd | grep etcdclusters; \
 	do \
 		echo "Waiting for etcdclusters CRD to be available"; \
@@ -288,8 +288,8 @@ $(M)/seba-1.0.0: | $(WORKSPACE)/cord/helm-charts $(M)/helm-init
 	touch $(M)/kafka
 	touch $(M)/onos
 	touch $(M)/etcd-operator-ready
-	helm install -n seba cord/seba --version=1.0.0 -f $(WORKSPACE)/cord/helm-charts/$(SEBAVALUES)
-	helm install -n att-workflow cord/att-workflow --version=1.0.2 -f $(WORKSPACE)/cord/helm-charts/$(SEBAVALUES)
+	helm install -n seba cord/seba --version=2.0.0-alpha1 -f $(WORKSPACE)/cord/helm-charts/$(SEBAVALUES)
+	helm install -n att-workflow cord/att-workflow --version=1.2.4 -f $(WORKSPACE)/cord/helm-charts/$(SEBAVALUES)
 	touch $(M)/voltha
 	touch $(M)/nem
 	touch $@
