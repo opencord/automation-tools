@@ -61,10 +61,10 @@ latest: ponsim
 stable: SEBAVALUES := configs/seba-ponsim.yaml
 stable: ponsim
 
-siab-1.0: SEBAVALUES := configs/siab-v1.0.0.yaml
-siab-1.0: KAFKA_POD := "pod/cord-platform-kafka-0"
-# Parallel make won't work here; need to install seba-1.0.0 before siab
-siab-1.0: $(M)/seba-1.0.0 $(M)/siab
+siab-2.0-alpha1: SEBAVALUES := configs/siab-v2.0.0-alpha1.yaml
+siab-2.0-alpha1: KAFKA_POD := "pod/cord-platform-kafka-0"
+# Parallel make won't work here; need to install seba-2.0.0 before siab
+siab-2.0-alpha1: $(M)/seba-2.0.0-alpha1 $(M)/siab
 
 validate_args:
 	if ! ([[ $(NUM_OLTS) == ?(-)+([0-9]) ]] && [ $(NUM_OLTS) -ge 1 ] && [ $(NUM_OLTS) -le 4 ]); \
@@ -278,8 +278,8 @@ endif
 	touch $@
 	echo "SEBA-in-a-Box installation finished!"
 
-$(M)/seba-1.0.0: | $(WORKSPACE)/cord/helm-charts $(M)/helm-init
-	helm install -n cord-platform cord/cord-platform --version=6.1.0 -f $(WORKSPACE)/cord/helm-charts/$(SEBAVALUES)
+$(M)/seba-2.0.0-alpha1: | $(WORKSPACE)/cord/helm-charts $(M)/helm-init
+	helm install -n cord-platform cord/cord-platform --version=7.0.0 -f $(WORKSPACE)/cord/helm-charts/$(SEBAVALUES)
 	until kubectl get crd | grep etcdclusters; \
 	do \
 		echo "Waiting for etcdclusters CRD to be available"; \
@@ -288,8 +288,8 @@ $(M)/seba-1.0.0: | $(WORKSPACE)/cord/helm-charts $(M)/helm-init
 	touch $(M)/kafka
 	touch $(M)/onos
 	touch $(M)/etcd-operator-ready
-	helm install -n seba cord/seba --version=1.0.0 -f $(WORKSPACE)/cord/helm-charts/$(SEBAVALUES)
-	helm install -n att-workflow cord/att-workflow --version=1.0.2 -f $(WORKSPACE)/cord/helm-charts/$(SEBAVALUES)
+	helm install -n seba cord/seba --version=2.0.0-alpha1 -f $(WORKSPACE)/cord/helm-charts/$(SEBAVALUES)
+	helm install -n att-workflow cord/att-workflow --version=1.2.4 -f $(WORKSPACE)/cord/helm-charts/$(SEBAVALUES)
 	touch $(M)/voltha
 	touch $(M)/nem
 	touch $@
@@ -340,7 +340,7 @@ $(M)/qatests: | $(M)/siab $(M)/qatests-prereqs $(WORKSPACE)/cord/test/cord-teste
 remove-chart-milestones:
 	cd $(M); rm -f kafka-running onos voltha etcd-operator-ready etcd-cluster \
 		voltha-running ponsim mininet nem nem-running ponsim-tosca siab bbsim bbsim-tosca \
-		logging nem-monitoring seba-1.0.0 ponX_fwd
+		logging nem-monitoring seba-2.0.0-alpha1 ponX_fwd
 
 remove-kube-milestones:
 	cd $(M); rm -f kubeadm helm-init
