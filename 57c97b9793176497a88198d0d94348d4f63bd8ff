@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f986cb3e_0a3d9a3e",
+        "filename": "seba-in-a-box/Makefile",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1000010
+      },
+      "writtenOn": "2019-07-03T21:47:34Z",
+      "side": 1,
+      "message": "Should rename this file to siab-v2.0.0-alpha1.yaml",
+      "range": {
+        "startLine": 64,
+        "startChar": 39,
+        "endLine": 64,
+        "endChar": 55
+      },
+      "revId": "57c97b9793176497a88198d0d94348d4f63bd8ff",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a877fab_91888242",
+        "filename": "seba-in-a-box/Makefile",
+        "patchSetId": 1
+      },
+      "lineNbr": 343,
+      "author": {
+        "id": 1000010
+      },
+      "writtenOn": "2019-07-03T21:47:34Z",
+      "side": 1,
+      "message": "Change to seba-2.0.0-alpha1",
+      "range": {
+        "startLine": 343,
+        "startChar": 25,
+        "endLine": 343,
+        "endChar": 35
+      },
+      "revId": "57c97b9793176497a88198d0d94348d4f63bd8ff",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
