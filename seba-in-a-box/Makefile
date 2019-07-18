@@ -41,6 +41,7 @@ NUM_ONUS_PER_OLT ?= 1
 # BBSim related Arguments
 BBSIM_OLT_TOSCA ?= examples/bbsim-16.yaml
 BBSIM_DHCP_TOSCA ?= examples/bbsim-dhcp.yaml
+BBSIM_TECH_PROF_TOSCA ?= examples/technology-profile.yaml
 
 # Targets
 ponsim: validate_args $(M)/siab
@@ -48,7 +49,6 @@ ponsim: validate_args $(M)/siab
 bbsim: $(M)/bbsim-tosca
 
 bbsim-latest: SEBAVALUES := configs/seba-ponsim-latest.yaml
-bbsim-latest: BBSIM_OLT_TOSCA := examples/bbsim-16-latest.yaml
 bbsim-latest: $(M)/bbsim-tosca
 
 both: BBSIM_DHCP_TOSCA =
@@ -304,8 +304,8 @@ $(M)/bbsim: | $(M)/onos $(M)/voltha-running $(M)/nem-running
 
 $(M)/bbsim-tosca: | $(M)/bbsim
 	cd $(WORKSPACE)/cord/helm-charts && \
-	echo "Loading BBSim TOSCA: $(BBSIM_DHCP_TOSCA) $(BBSIM_OLT_TOSCA)" && \
-	for tosca in $(BBSIM_DHCP_TOSCA) $(BBSIM_OLT_TOSCA) ; do \
+	echo "Loading BBSim TOSCA: $(BBSIM_DHCP_TOSCA) $(BBSIM_OLT_TOSCA) $(BBSIM_TECH_PROF_TOSCA)" && \
+	for tosca in $(BBSIM_DHCP_TOSCA) $(BBSIM_OLT_TOSCA) $(BBSIM_TECH_PROF_TOSCA) ; do \
 		curl -H "xos-username: admin@opencord.org" -H "xos-password: letmein" -X POST --data-binary @$$tosca http://127.0.0.1:30007/run ; \
 	done && \
 	touch $@
