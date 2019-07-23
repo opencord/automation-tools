@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Copyright 2017-present Open Networking Foundation
 #
@@ -44,7 +44,7 @@ if [ ! -e ~/openstack-helm-infra ]
 then
   cd ~
   git clone https://git.openstack.org/openstack/openstack-helm-infra.git -b "${OPENSTACK_HELM_INFRA_BRANCH}"
-  if [ ! -z "${OPENSTACK_HELM_INFRA_COMMIT}" ]
+  if [ -n "${OPENSTACK_HELM_INFRA_COMMIT}" ]
   then
     cd openstack-helm-infra
     git reset --hard "${OPENSTACK_HELM_INFRA_COMMIT}"
@@ -55,7 +55,7 @@ if [ ! -e ~/openstack-helm ]
 then
   cd ~
   git clone https://git.openstack.org/openstack/openstack-helm.git -b "${OPENSTACK_HELM_BRANCH}"
-  if [ ! -z "${OPENSTACK_HELM_COMMIT}" ]
+  if [ -n "${OPENSTACK_HELM_COMMIT}" ]
   then
     cd openstack-helm
     git reset --hard "${OPENSTACK_HELM_COMMIT}"
