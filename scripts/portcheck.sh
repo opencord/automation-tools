@@ -55,7 +55,7 @@ if [ $number_of_ports_in_use -gt 0 ]
     then
         echo "Kill the running services mentioned above before proceeding to install SEBA"
         echo "Terminating make"
-        exit -1
+        exit 1
 fi
 
 #The ports that are required by SEBA components will be added to the reserved port list

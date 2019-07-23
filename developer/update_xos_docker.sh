@@ -35,7 +35,7 @@ XOS_MAJOR=$(cut -b 1 "${WORKSPACE}/cord/orchestration/xos/VERSION")
 XOS_VERSION=$(cat "${WORKSPACE}/cord/orchestration/xos/VERSION")
 
 # Update Synchronizer FROM parent versions
-for df in ${WORKSPACE}/cord/orchestration/xos_services/*/Dockerfile.synchronizer
+for df in "${WORKSPACE}"/cord/orchestration/xos_services/*/Dockerfile.synchronizer
 do
   df_contents=$(cat "$df")
 
@@ -74,8 +74,8 @@ do
 done
 
 # Update XOS parent versions
-for df in ${WORKSPACE}/cord/orchestration/xos/containers/*/Dockerfile* \
-          ${WORKSPACE}/cord/orchestration/xos-tosca/Dockerfile
+for df in "${WORKSPACE}"/cord/orchestration/xos/containers/*/Dockerfile* \
+          "${WORKSPACE}/cord/orchestration/xos-tosca/Dockerfile"
 do
   echo "Updating core Dockerfile: ${df}"
   perl -pi -e "s/^FROM xos(.*):.*$/FROM xos\\1:$XOS_VERSION/" "$df"

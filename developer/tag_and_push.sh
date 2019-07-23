@@ -108,12 +108,12 @@ else
 fi
 
 # Filter images
-if [[ ! -z "$filter" ]]
+if [[ -n "$filter" ]]
 then
   images=$(echo -e "${images}" | grep -E "${filter}")
 fi
 
-if [[ ! -z "$registry" ]]
+if [[ -n "$registry" ]]
 then
   images=$(echo "${images}" | grep -v "${registry}")
 fi
@@ -122,7 +122,7 @@ for image in $(echo -e "${images}"); do
   new_image=""
 
   # Set registry
-  if [[ ! -z "$registry" ]]
+  if [[ -n "$registry" ]]
   then
     new_image+="${registry}/"
   else

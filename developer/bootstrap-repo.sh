@@ -73,7 +73,7 @@ then
   repo sync
 
   # download gerrit patches using repo
-  if [[ ! -z "${GERRIT_PATCHES[*]-}" ]]
+  if [[ -n "${GERRIT_PATCHES[*]-}" ]]
   then
     for gerrit_patch in "${GERRIT_PATCHES[@]-}"
     do

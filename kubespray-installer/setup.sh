@@ -101,7 +101,7 @@ check_pod_name () {
       echo "Missing option: podname" >&2
       echo " "
       display_help
-      exit -1
+      exit 1
     fi
 }
 
@@ -166,7 +166,7 @@ do
         echo Error: Unknown option: "$CLI_OPT" >&2
         echo " "
         display_help
-        exit -1
+        exit 1
         ;;
   esac
 done
