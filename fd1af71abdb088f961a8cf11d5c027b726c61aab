@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "24cd4ec9_90c74065",
+        "filename": "developer/update_xos_docker.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2019-07-24T22:01:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8e3280c8_53d5b6c3",
+      "range": {
+        "startLine": 38,
+        "startChar": 55,
+        "endLine": 38,
+        "endChar": 59
+      },
+      "revId": "fd1af71abdb088f961a8cf11d5c027b726c61aab",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2b85b26c_c4f932a7",
         "filename": "developer/update_xos_docker.sh",
         "patchSetId": 2
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "16b2ea09_f2e418f8",
+        "filename": "developer/update_xos_docker.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2019-07-24T22:01:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2b85b26c_c4f932a7",
+      "range": {
+        "startLine": 77,
+        "startChar": 57,
+        "endLine": 77,
+        "endChar": 61
+      },
+      "revId": "fd1af71abdb088f961a8cf11d5c027b726c61aab",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "acefdb67_d2fa01f4",
         "filename": "developer/update_xos_docker.sh",
         "patchSetId": 2
@@ -59,6 +107,30 @@
       "writtenOn": "2019-07-24T20:41:52Z",
       "side": 1,
       "message": "Do we need quotes here too?",
+      "range": {
+        "startLine": 78,
+        "startChar": 10,
+        "endLine": 78,
+        "endChar": 62
+      },
+      "revId": "fd1af71abdb088f961a8cf11d5c027b726c61aab",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f7a22ff7_df87b958",
+        "filename": "developer/update_xos_docker.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2019-07-24T22:01:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "acefdb67_d2fa01f4",
       "range": {
         "startLine": 78,
         "startChar": 10,
