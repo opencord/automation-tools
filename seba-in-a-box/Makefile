@@ -341,10 +341,13 @@ $(M)/qatests: | $(M)/siab $(M)/qatests-prereqs $(WORKSPACE)/cord/test/cord-teste
 	robot $(PYBOT_ARGS) --removekeywords wuks -e notready -i $(TESTTAGS) -v VOLTHA_DIR:$(WORKSPACE)/cord/incubator/voltha SIAB.robot
 	touch $@
 
-remove-chart-milestones:
+remove-chart-milestones: remove-bbsim-milestones
 	cd $(M); rm -f kafka-running onos voltha etcd-operator-ready etcd-cluster \
-		voltha-running ponsim mininet nem nem-running ponsim-tosca siab bbsim bbsim-tosca \
+		voltha-running ponsim mininet nem nem-running ponsim-tosca siab \
 		logging nem-monitoring seba-2.0.0-alpha1 ponX_fwd
+
+remove-bbsim-milestones:
+	cd $(M); rm -f bbsim bbsim-tosca
 
 remove-kube-milestones:
 	cd $(M); rm -f kubeadm helm-init
@@ -356,6 +359,15 @@ teardown-charts: remove-chart-milestones
 	helm delete --purge $(shell helm ls -q | grep -v -E "docker-registry|mavenrepo|ponnet|kafka")
 	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh
 
+teardown-bbsim: remove-bbsim-milestones
+	cd $(M); rm -f voltha-running voltha 
+	cordctl model delete RCORDSubscriber --all || true
+	timeout 60s bash -c "until cordctl model list VOLTServiceInstance --format json | wc -l | grep -q 0; do echo 'Waiting for Subscribers to be removed'; sleep 5; done"
+	cordctl model delete OLTDevice --all || true
+	cordctl model delete AttWorkflowDriverServiceInstance --all || true
+	timeout 60s bash -c "until http GET http://127.0.0.1:30125/api/v1/devices | jq '.items | length' | grep -q 0; do echo 'Waiting for OLTs to be removed'; sleep 5; done"
+	helm del --purge bbsim voltha
+
 reset-kubeadm: remove-chart-milestones remove-kube-milestones remove-test-milestones
 	cd $(M); rm -f kafka ponnet
 	sudo kubeadm reset -f || true
@@ -365,3 +377,4 @@ reset-kubeadm: remove-chart-milestones remove-kube-milestones remove-test-milest
 	sudo rm -f /var/lib/cni/networks/k8s-pod-network/* || true
 	for br in /sys/class/net/pon*; do sudo ip link delete `basename $$br` type bridge; done || true
 	for br in /sys/class/net/nni*; do sudo ip link delete `basename $$br` type bridge; done || true
+
