@@ -29,7 +29,7 @@ HELM_ONOS_ARGS	?= $(HELM_GLOBAL_ARGS)
 cpu_family	:= $(shell lscpu | grep 'CPU family:' | awk '{print $$3}')
 cpu_model	:= $(shell lscpu | grep 'Model:' | awk '{print $$2}')
 os_vendor	:= $(shell lsb_release -i -s)
-os_distro	:= $(shell lsb_release -c -s)
+os_release	:= $(shell lsb_release -r -s)
 
 # TODO: include CORD platform
 ciab: $(M)/system_check $(M)/omec $(M)/oaisim
@@ -50,8 +50,14 @@ $(M)/system_check: | $(M)
 		exit 1; \
 	fi
 	@if [[ $(os_vendor) =~ (Ubuntu) ]]; then \
-		if [[ ! $(os_distro) =~ (xenial) ]]; then \
-			echo "WARN: $(os_vendor) $(os_distro) has not been tested."; \
+		if [[ ! $(os_release) =~ (16.04) ]]; then \
+			echo "WARN: $(os_vendor) $(os_release) has not been tested."; \
+		fi; \
+		if dpkg --compare-versions 4.15 gt $(shell uname -r); then \
+			echo "FATAL: kernel 4.15 or later is required."; \
+			echo "Please upgrade your kernel by running" \
+			"apt install --install-recommends linux-generic-hwe-$(os_release)"; \
+			exit 1; \
 		fi \
 	else \
 		echo "FAIL: unsupported OS."; \
@@ -171,8 +177,9 @@ run-test: | $(M)/router
 	ping -I oip1 13.1.1.254 -c 5
 
 reset-test:
-	-kubectl delete po router
-	-helm delete --purge oaisim mcord-services
+	kubectl delete po router || true
+	helm delete --purge oaisim || true
+	helm delete --purge mcord-services || true
 	cd $(M); rm -f router oaisim omec
 
 clean: reset-test
