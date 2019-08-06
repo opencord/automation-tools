@@ -19,7 +19,7 @@
 ###############################################
 
 # Don't do anything if not a CloudLab node
-[ ! -d /usr/local/etc/emulab ] && return
+[ ! -d /usr/local/etc/emulab ] && exit 0
 
 # Mount extra space, if haven't already
 if [ ! -d /mnt/extra ]
