@@ -173,8 +173,8 @@ $(M)/router: | /opt/cni/bin/simpleovs $(M)/ovs-setup
 	kubectl exec router ip route add 16.0.0.0/8 via $(spgwu_ip)
 	touch $@
 
-run-test: | $(M)/router
-	ping -I oip1 13.1.1.254 -c 5
+test: | $(M)/router
+	@timeout 30s bash -c "until timeout 1 ping -I oip1 13.1.1.254 -c 1; do sleep 1; done"
 
 reset-test:
 	kubectl delete po router || true
