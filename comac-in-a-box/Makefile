@@ -90,7 +90,7 @@ $(M)/k8s-ready: | $(M)/setup $(BUILD)/kubespray $(VENV)/bin/activate $(M)/kubesp
 		-e "{'docker_version' : $(DOCKER_VERSION)}" \
 		-e "{'docker_iptables_enabled' : True}" \
 		-e "{'kube_version' : $(K8S_VERSION)}" \
-		-e "{'kube_network_plugin_multus' : True}" \
+		-e "{'kube_network_plugin_multus' : True, 'multus_version' : stable}" \
 		-e "{'kube_proxy_mode': iptables}" \
 		-e "{'kube_pods_subnet' : 192.168.0.0/17, 'kube_service_addresses' : 192.168.128.0/17}" \
 		-e "{'kube_apiserver_node_port_range' : 2000-36767}" \
