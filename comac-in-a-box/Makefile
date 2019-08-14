@@ -174,7 +174,11 @@ $(M)/router: | /opt/cni/bin/simpleovs $(M)/ovs-setup
 	touch $@
 
 test: | $(M)/router
-	@timeout 30s bash -c "until timeout 1 ping -I oip1 13.1.1.254 -c 1; do sleep 1; done"
+	@timeout 60s bash -c \
+	"until timeout 3 ping -I oip1 13.1.1.254 -c 1 > /dev/null 2>&1; do \
+		echo 'Waiting for DP to be ready'; \
+	done"
+	ping -I oip1 13.1.1.254 -c 3
 
 reset-test:
 	kubectl delete po router || true

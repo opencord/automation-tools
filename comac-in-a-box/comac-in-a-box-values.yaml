@@ -23,12 +23,12 @@ hssdb:
 hss:
   cpu: 0.5
 spgwc:
-  image: omecproject/ngic-cp:0.1.0-debug
+  image: omecproject/ngic-cp:0.1.0-dev-debug
   cpu: 0.5
 spgwu:
   images:
     tags:
-      spgwu: omecproject/ngic-dp:0.1.0-debug
+      spgwu: omecproject/ngic-dp:0.1.0-dev-debug
   resources:
     cpu: 1
   conf:
@@ -44,15 +44,9 @@ network:
   s1u:
     cni_plugin: simpleovs
     ipam: host-local
-    static_arp:
-    - ip: 119.0.0.253
-      mac: 0a:00:00:00:00:01
   sgi:
     cni_plugin: simpleovs
     ipam: host-local
-    static_arp:
-    - ip: 13.1.1.254
-      mac: 0e:00:00:00:00:01
 
 # oaisim values
 conf:
