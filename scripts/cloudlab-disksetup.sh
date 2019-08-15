@@ -21,6 +21,13 @@
 # Don't do anything if not a CloudLab node
 [ ! -d /usr/local/etc/emulab ] && exit 0
 
+# The watchdog will sometimes reset groups, turn it off
+if [ -e /usr/local/etc/emulab/watchdog ]
+then
+  sudo /usr/bin/perl -w /usr/local/etc/emulab/watchdog stop
+  sudo mv /usr/local/etc/emulab/watchdog /usr/local/etc/emulab/watchdog-disabled
+fi
+
 # Mount extra space, if haven't already
 if [ ! -d /mnt/extra ]
 then
@@ -57,7 +64,7 @@ then
     fi
 fi
 
-for DIR in docker kubelet openstack-helm nova
+for DIR in docker kubelet openstack-helm nova libvirt/images
 do
     sudo mkdir -p "/mnt/extra/$DIR"
     sudo chmod -R a+rwx "/mnt/extra/$DIR"
