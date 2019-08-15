@@ -20,7 +20,7 @@
 
 set -e -o pipefail
 
-KS_COMMIT="${KS_COMMIT:-master}"
+KS_COMMIT="${KS_COMMIT:-v2.10.4}"
 
 install_kubespray () {
   # Cleanup Old Kubespray Installations
@@ -41,7 +41,7 @@ install_kubespray () {
     # shellcheck disable=SC1091
     source ks_venv/bin/activate
 
-    pip3 install ansible==2.7
+    pip3 install ansible~=2.7.12  # update to newest 2.7.x version of ansible
     pip3 install -r kubespray/requirements.txt
   else
     # shellcheck disable=SC1091

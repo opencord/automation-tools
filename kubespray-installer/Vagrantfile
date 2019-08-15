@@ -1,0 +1,78 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+#
+# kubespray-installer test Vagrantfile
+
+$num_instances = 3
+
+# Script to format/mount vda volume for ceph testing
+# https://www.vagrantup.com/docs/provisioning/shell.html
+$vdisk_setup  = <<-EOF
+echo "Formatting and mounting /dev/vda, vdb on /mnt/ceph and /mnt/local"
+parted -s /dev/vda \
+  mklabel gpt \
+  mkpart primary ext4 1MiB 100%
+
+sync
+mkfs.ext4 -q -m 2 -F /dev/vda1
+
+parted -s /dev/vdb \
+  mklabel gpt \
+  mkpart primary ext4 1MiB 20GiB \
+  mkpart primary ext4 20GiB 100%
+
+sync
+mkfs.ext4 -q -m 2 -F /dev/vdb1
+mkfs.ext4 -q -m 2 -F /dev/vdb2
+
+parted -s /dev/vdc \
+  mklabel gpt \
+  mkpart primary ext4 1MiB 20GiB \
+  mkpart primary ext4 20GiB 100%
+
+sync
+mkfs.ext4 -q -m 2 -F /dev/vdc1
+mkfs.ext4 -q -m 2 -F /dev/vdc2
+
+mkdir -p /mnt/ceph
+mkdir -p /mnt/local-storage/hdd/vdb1
+mkdir -p /mnt/local-storage/hdd/vdb2
+mkdir -p /mnt/local-storage/ssd/vdc1
+mkdir -p /mnt/local-storage/ssd/vdc2
+
+echo "/dev/vda1 /mnt/ceph ext4 defaults 0 0" | sudo tee -a /etc/fstab
+echo "/dev/vdb1 /mnt/local-storage/hdd/vdb1 ext4 defaults 0 0" | sudo tee -a /etc/fstab
+echo "/dev/vdb2 /mnt/local-storage/hdd/vdb2 ext4 defaults 0 0" | sudo tee -a /etc/fstab
+echo "/dev/vdc1 /mnt/local-storage/ssd/vdc1 ext4 defaults 0 0" | sudo tee -a /etc/fstab
+echo "/dev/vdc2 /mnt/local-storage/ssd/vdc2 ext4 defaults 0 0" | sudo tee -a /etc/fstab
+mount -a
+EOF
+
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "bento/ubuntu-16.04"
+
+  (1..$num_instances).each do |i|
+    config.vm.define vm_name = "k8s-%02d" % i do |config|
+      config.vm.hostname = vm_name
+
+       config.vm.provider :libvirt do |lv|
+         lv.memory = 16384
+         lv.cpus = 8
+         lv.nested = true
+         # additional disks for testing storage, shows up as `vd[a-c]` in the VM
+         lv.storage :file, :size => '40G'
+         lv.storage :file, :size => '40G'
+         lv.storage :file, :size => '40G'
+       end
+
+       config.vm.provision "shell", inline: "swapoff -a"
+       config.vm.provision "shell", inline: $vdisk_setup
+
+       ip = "10.90.0.#{i+100}"
+       config.vm.network :private_network, ip: ip
+
+     end
+  end
+end
+
