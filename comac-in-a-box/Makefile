@@ -11,7 +11,7 @@ CIABVALUES	?= $(MAKEDIR)/comac-in-a-box-values.yaml
 KUBESPRAY_VERSION ?= release-2.10
 DOCKER_VERSION	?= 18.06
 K8S_VERSION	?= v1.14.3
-HELM_VERSION	?= v2.13.1
+HELM_VERSION	?= v2.14.2
 
 # used to start logging/monitoring and other infrastructure charts
 INFRA_CHARTS	?=
@@ -19,8 +19,6 @@ INFRA_PREREQS   = $(foreach chart,$(INFRA_CHARTS),$(M)/$(chart))
 
 KAFKA_CHART_VERSION ?= 0.13.3
 KAFKA_POD	:= "pod/cord-kafka-0"
-
-ETCD_OPERATOR_VERSION ?= 0.8.3
 
 HELM_GLOBAL_ARGS ?=
 HELM_NEM_ARGS	?= $(HELM_GLOBAL_ARGS)
@@ -129,9 +127,18 @@ $(M)/ovs-setup: | $(M)/setup
 /opt/cni/bin/simpleovs: | $(M)/k8s-ready
 	sudo cp $(RESOURCEDIR)/simpleovs /opt/cni/bin/
 
-$(M)/omec: | $(M)/ovs-setup $(M)/helm-ready $(WORKSPACE)/cord/helm-charts /opt/cni/bin/simpleovs
-	cd $(WORKSPACE)/cord/helm-charts/mcord-release; \
-	helm upgrade --install $(HELM_GLOBAL_ARGS) mcord-services mcord-services -f $(CIABVALUES)
+/opt/cni/bin/static: | $(M)/k8s-ready
+	mkdir -p $(BUILD)/cni-plugins; cd $(BUILD)/cni-plugins; \
+	wget https://github.com/containernetworking/plugins/releases/download/v0.8.2/cni-plugins-linux-amd64-v0.8.2.tgz && \
+	tar xvfz cni-plugins-linux-amd64-v0.8.2.tgz
+	sudo cp $(BUILD)/cni-plugins/static /opt/cni/bin/
+
+$(M)/omec: | $(M)/ovs-setup $(M)/helm-ready $(WORKSPACE)/cord/helm-charts /opt/cni/bin/simpleovs /opt/cni/bin/static
+	cd $(WORKSPACE)/cord/helm-charts/omec; \
+	helm dep up omec-data-plane && \
+	helm dep up omec-control-plane && \
+	helm upgrade --install $(HELM_GLOBAL_ARGS) omec-data-plane omec-data-plane -f $(CIABVALUES) && \
+	helm upgrade --install $(HELM_GLOBAL_ARGS) omec-control-plane omec-control-plane -f $(CIABVALUES)
 	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh default
 	touch $@
 
@@ -154,7 +161,7 @@ $(M)/oaisim: | $(M)/omec $(M)/ue-image
 	$(eval mme_iface=$(shell ip -4 route list default | awk -F 'dev' '{ print $$2; exit }' | awk '{ print $$1 }'))
 	cd $(WORKSPACE)/cord/helm-charts; \
 	helm upgrade --install $(HELM_GLOBAL_ARGS) oaisim oaisim -f $(CIABVALUES) \
-		--set conf.enb.networks.s1_mme.interface=$(mme_iface)
+		--set config.enb.networks.s1_mme.interface=$(mme_iface)
 	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh default
 	@timeout 60s bash -c \
 	"until ip addr show oip1 | grep -q inet; \
@@ -166,7 +173,7 @@ $(M)/oaisim: | $(M)/omec $(M)/ue-image
 
 $(M)/router: | /opt/cni/bin/simpleovs $(M)/ovs-setup
 	kubectl apply -f $(RESOURCEDIR)/quagga.yaml
-	kubectl wait pod --for=condition=Ready -l app=quagga
+	kubectl wait pod --for=condition=Ready -l app=quagga --timeout=60s
 	$(eval spgwu_ip=$(shell kubectl get pod -ojson spgwu-0 2>/dev/null | \
 		jq -r '.metadata.annotations["k8s.v1.cni.cncf.io/networks-status"]' | \
 		jq -r '.[] | select(.name=="sgi-net") | .ips[0]'))
@@ -174,7 +181,7 @@ $(M)/router: | /opt/cni/bin/simpleovs $(M)/ovs-setup
 	touch $@
 
 test: | $(M)/router
-	@timeout 60s bash -c \
+	@timeout 120s bash -c \
 	"until timeout 3 ping -I oip1 13.1.1.254 -c 1 > /dev/null 2>&1; do \
 		echo 'Waiting for DP to be ready'; \
 	done"
@@ -183,7 +190,8 @@ test: | $(M)/router
 reset-test:
 	kubectl delete po router || true
 	helm delete --purge oaisim || true
-	helm delete --purge mcord-services || true
+	helm delete --purge omec-control-plane || true
+	helm delete --purge omec-data-plane || true
 	cd $(M); rm -f router oaisim omec
 
 clean: reset-test
