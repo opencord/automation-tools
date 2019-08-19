@@ -12,41 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
----
-# etcd-cluster
-etcdNodePort: 32379
-clusterSize: 1
-
 # mcord-services values
-hssdb:
-  cpu: 1
-hss:
-  cpu: 0.5
-spgwc:
-  image: omecproject/ngic-cp:0.1.0-dev-debug
-  cpu: 0.5
-spgwu:
-  images:
-    tags:
-      spgwu: omecproject/ngic-dp:0.1.0-dev-debug
-  resources:
-    cpu: 1
-  conf:
+cassandra:
+  config:
+    cluster_size: 1
+resources:
+  enabled: false
+config:
+  spgwu:
     dp:
       devices: "--no-pci --vdev eth_af_packet0,iface=s1u-net --vdev eth_af_packet1,iface=sgi-net"
-mme:
-  type: openmme
-  resources:
-    cpu: 0.5
-network:
+networks:
   sriov:
     enabled: false
-  s1u:
-    cni_plugin: simpleovs
-    ipam: host-local
-  sgi:
-    cni_plugin: simpleovs
-    ipam: host-local
+  cniPlugin: simpleovs
+  ipam: host-local
 
 # oaisim values
 conf:
