@@ -43,7 +43,7 @@ function check_vf {
         pfpci=$(readlink /sys/devices/pci*/*/*/net/"$SRIOV_PF"/device | awk '{print substr($1,10)}')
         num_vfs=$(cat /sys/class/net/"$SRIOV_PF"/device/sriov_numvfs)
         if [ "$num_vfs" = "0" ]; then
-                echo "FAIL: SR-IOV VFs are not created"
+                echo "INFO: SR-IOV VF does not exist"
                 return 1
         fi
 
@@ -55,7 +55,7 @@ function check_vf {
                 vfpci=$(ls -l /sys/devices/pci*/*/"$pfpci" | awk -v vfn=$vfn 'vfn==$9 {print substr($11,4)}')
                 driver=$(lspci -vvv -s "$vfpci" | grep "Kernel driver in use" | awk '{print $5}')
                 if [ "$driver" != "vfio-pci" ]; then
-                        echo "FAIL: SR-IOV VF $idx does not exist or bind to vfio-pci"
+                        echo "INFO: SR-IOV VF $idx does not exist or is not binded to vfio-pci"
                         return 1
                 fi
         done
@@ -106,7 +106,7 @@ fi
 # --------------------------
 if ! compgen -G "/sys/class/iommu/*/devices" > /dev/null; then
         disabled=1
-        echo "FAIL: IOMMU is disabled"
+        echo "INFO: IOMMU is disabled"
         update_grub_cmdline "intel_iommu=on"
 else
         echo "  OK: IOMMU is enabled"
@@ -117,7 +117,7 @@ fi
 hugepage=$(grep -i HugePages_Total /proc/meminfo | awk '{print $2}') || true
 if [ "$hugepage" -eq "0" ]; then
         disabled=1
-        echo "FAIL: Hugepage is disabled"
+        echo "INFO: Hugepage is disabled"
 
         update_grub_cmdline "hugepages=$NR_HUGEPAGE"
         update_grub_cmdline "default_hugepagesz=1G"
