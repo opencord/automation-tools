@@ -1,0 +1,25 @@
+# Sample override values for 3-nodes cluster with SR-IOV configured on DP node.
+
+# etcd
+clusterSize: 3
+etcdNodePort: 32379
+
+# mcord-setup
+resourceList:
+  - resourceName: sriov_vfio
+    selectors:
+      pfNames:
+        - enp1s0f0
+      drivers:
+        - vfio-pci
+
+# cassandra for HSSDB
+cassandra:
+  config:
+    cluster_size: 3
+
+# mcord-services
+nodeSelectors:
+  enabled: true
+networks:
+  etcdurl: http://node1:32379
