@@ -22,7 +22,7 @@ metadata:
     app: quagga
   annotations:
     k8s.v1.cni.cncf.io/networks: '[
-            { "name": "sgi-net", "interface": "sgi-rtr", "interfaceRequest": "sgi-rtr" }
+            { "name": "sgi-net", "interface": "sgi-rtr", "ips": "13.1.1.254/24" }
     ]'
 spec:
   containers:
@@ -30,9 +30,7 @@ spec:
     command: ["/bin/bash", "-c"]
     args:
       - >
-        ip addr flush sgi-rtr;
         ip link set sgi-rtr address 0e:00:00:00:00:01;
-        ip addr add 13.1.1.254/24 dev sgi-rtr;
         trap : TERM INT; sleep infinity & wait
     image: opencord/quagga
     securityContext:
