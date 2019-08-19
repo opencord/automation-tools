@@ -11,7 +11,7 @@ CIABVALUES	?= $(MAKEDIR)/comac-in-a-box-values.yaml
 KUBESPRAY_VERSION ?= release-2.10
 DOCKER_VERSION	?= 18.06
 K8S_VERSION	?= v1.14.3
-HELM_VERSION	?= v2.13.1
+HELM_VERSION	?= v2.14.2
 
 # used to start logging/monitoring and other infrastructure charts
 INFRA_CHARTS	?=
@@ -19,8 +19,6 @@ INFRA_PREREQS   = $(foreach chart,$(INFRA_CHARTS),$(M)/$(chart))
 
 KAFKA_CHART_VERSION ?= 0.13.3
 KAFKA_POD	:= "pod/cord-kafka-0"
-
-ETCD_OPERATOR_VERSION ?= 0.8.3
 
 HELM_GLOBAL_ARGS ?=
 HELM_NEM_ARGS	?= $(HELM_GLOBAL_ARGS)
@@ -131,6 +129,7 @@ $(M)/ovs-setup: | $(M)/setup
 
 $(M)/omec: | $(M)/ovs-setup $(M)/helm-ready $(WORKSPACE)/cord/helm-charts /opt/cni/bin/simpleovs
 	cd $(WORKSPACE)/cord/helm-charts/mcord-release; \
+	helm dep up mcord-services && \
 	helm upgrade --install $(HELM_GLOBAL_ARGS) mcord-services mcord-services -f $(CIABVALUES)
 	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh default
 	touch $@
@@ -174,7 +173,7 @@ $(M)/router: | /opt/cni/bin/simpleovs $(M)/ovs-setup
 	touch $@
 
 test: | $(M)/router
-	@timeout 60s bash -c \
+	@timeout 120s bash -c \
 	"until timeout 3 ping -I oip1 13.1.1.254 -c 1 > /dev/null 2>&1; do \
 		echo 'Waiting for DP to be ready'; \
 	done"
