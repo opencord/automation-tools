@@ -69,3 +69,17 @@ conf:
       api_key: "465b5ce8b199b49faa5f0a2ee238a6bc"
       opc: "d4416644f6154936193433dd20a0ace0"
       msisdn: "1122334456"
+
+# cord-platform values
+etcd-operator:
+  enabled: false
+logging:
+  enabled: false
+nem-monitoring:
+  enabled: true
+
+# comac-platform values
+mcord-setup:
+  enabled: false
+etcd-cluster:
+  enabled: false
