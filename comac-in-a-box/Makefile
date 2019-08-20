@@ -20,7 +20,8 @@ INFRA_PREREQS   = $(foreach chart,$(INFRA_CHARTS),$(M)/$(chart))
 KAFKA_CHART_VERSION ?= 0.13.3
 KAFKA_POD	:= "pod/cord-kafka-0"
 
-ETCD_OPERATOR_VERSION ?= 0.8.3
+CORD_PLATFORM_VERSION ?= 7.0.0
+COMAC_PLATFORM_VERSION ?= 0.0.2
 
 HELM_GLOBAL_ARGS ?=
 HELM_NEM_ARGS	?= $(HELM_GLOBAL_ARGS)
@@ -31,8 +32,7 @@ cpu_model	:= $(shell lscpu | grep 'Model:' | awk '{print $$2}')
 os_vendor	:= $(shell lsb_release -i -s)
 os_release	:= $(shell lsb_release -r -s)
 
-# TODO: include CORD platform
-ciab: $(M)/system_check $(M)/omec $(M)/oaisim
+ciab: $(M)/system_check $(M)/omec $(M)/oaisim $(M)/comac-platform
 
 .PHONY: ciab run-test reset-test clean
 
@@ -115,6 +115,26 @@ $(M)/helm-ready: | $(M)/k8s-ready
 $(WORKSPACE)/cord/helm-charts: | $(M)/setup
 	mkdir -p $(WORKSPACE)/cord
 	cd $(WORKSPACE)/cord; git clone https://gerrit.opencord.org/helm-charts
+
+$(WORKSPACE)/cord/cord-platform: | $(M)/setup
+	mkdir -p $(WORKSPACE)/cord
+	cd $(WORKSPACE)/cord; git clone https://gerrit.opencord.org/cord-platform
+
+$(WORKSPACE)/cord/comac-helm-charts: | $(M)/setup
+	mkdir -p $(WORKSPACE)/cord
+	cd $(WORKSPACE)/cord; git clone https://gerrit.opencord.org/comac-helm-charts
+
+$(M)/cord-platform: | $(M)/helm-ready $(WORKSPACE)/cord/cord-platform
+	cd $(WORKSPACE)/cord/cord-platform && \
+	helm dep update cord-platform && \
+	helm upgrade --install $(HELM_GLOBAL_ARGS) cord-platform --version $(CORD_PLATFORM_VERSION) cord-platform -f $(CIABVALUES)
+	touch $@
+
+$(M)/comac-platform: | $(M)/helm-ready $(WORKSPACE)/cord/comac-helm-charts $(M)/cord-platform
+	cd $(WORKSPACE)/cord/comac-helm-charts && \
+	helm dep update comac-platform && \
+	helm upgrade --install $(HELM_GLOBAL_ARGS) comac-platform --version $(COMAC_PLATFORM_VERSION) comac-platform -f $(CIABVALUES)
+	touch $@
 
 # TODO: need to connect ONOS
 $(M)/ovs-setup: | $(M)/setup
