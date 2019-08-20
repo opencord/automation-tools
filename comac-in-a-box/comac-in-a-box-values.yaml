@@ -69,3 +69,18 @@ conf:
       api_key: "465b5ce8b199b49faa5f0a2ee238a6bc"
       opc: "d4416644f6154936193433dd20a0ace0"
       msisdn: "1122334456"
+
+# comac-platform values
+mcord-setup:
+  enabled: false
+
+  sriov_vfio:
+    name: sriov_vfio
+    devicepci: 04:00.0
+    devicetype: vfio
+
+  sriov_netdevice:
+    name: sriov_netdevice
+    devicepci: 04:00.0
+    devicetype: netdevice
+    
