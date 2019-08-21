@@ -71,6 +71,30 @@
     },
     {
       "key": {
+        "uuid": "0489e71c_c014eba9",
+        "filename": "comac-in-a-box/Makefile",
+        "patchSetId": 3
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1000324
+      },
+      "writtenOn": "2019-08-21T20:14:23Z",
+      "side": 1,
+      "message": "Currently, we can disable it. However, we will need etcd cluster for SEBA integration. Voltha requires it. Please keep in mind for the future.",
+      "parentUuid": "2203b90a_eddb2d83",
+      "range": {
+        "startLine": 128,
+        "startChar": 0,
+        "endLine": 132,
+        "endChar": 5
+      },
+      "revId": "e50c433b7011e73983756fb37d78e2d4a670160b",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d8e956de_a5f3ea2a",
         "filename": "comac-in-a-box/comac-in-a-box-values.yaml",
         "patchSetId": 3
