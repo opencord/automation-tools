@@ -22,6 +22,52 @@
       "revId": "e50c433b7011e73983756fb37d78e2d4a670160b",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2203b90a_eddb2d83",
+        "filename": "comac-in-a-box/Makefile",
+        "patchSetId": 3
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1000012
+      },
+      "writtenOn": "2019-08-21T20:05:40Z",
+      "side": 1,
+      "message": "we don\u0027t need etcd operator and cluster in comac-in-a-box. you may want to disable it.",
+      "range": {
+        "startLine": 128,
+        "startChar": 0,
+        "endLine": 132,
+        "endChar": 5
+      },
+      "revId": "e50c433b7011e73983756fb37d78e2d4a670160b",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d8e956de_a5f3ea2a",
+        "filename": "comac-in-a-box/comac-in-a-box-values.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1000012
+      },
+      "writtenOn": "2019-08-21T20:05:40Z",
+      "side": 1,
+      "message": "you can remove this block when mcord-setup is diabled.",
+      "range": {
+        "startLine": 77,
+        "startChar": 0,
+        "endLine": 85,
+        "endChar": 25
+      },
+      "revId": "e50c433b7011e73983756fb37d78e2d4a670160b",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
     }
   ]
 }
