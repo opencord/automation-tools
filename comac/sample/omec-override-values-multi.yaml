@@ -398,3 +398,17 @@ config:
 
 nodeSelectors:
   enabled: true
+
+# cord-platform values
+etcd-operator:
+  enabled: false
+logging:
+  enabled: false
+nem-monitoring:
+  enabled: true
+
+# comac-platform values
+mcord-setup:
+  enabled: false
+etcd-cluster:
+  enabled: false
