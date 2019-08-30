@@ -56,7 +56,7 @@ config:
         unreachability: 1
   spgwu:
     cpComm:
-      addr: 10.90.0.131
+      addr: 192.168.171.3
       port: 30021
     dpComm:
       nodePort:
@@ -68,7 +68,7 @@ config:
         enabled: true
         port: 30021
     dpComm:
-      addr: 10.90.0.151
+      addr: 192.168.170.3
       port: 30020
     cfgFiles:
       adc_rules.cfg: |
@@ -398,3 +398,26 @@ config:
 
 nodeSelectors:
   enabled: true
+
+# cord-platform values
+etcd-operator:
+  enabled: false
+logging:
+  enabled: false
+nem-monitoring:
+  enabled: true
+
+# comac-platform values
+mcord-setup:
+  enabled: false
+etcd-cluster:
+  enabled: false
+
+# CDN local values
+remote_streaming:
+  antmedia_ip: 192.168.171.3
+  video_quality: 360
+stream_name: 360
+
+# CDN remote values
+remote_ip: 192.168.171.3
