@@ -12,42 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-resources:
-  enabled: false
-
-cassandra:
-  config:
-    cluster_size: 1
-
-config:
-  sriov:
-    enabled: false
-  spgwu:
-    devices: "--no-pci --vdev eth_af_packet0,iface=s1u-net --vdev eth_af_packet1,iface=sgi-net"
-  plmn:
-    name: "COMAC Test Network"
-    short_name: "COMAC"
-    mcc: "208"
-    mnc: "01"
-  enb:
-    mme:
-      address: 127.0.0.1
-    networks:
-      s1u:
-        interface: s1u-enb
-  ue:
-    # 1 UE is supported for now
-    name: ue
-    sim:
-      msin: "4567891201"
-      api_key: "465b5ce8b199b49faa5f0a2ee238a6bc"
-      opc: "d4416644f6154936193433dd20a0ace0"
-      msisdn: "1122334456"
-
-networks:
-  cniPlugin: simpleovs
-  ipam: static
-
 # cord-platform values
 etcd-operator:
   enabled: false
@@ -61,3 +25,61 @@ mcord-setup:
   enabled: false
 etcd-cluster:
   enabled: false
+
+# cassandra values
+cassandra:
+  config:
+    cluster_size: 1
+    seed_size: 1
+
+resources:
+  enabled: false
+
+networks:
+  cniPlugin: simpleovs
+  ipam: static
+
+config:
+  # omec-data-plane values
+  sriov:
+    enabled: false
+  spgwu:
+    devices: "--no-pci --vdev eth_af_packet0,iface=s1u-net --vdev eth_af_packet1,iface=sgi-net"
+  # omec-control-plane values
+  mme:
+    cfgFiles:
+      config.json:
+        mme:
+          mcc:
+            dig1: 2
+            dig2: 0
+            dig3: 8
+          mnc:
+            dig1: 0
+            dig2: 1
+            dig3: -1
+  hss:
+    bootstrap:
+      users:
+        - imsi: "208014567891201"
+          msisdn: "1122334455"
+          apn: apn1
+          key: "465b5ce8b199b49faa5f0a2ee238a6bc"
+          opc: "d4416644f6154936193433dd20a0ace0"
+  # oaisim values
+  enb:
+    mme:
+      address: 127.0.0.1
+    networks:
+      s1u:
+        interface: s1u-enb
+  plmn:
+    mcc: "208"
+    mnc: "01"
+    mnc_length: 2
+  ue:
+    sim:
+      msin: "4567891201"
+      api_key: "465b5ce8b199b49faa5f0a2ee238a6bc"
+      opc: "d4416644f6154936193433dd20a0ace0"
+      msisdn: "1122334456"
