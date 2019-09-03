@@ -34,7 +34,7 @@ os_release	:= $(shell lsb_release -r -s)
 
 ciab: $(M)/system-check $(M)/omec $(M)/oaisim
 
-.PHONY: ciab run-test reset-test clean
+.PHONY: ciab test reset-test clean
 
 $(M):
 	mkdir -p $(M)
