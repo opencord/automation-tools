@@ -23,11 +23,6 @@ config:
       vfio:
         pfNames:
           - eth2
-      netDevice:
-        pfNames:
-          - eth2
-        drivers:
-          - ixgbevf
   mme:
     cfgFiles:
       config.json:
@@ -404,9 +399,9 @@ etcd-cluster:
 
 # CDN local values
 remote_streaming:
-  antmedia_ip: 192.168.171.3
+  antmedia_ip: 10.90.0.131
   video_quality: 360
 stream_name: 360
 
 # CDN remote values
-remote_ip: 192.168.171.3
+remote_ip: 10.90.0.131
