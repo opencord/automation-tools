@@ -20,9 +20,6 @@ INFRA_PREREQS   = $(foreach chart,$(INFRA_CHARTS),$(M)/$(chart))
 KAFKA_CHART_VERSION ?= 0.13.3
 KAFKA_POD	:= "pod/cord-kafka-0"
 
-CORD_PLATFORM_VERSION ?= 7.0.0
-COMAC_PLATFORM_VERSION ?= 0.0.2
-
 HELM_GLOBAL_ARGS ?=
 HELM_NEM_ARGS	?= $(HELM_GLOBAL_ARGS)
 HELM_ONOS_ARGS	?= $(HELM_GLOBAL_ARGS)
@@ -127,13 +124,13 @@ $(WORKSPACE)/cord/comac-helm-charts: | $(M)/setup
 $(M)/cord-platform: | $(M)/helm-ready $(WORKSPACE)/cord/cord-platform
 	cd $(WORKSPACE)/cord/cord-platform && \
 	helm dep update cord-platform && \
-	helm upgrade --install $(HELM_GLOBAL_ARGS) cord-platform --version $(CORD_PLATFORM_VERSION) cord-platform -f $(CIABVALUES)
+	helm upgrade --install $(HELM_GLOBAL_ARGS) cord-platform cord-platform -f $(CIABVALUES)
 	touch $@
 
 $(M)/comac-platform: | $(M)/helm-ready $(WORKSPACE)/cord/comac-helm-charts $(M)/cord-platform
 	cd $(WORKSPACE)/cord/comac-helm-charts && \
 	helm dep update comac-platform && \
-	helm upgrade --install $(HELM_GLOBAL_ARGS) comac-platform --version $(COMAC_PLATFORM_VERSION) comac-platform -f $(CIABVALUES)
+	helm upgrade --install $(HELM_GLOBAL_ARGS) comac-platform comac-platform -f $(CIABVALUES)
 	touch $@
 
 # TODO: need to connect ONOS

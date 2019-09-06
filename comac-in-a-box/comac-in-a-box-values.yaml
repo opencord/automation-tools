@@ -16,7 +16,7 @@
 etcd-operator:
   enabled: false
 logging:
-  enabled: false
+  enabled: true
 nem-monitoring:
   enabled: true
 
