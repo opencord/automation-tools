@@ -1,5 +1,3 @@
-#!/bin/bash -x
-#
 # Copyright 2019-present Open Networking Foundation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,13 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 ---
 apiVersion: v1
 kind: Pod
 metadata:
   name: router
   labels:
-    app: quagga
+    app: router
   annotations:
     k8s.v1.cni.cncf.io/networks: '[
             { "name": "sgi-net", "interface": "sgi-rtr", "ips": "13.1.1.254/24" }
@@ -30,7 +29,6 @@ spec:
     command: ["/bin/bash", "-c"]
     args:
       - >
-        ip link set sgi-rtr address 0e:00:00:00:00:01;
         trap : TERM INT; sleep infinity & wait
     image: opencord/quagga
     securityContext:

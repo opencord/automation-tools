@@ -133,16 +133,6 @@ $(M)/comac-platform: | $(M)/helm-ready $(WORKSPACE)/cord/comac-helm-charts $(M)/
 	helm upgrade --install $(HELM_GLOBAL_ARGS) comac-platform comac-platform -f $(CIABVALUES)
 	touch $@
 
-# TODO: need to connect ONOS
-$(M)/ovs-setup: | $(M)/setup
-	sudo apt install -y openvswitch-switch
-	sudo ovs-vsctl --may-exist add-br br-s1u-net
-	sudo ovs-vsctl --may-exist add-port br-s1u-net s1u-enb -- set Interface s1u-enb type=internal
-	sudo ip link set s1u-enb address 0a:00:00:00:00:01
-	sudo ip addr add 119.0.0.253/24 dev s1u-enb || true
-	sudo ip link set s1u-enb up
-	touch $@
-
 /opt/cni/bin/simpleovs: | $(M)/k8s-ready
 	sudo cp $(RESOURCEDIR)/simpleovs /opt/cni/bin/
 
@@ -152,7 +142,21 @@ $(M)/ovs-setup: | $(M)/setup
 	tar xvfz cni-plugins-linux-amd64-v0.8.2.tgz
 	sudo cp $(BUILD)/cni-plugins/static /opt/cni/bin/
 
-$(M)/omec: | $(M)/ovs-setup $(M)/helm-ready $(WORKSPACE)/cord/helm-charts /opt/cni/bin/simpleovs /opt/cni/bin/static
+# TODO: need to connect ONOS
+$(M)/fabric: | $(M)/setup /opt/cni/bin/simpleovs
+	sudo apt install -y openvswitch-switch
+	sudo ovs-vsctl --may-exist add-br br-s1u-net
+	sudo ovs-vsctl --may-exist add-port br-s1u-net s1u-enb -- set Interface s1u-enb type=internal
+	sudo ip addr add 119.0.0.4/24 dev s1u-enb || true
+	sudo ip link set s1u-enb up
+	kubectl apply -f $(RESOURCEDIR)/sgi-net.yaml
+	kubectl apply -f $(RESOURCEDIR)/router.yaml
+	kubectl wait pod --for=condition=Ready -l app=router --timeout=60s
+	kubectl exec router ip route add 16.0.0.0/8 via 13.1.1.3
+	kubectl delete net-attach-def sgi-net
+	touch $@
+
+$(M)/omec: | $(M)/helm-ready $(WORKSPACE)/cord/helm-charts /opt/cni/bin/simpleovs /opt/cni/bin/static $(M)/fabric
 	cd $(WORKSPACE)/cord/helm-charts/omec; \
 	helm dep up omec-data-plane && \
 	helm dep up omec-control-plane && \
@@ -190,16 +194,7 @@ $(M)/oaisim: | $(M)/omec $(M)/ue-image
 	done"
 	touch $@
 
-$(M)/router: | /opt/cni/bin/simpleovs $(M)/ovs-setup
-	kubectl apply -f $(RESOURCEDIR)/quagga.yaml
-	kubectl wait pod --for=condition=Ready -l app=quagga --timeout=60s
-	$(eval spgwu_ip=$(shell kubectl get pod -ojson spgwu-0 2>/dev/null | \
-		jq -r '.metadata.annotations["k8s.v1.cni.cncf.io/networks-status"]' | \
-		jq -r '.[] | select(.name=="sgi-net") | .ips[0]'))
-	kubectl exec router ip route add 16.0.0.0/8 via $(spgwu_ip)
-	touch $@
-
-test: | $(M)/omec $(M)/oaisim $(M)/router
+test: | $(M)/fabric $(M)/omec $(M)/oaisim
 	@timeout 120s bash -c \
 	"until timeout 3 ping -I oip1 13.1.1.254 -c 1 > /dev/null 2>&1; do \
 		echo 'Waiting for DP to be ready'; \
@@ -207,14 +202,15 @@ test: | $(M)/omec $(M)/oaisim $(M)/router
 	ping -I oip1 13.1.1.254 -c 3
 
 reset-test:
-	kubectl delete po router || true
 	helm delete --purge oaisim || true
 	helm delete --purge omec-control-plane || true
 	helm delete --purge omec-data-plane || true
-	cd $(M); rm -f router oaisim omec
+	cd $(M); rm -f oaisim omec
 
 clean: reset-test
 	helm delete --purge $(shell helm ls -q) || true
+	kubectl delete po router
+	kubectl delete net-attach-def sgi-net
 	sudo ovs-vsctl del-br br-s1u-net || true
 	sudo ovs-vsctl del-br br-sgi-net || true
 	sudo apt remove --purge openvswitch-switch -y
