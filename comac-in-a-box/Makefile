@@ -149,10 +149,9 @@ $(M)/fabric: | $(M)/setup /opt/cni/bin/simpleovs
 	sudo ovs-vsctl --may-exist add-port br-s1u-net s1u-enb -- set Interface s1u-enb type=internal
 	sudo ip addr add 119.0.0.4/24 dev s1u-enb || true
 	sudo ip link set s1u-enb up
-	kubectl apply -f $(RESOURCEDIR)/sgi-net.yaml
 	kubectl apply -f $(RESOURCEDIR)/router.yaml
-	kubectl wait pod --for=condition=Ready -l app=router --timeout=60s
-	kubectl exec router ip route add 16.0.0.0/8 via 13.1.1.3
+	kubectl wait pod -n default --for=condition=Ready -l app=router --timeout=60s
+	kubectl -n default exec router ip route add 16.0.0.0/8 via 13.1.1.3
 	kubectl delete net-attach-def sgi-net
 	touch $@
 
@@ -160,9 +159,9 @@ $(M)/omec: | $(M)/helm-ready $(WORKSPACE)/cord/helm-charts /opt/cni/bin/simpleov
 	cd $(WORKSPACE)/cord/helm-charts/omec; \
 	helm dep up omec-data-plane && \
 	helm dep up omec-control-plane && \
-	helm upgrade --install $(HELM_GLOBAL_ARGS) omec-data-plane omec-data-plane -f $(CIABVALUES) && \
-	helm upgrade --install $(HELM_GLOBAL_ARGS) omec-control-plane omec-control-plane -f $(CIABVALUES)
-	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh default
+	helm upgrade --install $(HELM_GLOBAL_ARGS) --namespace omec omec-data-plane omec-data-plane -f $(CIABVALUES) && \
+	helm upgrade --install $(HELM_GLOBAL_ARGS) --namespace omec omec-control-plane omec-control-plane -f $(CIABVALUES)
+	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh omec
 	touch $@
 
 # UE images includes kernel module, ue_ip.ko
@@ -183,9 +182,9 @@ $(M)/oaisim: | $(M)/omec $(M)/ue-image
 	sudo ip addr add 127.0.0.2/8 dev lo || true
 	$(eval mme_iface=$(shell ip -4 route list default | awk -F 'dev' '{ print $$2; exit }' | awk '{ print $$1 }'))
 	cd $(WORKSPACE)/cord/helm-charts; \
-	helm upgrade --install $(HELM_GLOBAL_ARGS) oaisim oaisim -f $(CIABVALUES) \
+	helm upgrade --install $(HELM_GLOBAL_ARGS) --namespace omec oaisim oaisim -f $(CIABVALUES) \
 		--set config.enb.networks.s1_mme.interface=$(mme_iface)
-	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh default
+	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh omec
 	@timeout 60s bash -c \
 	"until ip addr show oip1 | grep -q inet; \
 	do \
@@ -209,8 +208,8 @@ reset-test:
 
 clean: reset-test
 	helm delete --purge $(shell helm ls -q) || true
-	kubectl delete po router
-	kubectl delete net-attach-def sgi-net
+	kubectl delete po router || true
+	kubectl delete net-attach-def sgi-net || true
 	sudo ovs-vsctl del-br br-s1u-net || true
 	sudo ovs-vsctl del-br br-sgi-net || true
 	sudo apt remove --purge openvswitch-switch -y
