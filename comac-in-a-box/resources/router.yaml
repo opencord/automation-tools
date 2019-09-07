@@ -29,6 +29,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: router
+  namespace: omec
   labels:
     app: router
   annotations:
