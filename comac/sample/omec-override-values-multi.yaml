@@ -23,11 +23,6 @@ config:
       vfio:
         pfNames:
           - eth2
-      netDevice:
-        pfNames:
-          - eth2
-        drivers:
-          - ixgbevf
   mme:
     cfgFiles:
       config.json:
@@ -60,7 +55,7 @@ config:
           unreachability: 1
   spgwu:
     cpComm:
-      addr: 192.168.171.3
+      addr: 10.90.0.131
       port: 30021
     dpComm:
       nodePort:
@@ -72,7 +67,7 @@ config:
         enabled: true
         port: 30021
     dpComm:
-      addr: 192.168.170.3
+      addr: 192.168.87.151
       port: 30020
     cfgFiles:
       adc_rules.cfg: |
@@ -419,9 +414,9 @@ etcd-cluster:
 
 # CDN local values
 remote_streaming:
-  antmedia_ip: 192.168.171.3
+  antmedia_ip: 10.90.0.131
   video_quality: 360
 stream_name: 360
 
 # CDN remote values
-remote_ip: 192.168.171.3
+remote_ip: 10.90.0.131
