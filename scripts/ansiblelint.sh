@@ -16,8 +16,23 @@
 
 # ansiblelint.sh - check all yaml files that they pass the ansible-lint tool
 
-set +e -u -o pipefail
+# Use noglob so that shell won't expend the `exlcude path ./$dir/*`
+set +e -u -o pipefail -o noglob
 fail_ansible=0
+SKIP_DIRS="comac comac-in-a-box"
+FIND_IGNORE_PATH=""
+
+#Try to generate the following syntax to exclude dirs
+# -not \( -path "./comac/*" -o -path "./comac-in-a-box/*"
+for dir in ${SKIP_DIRS}; do
+    if [ ! -z "${FIND_IGNORE_PATH}" ]; then
+        FIND_IGNORE_PATH+=" -o"
+    fi
+    FIND_IGNORE_PATH+=" -path ./$dir/*"
+done
+if [ ! -z "${FIND_IGNORE_PATH}" ]; then
+    FIND_IGNORE_PATH="-not ( ${FIND_IGNORE_PATH} )"
+fi
 
 # verify that we have ansible-lint installed
 command -v ansible-lint  >/dev/null 2>&1 || { echo "ansible-lint not found, please install it" >&2; exit 1; }
@@ -36,6 +51,6 @@ do
     echo "==> LINTING FAIL: ${yf}"
     fail_ansible=1
   fi
-done < <(find "${WORKSPACE}" \( -name "*.yml" -o -name "*.yaml" \) -print0)
+done < <(find "${WORKSPACE}" \( -name "*.yml" -o -name "*.yaml" \) ${FIND_IGNORE_PATH} -print0)
 
 exit ${fail_ansible}
