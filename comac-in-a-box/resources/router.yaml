@@ -13,6 +13,18 @@
 # limitations under the License.
 
 ---
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: sgi-net
+spec:
+  config: '{
+    "type": "simpleovs",
+    "ipam": {
+        "type": "static"
+    }
+  }'
+---
 apiVersion: v1
 kind: Pod
 metadata:
