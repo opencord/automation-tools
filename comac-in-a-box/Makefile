@@ -29,7 +29,7 @@ cpu_model	:= $(shell lscpu | grep 'Model:' | awk '{print $$2}')
 os_vendor	:= $(shell lsb_release -i -s)
 os_release	:= $(shell lsb_release -r -s)
 
-ciab: $(M)/system-check $(M)/omec $(M)/oaisim
+ciab: $(M)/system-check $(M)/omec $(M)/oaisim $(M)/comac-platform
 
 .PHONY: ciab test reset-test clean
 
