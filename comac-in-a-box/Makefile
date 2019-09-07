@@ -149,7 +149,6 @@ $(M)/fabric: | $(M)/setup /opt/cni/bin/simpleovs
 	sudo ovs-vsctl --may-exist add-port br-s1u-net s1u-enb -- set Interface s1u-enb type=internal
 	sudo ip addr add 119.0.0.4/24 dev s1u-enb || true
 	sudo ip link set s1u-enb up
-	kubectl apply -f $(RESOURCEDIR)/sgi-net.yaml
 	kubectl apply -f $(RESOURCEDIR)/router.yaml
 	kubectl wait pod --for=condition=Ready -l app=router --timeout=60s
 	kubectl exec router ip route add 16.0.0.0/8 via 13.1.1.3
