@@ -150,7 +150,7 @@ $(M)/fabric: | $(M)/setup /opt/cni/bin/simpleovs
 	sudo ip addr add 119.0.0.4/24 dev s1u-enb || true
 	sudo ip link set s1u-enb up
 	kubectl apply -f $(RESOURCEDIR)/router.yaml
-	kubectl wait pod -n default --for=condition=Ready -l app=router --timeout=60s
+	kubectl wait pod -n default --for=condition=Ready -l app=router --timeout=300s
 	kubectl -n default exec router ip route add 16.0.0.0/8 via 13.1.1.3
 	kubectl delete net-attach-def sgi-net
 	touch $@
