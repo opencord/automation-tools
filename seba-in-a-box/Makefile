@@ -136,6 +136,7 @@ $(M)/helm-init: | $(M)/kubeadm /usr/local/bin/helm
 	done
 	helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com/
 	helm repo add cord https://charts.opencord.org
+	helm repo update
 	touch $@
 
 $(WORKSPACE)/cord/helm-charts: | $(M)/setup
