@@ -14,15 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-SRIOV_PF=${1:?"Specify SR-IOV interface name as argv[1]"}
-NR_HUGEPAGE=32
-
-if [ "$(id -u)" != "0" ]; then
-        echo "FAIL: You should run this as root."
-        echo "HINT: sudo $0 $SRIOV_PF"
-        exit 1
-fi
-
 grub_updated=0
 function update_grub_cmdline {
         local param=$1
@@ -37,6 +28,19 @@ function update_grub_cmdline {
 }
 
 function check_vf {
+        local pfpci
+        local num_vfs
+
+        pfpci=$(readlink /sys/devices/pci*/*/*/net/"$SRIOV_PF"/device | awk '{print substr($1,10)}')
+        num_vfs=$(cat /sys/class/net/"$SRIOV_PF"/device/sriov_numvfs)
+        if [ "$num_vfs" = "0" ]; then
+                echo "INFO: SR-IOV VF does not exist"
+                return 1
+        fi
+        return 0
+}
+
+function check_vf_vfio {
         local pfpci
         local num_vfs
 
@@ -61,6 +65,41 @@ function check_vf {
         done
         return 0
 }
+
+SRIOV_PF=
+VFIO_ENABLED=
+NR_HUGEPAGE=32
+
+while :; do
+    case $1 in
+        -i|--interface)
+            if [ "$2" ]; then
+                SRIOV_PF=$2
+                shift
+            else
+              echo 'FAIL: "--interface" requires a non-empty option arguments'
+              exit 1
+            fi
+            ;;
+        -v|--vfio)
+            VFIO_ENABLED="-b"
+            ;;
+        *) break
+    esac
+    shift
+done
+
+if [ "$(id -u)" != "0" ]; then
+        echo "FAIL: You should run this as root."
+        echo "HINT: sudo $0 -i [iface name]"
+        exit 1
+fi
+
+if [ -z "$SRIOV_PF" ]; then
+        echo "FAIL: Interface name is required"
+        echo "HINT: sudo $0 -i [iface name]"
+        exit 1
+fi
 
 # Check hardware virtualization is enabled
 # --------------------------
@@ -135,7 +174,12 @@ if ! lsmod | grep -q vfio-pci; then
         systemctl restart systemd-modules-load.service
 fi
 
-if ! check_vf; then
+check_func=check_vf
+if [ -n "$VFIO_ENABLED" ]; then
+        check_func=check_vf_vfio
+fi
+
+if ! $check_func; then
         cp "$(cd "$(dirname "$0")" && pwd)/sriov.sh" /usr/bin/sriov.sh
         tee "/etc/systemd/system/sriov.service" > /dev/null << EOF
 [Unit]
@@ -143,7 +187,7 @@ Description=Create VFs on $SRIOV_PF
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/sriov.sh -b $SRIOV_PF
+ExecStart=/usr/bin/sriov.sh $SRIOV_PF $VFIO_ENABLED
 
 [Install]
 WantedBy=default.target
@@ -153,7 +197,7 @@ EOF
         echo "      Configured VFs on $SRIOV_PF"
 fi
 
-if check_vf; then
+if $check_func; then
         echo "  OK: SR-IOV is enabled on $SRIOV_PF"
 else
         disabled=1
