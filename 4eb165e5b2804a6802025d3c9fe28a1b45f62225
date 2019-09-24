@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf637a7f_38854dc3",
+        "filename": "comac/scripts/node-setup.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 1000324
+      },
+      "writtenOn": "2019-09-24T04:57:49Z",
+      "side": 1,
+      "message": "I think VFIO_ENABLED should be written before SRIOV_PF right? Doesn’t it matter?",
+      "range": {
+        "startLine": 190,
+        "startChar": 39,
+        "endLine": 190,
+        "endChar": 51
+      },
+      "revId": "4eb165e5b2804a6802025d3c9fe28a1b45f62225",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
