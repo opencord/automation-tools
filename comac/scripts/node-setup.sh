@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+set -o pipefail
+
 grub_updated=0
 function update_grub_cmdline {
         local param=$1
@@ -84,6 +86,13 @@ while :; do
         -v|--vfio)
             VFIO_ENABLED="-b"
             ;;
+        -h|--help)
+            echo "Usage:"
+            echo "    sudo $0 -i [iface name]          Create VF from [iface name]."
+            echo "    sudo $0 -i [iface name] --vfio   Create VF from [iface name] and bind it to VFIO driver."
+            echo "    sudo $0 -h                       Display this help message."
+            exit 0
+            ;;
         *) break
     esac
     shift
@@ -101,51 +110,30 @@ if [ -z "$SRIOV_PF" ]; then
         exit 1
 fi
 
-# Check hardware virtualization is enabled
+# Check VT is enabled in BIOS
 # --------------------------
-virt=$(grep -E -m1 -w '^flags[[:blank:]]*:' /proc/cpuinfo | grep -E -wo '(vmx|svm)') || true
-if [ -z "$virt" ]; then
+if ! grep -q -E -wo 'vmx' /proc/cpuinfo; then
         echo "FATAL: Your CPU does not support hardware virtualization."
         exit 1
 fi
 
-msr="/dev/cpu/0/msr"
-if [ ! -r "$msr" ]; then
-        modprobe msr
-fi
+apt update &>/dev/null
+apt install msr-tools -y &>/dev/null
+modprobe msr
 
-disabled=0
-if [ "$virt" = "vmx" ]; then
-        BIT=$(rdmsr --bitfield 0:0 0x3a 2>/dev/null || true)
-        if [ "$BIT" = "1" ]; then
-                BIT=$(rdmsr --bitfield 2:2 0x3a 2>/dev/null || true)
-                if [ "$BIT" = "0" ]; then
-                        disabled=1
-                fi
-        fi
-elif [ "$virt" = "svm" ]; then
-        BIT=$(rdmsr --bitfield 4:4 0xc0010114 2>/dev/null || true)
-        if [ "$BIT" = "1" ]; then
-                disabled=1
-        fi
-else
-        echo "FATAL: Unknown virtualization extension: $virt."
-        exit 1
-fi
-
-if [ "$disabled" -eq 1 ]; then
-        echo "FAIL: $virt is disabled by BIOS"
+if [[ "$(rdmsr 0x3a)" = "1" ]]; then
+        echo "FAIL: Intel VT is not enabled in BIOS"
         echo "HINT: Enter your BIOS setup and enable Virtualization Technology (VT),"
         echo "      and then hard poweroff/poweron your system"
 else
-        echo "  OK: $virt is enabled"
+        echo "  OK: Intel VT is enabled"
 fi
 
 # Ensure IOMMU is enabled
 # --------------------------
 if ! compgen -G "/sys/class/iommu/*/devices" > /dev/null; then
         disabled=1
-        echo "INFO: IOMMU is disabled"
+        echo "INFO: IOMMU is not enabled"
         update_grub_cmdline "intel_iommu=on"
 else
         echo "  OK: IOMMU is enabled"
