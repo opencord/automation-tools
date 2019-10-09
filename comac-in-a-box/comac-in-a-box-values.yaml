@@ -14,17 +14,22 @@
 
 # cord-platform values
 etcd-operator:
-  enabled: false
+  enabled: true
 logging:
   enabled: true
 nem-monitoring:
   enabled: true
 
-# comac-platform values
-mcord-setup:
-  enabled: false
-etcd-cluster:
-  enabled: false
+# comac-platform values; to enable Residential Access
+residentialService:
+  enabled: true
+progran:
+  enabled: true
+comac:
+  residentialService:
+    enabled: true
+  progran:
+    enabled: true
 
 # cassandra values
 cassandra:
@@ -83,3 +88,18 @@ config:
       api_key: "465b5ce8b199b49faa5f0a2ee238a6bc"
       opc: "d4416644f6154936193433dd20a0ace0"
       msisdn: "1122334456"
+
+# in Voltha chart
+kafkaReleaseName: cord-platform-kafka
+
+ofagent_args:
+- "/ofagent/ofagent/main.py"
+- "--consul=consul.$(NAMESPACE).svc.cluster.local:8500"
+- "--controller=cord-platform-onos-openflow.default.svc.cluster.local:6653"
+- "--grpc-endpoint=vcore.$(NAMESPACE).svc.cluster.local:50556"
+
+etcd-cluster:
+  clusterSize: 1
+
+# in mininet chart
+onosOpenflowSvc: "cord-platform-onos-openflow.default.svc.cluster.local"
