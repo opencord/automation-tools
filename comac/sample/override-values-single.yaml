@@ -16,6 +16,7 @@
 cassandra:
   config:
     cluster_size: 1
+    seed_size: 1
 
 config:
   sriov:
@@ -23,6 +24,12 @@ config:
       vfio:
         pfNames:
           - eth2
+      netDevice:
+        pfNames:
+          - eth2
+        drivers:
+          - i40evf
+          - ixgbevf
   mme:
     cfgFiles:
       config.json:
@@ -382,7 +389,7 @@ config:
 # CDN configuration values
   cdnRemotes:
   - name: remote-1
-    ip: 10.90.0.131
+    ip: 10.0.0.240
     port: 30935
     streams:
     - name: 360p
