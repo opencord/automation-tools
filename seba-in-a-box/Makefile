@@ -43,6 +43,9 @@ BBSIM_OLT_TOSCA ?= examples/bbsim-16.yaml
 BBSIM_DHCP_TOSCA ?= examples/bbsim-dhcp.yaml
 BBSIM_TECH_PROF_TOSCA ?= examples/technology-profile.yaml
 
+# Driver of fabric switches (e.g. ofdpa-ovs, stratum-bmv2)
+FABRIC_DRIVER ?= ofdpa-ovs
+
 # Targets
 ponsim: validate_args $(M)/siab
 
@@ -226,7 +229,7 @@ $(M)/ponX_fwd: | $(M)/ponsim
 # Make sure that we're using the ofdpa-ovs driver with OvS.
 $(M)/mininet: | $(M)/onos $(M)/ponsim $(M)/ponX_fwd $(M)/ponsim-tosca
 	sudo modprobe openvswitch
-	timeout 60s bash -c "cordctl model sync Switch -f 'driver=ofdpa-ovs'"
+	timeout 60s bash -c "cordctl model sync Switch -f 'driver=$(FABRIC_DRIVER)'"
 	cd $(WORKSPACE)/cord/helm-charts; helm upgrade --install $(HELM_GLOBAL_ARGS) mininet mininet -f $(SEBAVALUES) --set numOlts=$(NUM_OLTS) --set numOnus=$(NUM_ONUS_PER_OLT)
 	touch $@
 
