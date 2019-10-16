@@ -198,7 +198,14 @@ test: | $(M)/fabric $(M)/omec $(M)/oaisim
 	"until timeout 3 ping -I oip1 13.1.1.254 -c 1 > /dev/null 2>&1; do \
 		echo 'Waiting for DP to be ready'; \
 	done"
+	@echo "Test1: ping from UE to SGI network gateway"
 	ping -I oip1 13.1.1.254 -c 3
+	@echo "Test2: ping from UE to 8.8.8.8"
+	ping -I oip1 8.8.8.8 -c 3
+	@echo "Test3: ping from UE to opennetworking.org and google.com"
+	ping -I oip1 opennetworking.org -c 3
+	ping -I oip1 google.com -c 3
+	@echo "Finished to test"
 
 reset-test:
 	helm delete --purge oaisim || true
