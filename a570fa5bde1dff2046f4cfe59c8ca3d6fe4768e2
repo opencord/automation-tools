@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7ae874c0_e2dfd5ac",
+        "filename": "comac-in-a-box/Makefile",
+        "patchSetId": 2
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 1000012
+      },
+      "writtenOn": "2019-10-17T18:02:48Z",
+      "side": 1,
+      "message": "Internal and upstream router sounds not clear to me. How about \"Test 1: ping from UE to SGI network gateway\", \"Test 2: ping from UE to 8.8.8.8\", \"Test 3: ping from UE to opennetworking.org\"?",
+      "range": {
+        "startLine": 201,
+        "startChar": 15,
+        "endLine": 201,
+        "endChar": 31
+      },
+      "revId": "a570fa5bde1dff2046f4cfe59c8ca3d6fe4768e2",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
