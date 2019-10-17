@@ -22,6 +22,30 @@
       "revId": "a570fa5bde1dff2046f4cfe59c8ca3d6fe4768e2",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "891d8260_c9f24d17",
+        "filename": "comac-in-a-box/Makefile",
+        "patchSetId": 2
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 1000324
+      },
+      "writtenOn": "2019-10-17T18:56:20Z",
+      "side": 1,
+      "message": "Good :) Let me change it",
+      "parentUuid": "7ae874c0_e2dfd5ac",
+      "range": {
+        "startLine": 201,
+        "startChar": 15,
+        "endLine": 201,
+        "endChar": 31
+      },
+      "revId": "a570fa5bde1dff2046f4cfe59c8ca3d6fe4768e2",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
     }
   ]
 }
