@@ -52,4 +52,4 @@ dns_min_replicas: 1
 
 helm_enabled: true
 helm_deployment_type: host
-helm_version: v2.14.2
+helm_version: v2.15.0

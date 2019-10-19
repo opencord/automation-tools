@@ -11,7 +11,7 @@ CIABVALUES	?= $(MAKEDIR)/comac-in-a-box-values.yaml
 KUBESPRAY_VERSION ?= release-2.11
 DOCKER_VERSION	?= 18.09
 K8S_VERSION	?= v1.15.3
-HELM_VERSION	?= v2.14.2
+HELM_VERSION	?= v2.15.0
 
 # used to start logging/monitoring and other infrastructure charts
 INFRA_CHARTS	?=
@@ -124,13 +124,13 @@ $(WORKSPACE)/cord/comac-helm-charts: | $(M)/setup
 $(M)/cord-platform: | $(M)/helm-ready $(WORKSPACE)/cord/cord-platform
 	cd $(WORKSPACE)/cord/cord-platform && \
 	helm dep update cord-platform && \
-	helm upgrade --install $(HELM_GLOBAL_ARGS) cord-platform cord-platform -f $(CIABVALUES)
+	helm install $(HELM_GLOBAL_ARGS) --name cord-platform cord-platform -f $(CIABVALUES)
 	touch $@
 
 $(M)/comac-platform: | $(M)/helm-ready $(WORKSPACE)/cord/comac-helm-charts $(M)/cord-platform
 	cd $(WORKSPACE)/cord/comac-helm-charts && \
 	helm dep update comac-platform && \
-	helm upgrade --install $(HELM_GLOBAL_ARGS) comac-platform comac-platform -f $(CIABVALUES)
+	helm install $(HELM_GLOBAL_ARGS) --name comac-platform comac-platform -f $(CIABVALUES)
 	touch $@
 
 /opt/cni/bin/simpleovs: | $(M)/k8s-ready
@@ -159,8 +159,8 @@ $(M)/omec: | $(M)/helm-ready $(WORKSPACE)/cord/helm-charts /opt/cni/bin/simpleov
 	cd $(WORKSPACE)/cord/helm-charts/omec; \
 	helm dep up omec-data-plane && \
 	helm dep up omec-control-plane && \
-	helm upgrade --install $(HELM_GLOBAL_ARGS) --namespace omec omec-data-plane omec-data-plane -f $(CIABVALUES) && \
-	helm upgrade --install $(HELM_GLOBAL_ARGS) --namespace omec omec-control-plane omec-control-plane -f $(CIABVALUES)
+	helm install $(HELM_GLOBAL_ARGS) --namespace omec --name omec-data-plane omec-data-plane -f $(CIABVALUES) && \
+	helm install $(HELM_GLOBAL_ARGS) --namespace omec --name omec-control-plane omec-control-plane -f $(CIABVALUES)
 	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh omec
 	touch $@
 
@@ -182,7 +182,7 @@ $(M)/oaisim: | $(M)/omec $(M)/ue-image
 	sudo ip addr add 127.0.0.2/8 dev lo || true
 	$(eval mme_iface=$(shell ip -4 route list default | awk -F 'dev' '{ print $$2; exit }' | awk '{ print $$1 }'))
 	cd $(WORKSPACE)/cord/helm-charts; \
-	helm upgrade --install $(HELM_GLOBAL_ARGS) --namespace omec oaisim oaisim -f $(CIABVALUES) \
+	helm install $(HELM_GLOBAL_ARGS) --namespace omec --name oaisim oaisim -f $(CIABVALUES) \
 		--set config.enb.networks.s1_mme.interface=$(mme_iface)
 	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh omec
 	@timeout 60s bash -c \
