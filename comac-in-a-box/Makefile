@@ -29,9 +29,10 @@ cpu_model	:= $(shell lscpu | grep 'Model:' | awk '{print $$2}')
 os_vendor	:= $(shell lsb_release -i -s)
 os_release	:= $(shell lsb_release -r -s)
 
-ciab: $(M)/system-check $(M)/omec $(M)/oaisim $(M)/comac-platform
+ciab: $(M)/system-check $(M)/platform $(M)/omec
+oaisim: $(M)/oaisim
 
-.PHONY: ciab test reset-test clean
+.PHONY: ciab oaisim test reset-test clean
 
 $(M):
 	mkdir -p $(M)
@@ -117,20 +118,13 @@ $(WORKSPACE)/cord/cord-platform: | $(M)/setup
 	mkdir -p $(WORKSPACE)/cord
 	cd $(WORKSPACE)/cord; git clone https://gerrit.opencord.org/cord-platform
 
-$(WORKSPACE)/cord/comac-helm-charts: | $(M)/setup
-	mkdir -p $(WORKSPACE)/cord
-	cd $(WORKSPACE)/cord; git clone https://gerrit.opencord.org/comac-helm-charts
-
-$(M)/cord-platform: | $(M)/helm-ready $(WORKSPACE)/cord/cord-platform
+$(M)/platform: | $(M)/helm-ready $(WORKSPACE)/cord/helm-charts $(WORKSPACE)/cord/cord-platform
 	cd $(WORKSPACE)/cord/cord-platform && \
 	helm dep update cord-platform && \
 	helm install $(HELM_GLOBAL_ARGS) --name cord-platform cord-platform -f $(CIABVALUES)
-	touch $@
-
-$(M)/comac-platform: | $(M)/helm-ready $(WORKSPACE)/cord/comac-helm-charts $(M)/cord-platform
-	cd $(WORKSPACE)/cord/comac-helm-charts && \
-	helm dep update comac-platform && \
-	helm install $(HELM_GLOBAL_ARGS) --name comac-platform comac-platform -f $(CIABVALUES)
+	cd $(WORKSPACE)/cord/helm-charts && \
+	helm dep update comac && \
+	helm install $(HELM_GLOBAL_ARGS) --name comac comac -f $(CIABVALUES)
 	touch $@
 
 /opt/cni/bin/simpleovs: | $(M)/k8s-ready
@@ -178,7 +172,7 @@ $(M)/ue-image: | $(M)/k8s-ready $(BUILD)/openairinterface
 		--tag omecproject/lte-uesoftmodem:1.0.0
 	touch $@
 
-$(M)/oaisim: | $(M)/omec $(M)/ue-image
+$(M)/oaisim: | $(M)/ue-image $(M)/omec
 	sudo ip addr add 127.0.0.2/8 dev lo || true
 	$(eval mme_iface=$(shell ip -4 route list default | awk -F 'dev' '{ print $$2; exit }' | awk '{ print $$1 }'))
 	cd $(WORKSPACE)/cord/helm-charts; \

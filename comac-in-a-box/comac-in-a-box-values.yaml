@@ -20,11 +20,14 @@ logging:
 nem-monitoring:
   enabled: true
 
-# comac-platform values
-mcord-setup:
+# comac values
+seba-services:
   enabled: false
-etcd-cluster:
-  enabled: false
+mcord-services:
+  fabric:
+    enabled: false
+  progran:
+    enabled: false
 
 # cassandra values
 cassandra:
