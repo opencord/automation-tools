@@ -33,6 +33,7 @@ kubeadm_enabled: true
 kubelet_deployment_type: host
 kubectl_localhost: true
 kubeconfig_localhost: true
+kube_proxy_metrics_bind_address: 0.0.0.0:10249
 
 kube_feature_gates: [SCTPSupport=True]
 kube_pods_subnet: 172.18.0.0/17
