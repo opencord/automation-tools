@@ -25,6 +25,52 @@
     },
     {
       "key": {
+        "uuid": "616a1c8b_fef1ff8f",
+        "filename": "voltha/voltha-kafka-dump/Dockerfile",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2019-12-10T18:31:40Z",
+      "side": 1,
+      "message": "Should this be the last item in the Dockerfile?",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 29
+      },
+      "revId": "98c01d8a7e39e6cacd1d54a5e9889f414213c6c8",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "dc185cf4_d6df3fca",
+        "filename": "voltha/voltha-kafka-dump/Dockerfile",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2019-12-10T18:31:40Z",
+      "side": 1,
+      "message": "version?",
+      "range": {
+        "startLine": 21,
+        "startChar": 4,
+        "endLine": 21,
+        "endChar": 59
+      },
+      "revId": "98c01d8a7e39e6cacd1d54a5e9889f414213c6c8",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "0861d69d_13121309",
         "filename": "voltha/voltha-kafka-dump/Makefile",
         "patchSetId": 2
@@ -48,6 +94,52 @@
     },
     {
       "key": {
+        "uuid": "acfe27a3_e5b0cfbf",
+        "filename": "voltha/voltha-kafka-dump/Makefile",
+        "patchSetId": 2
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2019-12-10T18:31:40Z",
+      "side": 1,
+      "message": "why have these if they do nothing?",
+      "range": {
+        "startLine": 91,
+        "startChar": 0,
+        "endLine": 93,
+        "endChar": 16
+      },
+      "revId": "98c01d8a7e39e6cacd1d54a5e9889f414213c6c8",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bccee8d4_61d9c436",
+        "filename": "voltha/voltha-kafka-dump/voltha-dump-events.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2019-12-10T18:31:40Z",
+      "side": 1,
+      "message": "No space.  Should probably be `#!/usr/bin/env bash`",
+      "range": {
+        "startLine": 1,
+        "startChar": 2,
+        "endLine": 1,
+        "endChar": 3
+      },
+      "revId": "98c01d8a7e39e6cacd1d54a5e9889f414213c6c8",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "6948c38d_bc6f1687",
         "filename": "voltha/voltha-kafka-dump/voltha-dump-events.sh",
         "patchSetId": 2
@@ -68,6 +160,29 @@
       "revId": "98c01d8a7e39e6cacd1d54a5e9889f414213c6c8",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "830405b2_e94523b9",
+        "filename": "voltha/voltha-kafka-dump/voltha-dump-events.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1000011
+      },
+      "writtenOn": "2019-12-10T18:31:40Z",
+      "side": 1,
+      "message": "whitespace?",
+      "range": {
+        "startLine": 17,
+        "startChar": 66,
+        "endLine": 17,
+        "endChar": 67
+      },
+      "revId": "98c01d8a7e39e6cacd1d54a5e9889f414213c6c8",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": true
     }
   ]
 }
