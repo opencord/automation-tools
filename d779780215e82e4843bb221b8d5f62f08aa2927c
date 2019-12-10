@@ -73,6 +73,30 @@
     },
     {
       "key": {
+        "uuid": "5ff5e388_8bb5daca",
+        "filename": "Makefile",
+        "patchSetId": 3
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2019-12-10T20:11:24Z",
+      "side": 1,
+      "message": "I think this repo is fundamentally a collection of separate things. I\u0027m a little uneasy at the assumption that the root Makefile exposes a consistent set of targets (docker-builder, docker-push, lint) already, but I figure we can cross that bridge when we come to it.",
+      "parentUuid": "b986e407_2751baef",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 28,
+        "endChar": 44
+      },
+      "revId": "d779780215e82e4843bb221b8d5f62f08aa2927c",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "ad6e994a_3450c3c3",
         "filename": "voltha/voltha-kafka-dump/Dockerfile",
         "patchSetId": 3
@@ -84,6 +108,30 @@
       "writtenOn": "2019-12-10T19:37:24Z",
       "side": 1,
       "message": "should a specific version be cloned, as @zdw mentioned?",
+      "range": {
+        "startLine": 38,
+        "startChar": 0,
+        "endLine": 38,
+        "endChar": 59
+      },
+      "revId": "d779780215e82e4843bb221b8d5f62f08aa2927c",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "14ddc9c5_dd6a78db",
+        "filename": "voltha/voltha-kafka-dump/Dockerfile",
+        "patchSetId": 3
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2019-12-10T20:11:24Z",
+      "side": 1,
+      "message": "yeah, let me do this.",
+      "parentUuid": "ad6e994a_3450c3c3",
       "range": {
         "startLine": 38,
         "startChar": 0,
