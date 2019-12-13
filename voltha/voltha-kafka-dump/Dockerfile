@@ -21,7 +21,7 @@ ARG VOLTHA_PROTOS_VERSION=unknown
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 RUN apt-get update && \
-    apt-get install -y unzip=6.0-21+deb9u2 curl=7.52.1-5+deb9u9 git=1:2.11.0-3+deb9u4 libatomic1=6.3.0-18+deb9u1 ca-certificates=20161130+nmu1+deb9u1 --no-install-recommends && \
+    apt-get install -y unzip=6.0-21+deb9u2 curl=7.52.1-5+deb9u9 git=1:2.11.0-3+deb9u4 libatomic1=6.3.0-18+deb9u1 ca-certificates=20161130+nmu1+deb9u1 python3.5=3.5.3-1+deb9u1 --no-install-recommends && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -41,4 +41,4 @@ WORKDIR /opt/voltha-kafka-dump
 # Install voltha-protos
 RUN git clone -b $VOLTHA_PROTOS_VERSION --single-branch https://github.com/opencord/voltha-protos.git
 
-COPY voltha-dump-events.sh ./
+COPY callprotoc.py voltha-dump-events.sh ./
