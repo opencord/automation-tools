@@ -276,6 +276,10 @@ ifeq ($(NEM_WORKFLOW),tt-workflow)
 	timeout 2m bash -c "until cordctl model list TtWorkflowDriverServiceInstance -q -f 'dhcp_state=AWAITING' | wc -l | grep -q $$(( $(NUM_OLTS) * $(NUM_ONUS_PER_OLT) )); do echo 'waiting for TT Workflow Driver ServiceInstance to be in AWAITING state'; sleep 10; done"
 	echo "[passed] TT Workflow Driver ServiceInstance is in AWAITING state"
 endif
+ifeq ($(NEM_WORKFLOW),dt-workflow)
+	timeout 2m bash -c "until cordctl model list DtWorkflowDriverServiceInstance -q -f 'authentication_state=AWAITING' | wc -l | grep -q $$(( $(NUM_OLTS) * $(NUM_ONUS_PER_OLT) )); do echo 'waiting for DT Workflow Driver ServiceInstance to be in AWAITING state'; sleep 10; done"
+	echo "[passed] DT Workflow Driver ServiceInstance is in AWAITING state"
+endif
 	sudo iptables -P FORWARD ACCEPT
 	sudo apparmor_parser -R /etc/apparmor.d/sbin.dhclient || true
 	sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.tcpdump || true
