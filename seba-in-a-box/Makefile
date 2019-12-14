@@ -58,7 +58,7 @@ both: BBSIM_DHCP_TOSCA =
 both: $(M)/siab $(M)/bbsim-tosca
 
 # https://ftp.gnu.org/old-gnu/Manuals/make-3.79.1/html_chapter/make_6.html#SEC69
-latest: SEBAVALUES := configs/seba-ponsim-latest.yaml
+latest: SEBAVALUES := configs/seba-ponsim.yaml,configs/seba-ponsim-latest.yaml
 latest: ponsim
 
 stable: SEBAVALUES := configs/seba-ponsim.yaml
@@ -68,6 +68,24 @@ siab-2.0-alpha1: SEBAVALUES := configs/siab-v2.0.0-alpha1.yaml
 siab-2.0-alpha1: KAFKA_POD := "pod/cord-platform-kafka-0"
 # Parallel make won't work here; need to install seba-2.0.0 before siab
 siab-2.0-alpha1: $(M)/seba-2.0.0-alpha1 $(M)/siab
+
+siab-stratum-stable: SEBAVALUES := configs/seba-ponsim.yaml,configs/seba-ponsim-stratum.yaml
+siab-stratum-stable: FABRIC_DRIVER := stratum-bmv2
+siab-stratum-stable: ponsim
+
+siab-stratum-latest: SEBAVALUES := configs/seba-ponsim.yaml,configs/seba-ponsim-latest.yaml,configs/seba-ponsim-stratum.yaml
+siab-stratum-latest: FABRIC_DRIVER := stratum-bmv2
+siab-stratum-latest: ponsim
+
+siab-sdbng-stable: SEBAVALUES := configs/seba-ponsim.yaml,configs/seba-ponsim-stratum.yaml,configs/seba-ponsim-sdbng.yaml
+siab-sdbng-stable: FABRIC_DRIVER := stratum-bmv2
+siab-sdbng-stable: NEM_WORKFLOW := dt-workflow
+siab-sdbng-stable: ponsim
+
+siab-sdbng-latest: SEBAVALUES := configs/seba-ponsim.yaml,configs/seba-ponsim-latest.yaml,configs/seba-ponsim-stratum.yaml,configs/seba-ponsim-sdbng.yaml,configs/seba-ponsim-sdbng-latest.yaml
+siab-sdbng-latest: FABRIC_DRIVER := stratum-bmv2
+siab-sdbng-latest: NEM_WORKFLOW := dt-workflow
+siab-sdbng-latest: ponsim
 
 validate_args:
 	if ! ([[ $(NUM_OLTS) == ?(-)+([0-9]) ]] && [ $(NUM_OLTS) -ge 1 ] && [ $(NUM_OLTS) -le 4 ]); \
@@ -268,14 +286,18 @@ $(M)/siab: | $(M)/voltha-running $(M)/mininet $(M)/ponsim-tosca
 	echo "[passed] OLT and ONU are enabled in VOLTHA"
 	timeout 2m bash -c "until http -a karaf:karaf GET http://127.0.0.1:30120/onos/v1/devices|jq '.devices[].available'|grep true|wc -l|grep -q $$(( $(NUM_OLTS) + 1 )); do echo 'Waiting for VOLTHA logical device and agg switch to be available in ONOS'; sleep 10; done"
 	echo "[passed] VOLTHA logical device and agg switch are available in ONOS"
-ifeq ($(NEM_WORKFLOW),att-workflow)
-	timeout 2m bash -c "until cordctl model list AttWorkflowDriverServiceInstance -q -f 'authentication_state=AWAITING' | wc -l | grep -q $$(( $(NUM_OLTS) * $(NUM_ONUS_PER_OLT) )); do echo 'waiting for ATT Workflow Driver ServiceInstance to be in AWAITING state'; sleep 10; done"
-	echo "[passed] ATT Workflow Driver ServiceInstance is in AWAITING state"
-endif
-ifeq ($(NEM_WORKFLOW),tt-workflow)
-	timeout 2m bash -c "until cordctl model list TtWorkflowDriverServiceInstance -q -f 'dhcp_state=AWAITING' | wc -l | grep -q $$(( $(NUM_OLTS) * $(NUM_ONUS_PER_OLT) )); do echo 'waiting for TT Workflow Driver ServiceInstance to be in AWAITING state'; sleep 10; done"
-	echo "[passed] TT Workflow Driver ServiceInstance is in AWAITING state"
-endif
+	if [ $(NEM_WORKFLOW) = att-workflow ]; then \
+		timeout 10s bash -c "until cordctl model list AttWorkflowDriverServiceInstance -q -f 'authentication_state=AWAITING' | wc -l | grep -q $$(( $(NUM_OLTS) * $(NUM_ONUS_PER_OLT) )); do echo 'waiting for ATT Workflow Driver ServiceInstance to be in AWAITING state'; sleep 10; done"; \
+		echo "[passed] ATT Workflow Driver ServiceInstance is in AWAITING state"; \
+	fi
+	if [ $(NEM_WORKFLOW) = tt-workflow ]; then \
+		timeout 10s bash -c "until cordctl model list TtWorkflowDriverServiceInstance -q -f 'dhcp_state=AWAITING' | wc -l | grep -q $$(( $(NUM_OLTS) * $(NUM_ONUS_PER_OLT) )); do echo 'waiting for TT Workflow Driver ServiceInstance to be in AWAITING state'; sleep 10; done"; \
+		echo "[passed] TT Workflow Driver ServiceInstance is in AWAITING state"; \
+	fi
+	if [ $(NEM_WORKFLOW) = dt-workflow ]; then \
+		timeout 10s bash -c "until cordctl model list DtWorkflowDriverServiceInstance -q -f 'authentication_state=AWAITING' | wc -l | grep -q $$(( $(NUM_OLTS) * $(NUM_ONUS_PER_OLT) )); do echo 'waiting for DT Workflow Driver ServiceInstance to be in AWAITING state'; sleep 10; done"; \
+		echo "[passed] DT Workflow Driver ServiceInstance is in AWAITING state"; \
+	fi
 	sudo iptables -P FORWARD ACCEPT
 	sudo apparmor_parser -R /etc/apparmor.d/sbin.dhclient || true
 	sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.tcpdump || true
