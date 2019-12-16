@@ -48,9 +48,8 @@ def main():
         buf = buf + in_bytes
         while b"===VOLTHA-DELIM===" in buf:
             (part, buf) = buf.split(b"===VOLTHA-DELIM===", 1)
-            if first:
-                first = False
             call_protoc(part, msgName, protoFileName, includeDir, first)
+            first = False
         in_bytes = sys.stdin.buffer.read(1)
 
     # there is likely one trailing message still to print
