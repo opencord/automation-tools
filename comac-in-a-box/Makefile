@@ -141,11 +141,11 @@ $(M)/fabric: | $(M)/setup /opt/cni/bin/simpleovs
 	sudo apt install -y openvswitch-switch
 	sudo ovs-vsctl --may-exist add-br br-s1u-net
 	sudo ovs-vsctl --may-exist add-port br-s1u-net s1u-enb -- set Interface s1u-enb type=internal
-	sudo ip addr add 119.0.0.4/24 dev s1u-enb || true
+	sudo ip addr add 192.168.251.4/24 dev s1u-enb || true
 	sudo ip link set s1u-enb up
 	kubectl apply -f $(RESOURCEDIR)/router.yaml
 	kubectl wait pod -n default --for=condition=Ready -l app=router --timeout=300s
-	kubectl -n default exec router ip route add 16.0.0.0/8 via 13.1.1.3
+	kubectl -n default exec router ip route add 10.250.0.0/16 via 192.168.250.3
 	kubectl delete net-attach-def sgi-net
 	touch $@
 
@@ -189,11 +189,11 @@ $(M)/oaisim: | $(M)/ue-image $(M)/omec
 
 test: | $(M)/fabric $(M)/omec $(M)/oaisim
 	@timeout 120s bash -c \
-	"until timeout 3 ping -I oip1 13.1.1.254 -c 1 > /dev/null 2>&1; do \
+	"until timeout 3 ping -I oip1 192.168.250.250 -c 1 > /dev/null 2>&1; do \
 		echo 'Waiting for DP to be ready'; \
 	done"
 	@echo "Test1: ping from UE to SGI network gateway"
-	ping -I oip1 13.1.1.254 -c 3
+	ping -I oip1 192.168.250.250 -c 3
 	@echo "Test2: ping from UE to 8.8.8.8"
 	ping -I oip1 8.8.8.8 -c 3
 	@echo "Test3: ping from UE to opennetworking.org and google.com"
