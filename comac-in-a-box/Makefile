@@ -74,7 +74,7 @@ $(BUILD)/kubespray: | $(M)/setup
 
 $(VENV)/bin/activate: | $(M)/setup
 	sudo pip install virtualenv
-	virtualenv $(VENV) --no-site-packages
+	virtualenv $(VENV)
 
 $(M)/kubespray-requirements: $(BUILD)/kubespray | $(VENV)/bin/activate
 	source "$(VENV)/bin/activate" && \
