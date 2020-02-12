@@ -110,23 +110,13 @@ if [ -z "$SRIOV_PF" ]; then
         exit 1
 fi
 
-# Check VT is enabled in BIOS
+# Check VT-d is enabled in BIOS
 # --------------------------
-if ! grep -q -E -wo 'vmx' /proc/cpuinfo; then
-        echo "FATAL: Your CPU does not support hardware virtualization."
-        exit 1
-fi
-
-apt update &>/dev/null
-apt install msr-tools -y &>/dev/null
-modprobe msr
-
-if [[ "$(rdmsr 0x3a)" = "1" ]]; then
-        echo "FAIL: Intel VT is not enabled in BIOS"
-        echo "HINT: Enter your BIOS setup and enable Virtualization Technology (VT),"
-        echo "      and then hard poweroff/poweron your system"
+if ! dmesg | grep DMAR > /dev/null 2>&1; then
+        echo "FAIL: Intel VT-d is not enabled in BIOS"
+        echo "HINT: Enter your BIOS setup and enable VT-d and then poweroff/poweron your system"
 else
-        echo "  OK: Intel VT is enabled"
+        echo "  OK: Intel VT-d is enabled"
 fi
 
 # Ensure IOMMU is enabled
@@ -175,7 +165,7 @@ Description=Create VFs on $SRIOV_PF
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/sriov.sh $SRIOV_PF $VFIO_ENABLED
+ExecStart=/usr/bin/sriov.sh $VFIO_ENABLED $SRIOV_PF
 
 [Install]
 WantedBy=default.target
