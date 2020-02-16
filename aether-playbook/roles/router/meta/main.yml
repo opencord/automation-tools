@@ -1,0 +1,9 @@
+---
+dependencies:
+  - role: router/linux
+    when:
+      - router_type == 'linux'
+
+#  - role: router/vyos
+#    when:
+#      - router_type == 'vyos'
