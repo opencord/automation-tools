@@ -1,0 +1,48 @@
+# Copyright 2020-present Open Networking Foundation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+---
+- name: Initialize k8s role
+  set_fact:
+    k8s_roles: ""
+  tags: k8s
+
+- name: Add k8s master role
+  set_fact:
+    k8s_roles: "{{ k8s_roles }} --etcd --controlplane"
+  when: "'kube-master' in group_names"
+  tags: k8s
+
+- name: Add k8s worker role
+  set_fact:
+    k8s_roles: "{{ k8s_roles }} --worker"
+  when: "'kube-worker' in group_names"
+  tags: k8s
+
+- name: Print k8s roles
+  debug:
+    msg: k8s_roles {{ k8s_roles }}
+  tags: k8s
+
+- name: Install k8s
+  command: >-
+    docker run -d --privileged --restart=unless-stopped --net=host
+    --volume /etc/kubernetes:/etc/kubernetes
+    --volume /var/run:/var/run
+    rancher/rancher-agent:v2.3.3
+    --server https://rancher.central.aetherproject.net
+    --token {{ rancher_cluster_token }}
+    --ca-checksum {{ rancher_ca_checksum }}
+    {{ k8s_roles }}
+  tags: k8s

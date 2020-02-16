@@ -1,0 +1,108 @@
+# Copyright 2020-present Open Networking Foundation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+---
+# Fail if VT-d is not enabled
+- name: Ensure VT-d is enabled in BIOS
+  shell: "dmesg | grep DMAR-IR"
+  register: check_vt_d
+  changed_when: check_vt_d.rc != 0
+  failed_when: check_vt_d.rc != 0
+  tags: sriov-dpdk
+
+- name: Add kernel boot parameters to the grub for SRIOV
+  lineinfile:
+    dest: /etc/default/grub
+    regexp: '^GRUB_CMDLINE_LINUX="(?!.* {{ item.regex }})(.*)"'
+    line: 'GRUB_CMDLINE_LINUX="\1 {{ item.context }}"'
+    state: present
+    backrefs: yes
+  loop:
+    - { regex: 'intel_iommu=on', context: 'intel_iommu=on' }
+    - { regex: 'hugepagesz=', context: 'hugepagesz=1G default_hugepagesz=1G hugepages=32' }
+  register: grub
+  tags: sriov-dpdk
+
+- name: Update grub
+  command: update-grub
+  when: grub.changed
+  register: update_grub
+  tags: sriov-dpdk
+
+- name: Load vfio_pci module to the kernel
+  modprobe:
+    name: vfio_pci
+    state: present
+  tags: sriov-dpdk
+
+- name: Set the vfio_pci module to load on boot
+  lineinfile:
+    dest: /etc/modules-load.d/vfio_pci.conf
+    create: yes
+    regexp: "^vfio_pci"
+    line: "vfio_pci"
+  tags: sriov-dpdk
+
+- name: Check VFIO bind devices for DPDK
+  shell: "ls -l /dev/vfio | wc -l"
+  register: check_dpdk_bind
+  changed_when: check_dpdk_bind.stdout | int < 4
+  tags: sriov-dpdk
+
+- name: Create SRIOV-DPDK service
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  loop:
+    - { src: 'usr/bin/sriov.sh.j2', dest: '/usr/bin/sriov.sh', mode: 'a+x' }
+    - { src: 'etc/systemd/system/sriov.service.j2', dest: '/etc/systemd/system/sriov.service', mode: 644 }
+  register: bind_dpdk
+  when: check_dpdk_bind.stdout | int < 4
+  tags: sriov-dpdk
+
+- name: Enable SRIOV-DPDK service
+  systemd:
+    name: sriov
+    daemon_reload: true
+    enabled: yes
+  when: bind_dpdk.changed
+  tags: sriov-dpdk
+
+- name: Reboot machine
+  shell: sleep 2 && shutdown -r now "Ansible updates triggered"
+  async: 1
+  poll: 0
+  ignore_errors: true
+  when: update_grub.changed or bind_dpdk.changed
+  tags: sriov-dpdk
+
+- name: Wait for server to restart successfully
+  wait_for:
+    host: "{{ ansible_host }}"
+    search_regex: "OpenSSH"
+    port: 22
+    timeout: 300
+    connect_timeout: 50
+    delay: 5
+  delegate_to: localhost
+  become: false
+  tags: sriov-dpdk
+
+- name: Ensure enough VFIO bind devices
+  shell: "ls -l /dev/vfio | wc -l"
+  register: confirm_dpdk_bind
+  changed_when: confirm_dpdk_bind.stdout | int < 4
+  failed_when: confirm_dpdk_bind.stdout | int < 4
+  tags: sriov-dpdk
