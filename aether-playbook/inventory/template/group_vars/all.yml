@@ -1,0 +1,63 @@
+# Copyright 2020-present Open Networking Foundation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+---
+ntp_enabled: true
+ntp_servers:
+  - time1.google.com
+  - time2.google.com
+ntp_timezone: Etc/UTC
+
+# Internal service domains to add to /etc/hosts (DO NOT CHANGE)
+etc_hosts_entries:
+  - ip: 10.168.0.200
+    name: registry.central.aetherproject.net
+  - ip: 10.168.0.3
+    name: rancher.central.aetherproject.net
+
+# Additional Docker daemon options
+docker_daemon_options:
+  insecure-registries:
+    - registry.central.aetherproject.net
+  iptables: false
+
+upf_sriov_enabled: true
+upf_sriov_pf: #SET_VALUE
+
+# SGI and S1U addresses for spgwu
+spgwu_sgi_ip: #SET_VALUE
+spgwu_s1u_ip: #SET_VALUE
+
+# UE pool (DO NOT CHANGE)
+ue_pool: 10.250.0.0/16
+
+# Enable to configure router to handle UE traffic to the Internet
+# Applicable only when using Ubuntu machine as a router now (VyOS is coming soon)
+router_setup_enabled: #SET_VALUE (true or false)
+router_type: linux
+sgi_gateway_ip: #SET_VALUE
+s1u_gateway_ip: #SET_VALUE
+sgi_s1u_gateway_iface: #SET_VALUE
+netplan_config_file: /etc/netplan/sgi-s1u-gateway.yaml
+
+# Rancher cluster token and checksum (DO NOT CHANGE)
+rancher_cluster_token: #GET_VALUE_FROM_AETHER_TEAM
+rancher_ca_checksum: "7f7858afaa621e304d0d17fa22fd2005aa2f1acd0637f4026cab7bcc2fa43cd9"
+
+# Refer to these values when configuring Accelleran
+accelleran_tac: #GET_VALUE_FROM_AETHER_TEAM
+accelleran_instance_filter: #GET_VALUE_FROM_AETHER_TEAM
+accelleran_mme_ip: 10.168.0.204
+accelleran_ru_ip: #SET_VALUE (S1U network address)
+accelleran_redis_host: #SET_VALUE (mgmt IP of any node)
