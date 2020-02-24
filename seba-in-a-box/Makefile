@@ -357,7 +357,7 @@ $(WORKSPACE)/cord/incubator/voltha: | $(M)/setup
 PYBOT_ARGS ?=
 $(M)/qatests: | $(M)/siab $(M)/qatests-prereqs $(WORKSPACE)/cord/test/cord-tester $(WORKSPACE)/cord/incubator/voltha
 	cd $(WORKSPACE)/cord/test/cord-tester/ ;\
-	make cord_venv; source cord_venv/bin/activate ; set -u;\
+	make venv_cord; source venv_cord/bin/activate ; set -u;\
 	cd src/test/cord-api/Tests/WorkflowValidations/ ;\
 	robot $(PYBOT_ARGS) --removekeywords wuks -e notready -i $(TESTTAGS) -v VOLTHA_DIR:$(WORKSPACE)/cord/incubator/voltha SIAB.robot
 	touch $@
