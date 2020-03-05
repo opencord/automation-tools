@@ -14,9 +14,18 @@
 
 ---
 router_type: linux
-netplan_config_file: /etc/netplan/sgi-s1u-gateway.yaml
 
-# Provide below to run the playbook
+router_enabled: false
+# Provide below when router_enabled is true
+#netplan_config_file: /etc/netplan/sgi-s1u-gateway.yaml
 #sgi_gateway_ip:
 #s1u_gateway_ip:
 #sgi_s1u_gateway_iface:
+
+vpn_enabled: false
+# Provide below when vpn_enabled is true
+#vpn_local_addr:
+#vpn_local_subnets:
+#vpn_remote_addr:
+#vpn_remote_subnets: 10.168.0.0/20,10.45.0.0/16,10.52.0.0/16
+#vpn_psk:

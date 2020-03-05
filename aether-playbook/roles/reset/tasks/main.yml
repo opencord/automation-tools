@@ -23,6 +23,7 @@
   retries: 4
   delay: 5
   until: remove_all_containers.rc == 0
+  changed_when: False
   tags: k8s
 
 - name: Remove directories
@@ -45,4 +46,5 @@
     - /var/log/containers
     - /var/log/pods
     - /var/run/calico
+  changed_when: False
   tags: k8s
