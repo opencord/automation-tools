@@ -40,10 +40,11 @@
 # 1) Assign SGI and S1U gateway address
 # 2) Add routing to UE pool
 # 3) Add SNAT rule for UE pool
+# 4) Install and configure VPN server
 - hosts: router
   any_errors_fatal: "{{ any_errors_fatal | default(true) }}"
   roles:
-    - { role: router, when: router_setup_enabled }
+    - { role: router, when: router_enabled or vpn_enabled }
 
 # K8S node setup
 # 1) Time synch

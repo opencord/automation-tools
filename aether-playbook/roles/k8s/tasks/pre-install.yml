@@ -18,18 +18,25 @@
     update_cache: yes
 
 - name: Install ntp
-  apt: name=ntp state=present
+  apt:
+    name: ntp
+    state: present
   when: ntp_enabled | bool
   tags: ntp
 
 - name: Configure ntp file
-  template: src=etc/ntp.conf.j2 dest=/etc/ntp.conf
+  template:
+    src: etc/ntp.conf.j2
+    dest: /etc/ntp.conf
   when: ntp_enabled | bool
   notify: restart ntp
   tags: ntp
 
 - name: Start the ntp service
-  service: name=ntp state=started enabled=yes
+  service:
+    name: ntp
+    state: started
+    enabled: yes
   when: ntp_enabled | bool
   tags: ntp
 
