@@ -30,7 +30,6 @@ etc_hosts_entries:
 docker_daemon_options:
   insecure-registries:
     - registry.central.aetherproject.net
-  iptables: false
 
 upf_sriov_enabled: true
 upf_sriov_pf: #SET_VALUE
@@ -42,14 +41,30 @@ spgwu_s1u_ip: #SET_VALUE
 # UE pool (DO NOT CHANGE)
 ue_pool: 10.250.0.0/16
 
-# Enable to configure router to handle UE traffic to the Internet
-# Applicable only when using Ubuntu machine as a router now (VyOS is coming soon)
-router_setup_enabled: #SET_VALUE (true or false)
+# Configure VPN router
+# Only linux machine is supported as a router now (VyOS is coming soon)
 router_type: linux
-sgi_gateway_ip: #SET_VALUE
-s1u_gateway_ip: #SET_VALUE
-sgi_s1u_gateway_iface: #SET_VALUE
+
+# Enable to configure SGI and S1U network gateway and routings/SNAT for UE traffic
+router_enabled: #SET_VALUE (true or false)
+sgi_gateway_ip: #SET_VALUE (only required when router_enabled)
+s1u_gateway_ip: #SET_VALUE (only required when router_enabled)
+sgi_s1u_gateway_iface: #SET_VALUE (only required when router_enabled)
 netplan_config_file: /etc/netplan/sgi-s1u-gateway.yaml
+
+# Enable to configure IPSec tunnel to Aether Central
+vpn_enabled: #SET_VALUE (true or false)
+# Provide IP address of the VPN server
+# Provide private address of the VPN server if it is behind NAT
+vpn_local_addr: #SET_VALUE (only required when vpn_enabled)
+# Provide public address of the VPN server
+vpn_local_id: #SET_VALUE (only required when vpn_enabled)
+# Provide management network and K8S pod/service ranges
+vpn_local_subnets: #SET_VALUE (only required when vpn_enabled)
+vpn_remote_addr: #SET_VALUE (only required when vpn_enabled)
+# Remote subnet (DO NOT CHANGE)
+vpn_remote_subnets: 10.168.0.0/20,10.45.0.0/16,10.52.0.0/16
+vpn_psk: #GET_VALUE_FROM_AETHER_TEAM
 
 # Rancher cluster token and checksum (DO NOT CHANGE)
 rancher_cluster_token: #GET_VALUE_FROM_AETHER_TEAM

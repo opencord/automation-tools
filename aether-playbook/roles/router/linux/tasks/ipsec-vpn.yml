@@ -13,11 +13,33 @@
 # limitations under the License.
 
 ---
-dependencies:
-  - role: router/linux
-    when:
-      - router_type == 'linux'
+- name: Run "apt update"
+  apt:
+    update_cache: yes
+  tags: vpn
 
-#  - role: router/vyos
-#    when:
-#      - router_type == 'vyos'
+- name: Install strongSwan
+  apt:
+    name: strongswan
+    state: present
+  tags: vpn
+
+- name: Start strongSwan
+  service:
+    name: strongswan
+    state: started
+    enabled: yes
+  tags: vpn
+
+- name: Create ipsec config and secrets file
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: 0640
+  loop:
+    - { src: 'etc/ipsec.secrets.j2', dest: '/etc/ipsec.secrets' }
+    - { src: 'etc/ipsec.conf.j2', dest: '/etc/ipsec.conf' }
+  notify: ipsec restart
+  tags: vpn
