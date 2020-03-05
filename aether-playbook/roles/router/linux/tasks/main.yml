@@ -13,44 +13,10 @@
 # limitations under the License.
 
 ---
-- name: Create netplan config file for SGI network gateway
-  template:
-    src: etc/netplan/sgi-s1u-gateway.yaml.j2
-    dest: "{{ netplan_config_file }}"
-  notify:
-    - netplan generate
-    - netplan apply
+- include_tasks: interfaces.yml
+  when: router_enabled | bool
   tags: router
 
-- name: Install iptables-persistent
-  apt:
-    name: iptables-persistent
-    state: present
-    update_cache: yes
-  tags: router
-
-- name: Ensure ip_forward enabled
-  sysctl:
-    name: net.ipv4.ip_forward
-    value: '1'
-    sysctl_set: yes
-    state: present
-  tags: router
-
-- name: Set default forwarding policy to ACCEPT
-  iptables:
-    chain: FORWARD
-    policy: ACCEPT
-  tags: router
-
-- name: Add SNAT
-  iptables:
-    table: nat
-    chain: POSTROUTING
-    out_interface: "{{ ansible_default_ipv4.interface }}"
-    jump: MASQUERADE
-  tags: router
-
-- name: Save iptables v4 rules
-  shell: iptables-save > /etc/iptables/rules.v4
-  tags: router
+- include_tasks: ipsec-vpn.yml
+  when: vpn_enabled | bool
+  tags: vpn
