@@ -35,6 +35,7 @@
     msg: k8s_roles {{ k8s_roles }}
   tags: k8s
 
+# TODO: Wait until K8S cluster is ready
 - name: Install k8s
   command: >-
     docker run -d --privileged --restart=unless-stopped --net=host
@@ -45,4 +46,5 @@
     --token {{ rancher_cluster_token }}
     --ca-checksum {{ rancher_ca_checksum }}
     {{ k8s_roles }}
+  changed_when: False
   tags: k8s

@@ -13,11 +13,18 @@
 # limitations under the License.
 
 ---
-- name: netplan generate
-  command: netplan generate
+  - include_role:
+      name: router/linux
+    when:
+      - router_type == 'linux'
+    tags:
+      - router
+      - vpn
 
-- name: netplan apply
-  command: netplan apply
-
-- name: ipsec restart
-  command: ipsec restart
+#  - include_role:
+#      name: router/vyos
+#    when:
+#      - router_type == 'vyos'
+#    tags:
+#      - router
+#      - vpn

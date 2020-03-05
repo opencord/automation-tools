@@ -15,7 +15,9 @@
 ---
 # Fail if VT-d is not enabled
 - name: Ensure VT-d is enabled in BIOS
-  shell: "dmesg | grep DMAR-IR"
+  shell: "set -o pipefail && dmesg | grep DMAR-IR"
+  args:
+    executable: /bin/bash
   register: check_vt_d
   changed_when: check_vt_d.rc != 0
   failed_when: check_vt_d.rc != 0
@@ -32,12 +34,7 @@
     - { regex: 'intel_iommu=on', context: 'intel_iommu=on' }
     - { regex: 'hugepagesz=', context: 'hugepagesz=1G default_hugepagesz=1G hugepages=32' }
   register: grub
-  tags: sriov-dpdk
-
-- name: Update grub
-  command: update-grub
-  when: grub.changed
-  register: update_grub
+  notify: update grub
   tags: sriov-dpdk
 
 - name: Load vfio_pci module to the kernel
@@ -55,9 +52,11 @@
   tags: sriov-dpdk
 
 - name: Check VFIO bind devices for DPDK
-  shell: "ls -l /dev/vfio | wc -l"
+  shell: "set -o pipefail && ls -l /dev/vfio | wc -l"
+  args:
+    executable: /bin/bash
   register: check_dpdk_bind
-  changed_when: check_dpdk_bind.stdout | int < 4
+  changed_when: False
   tags: sriov-dpdk
 
 - name: Create SRIOV-DPDK service
@@ -69,15 +68,11 @@
     - { src: 'usr/bin/sriov.sh.j2', dest: '/usr/bin/sriov.sh', mode: 'a+x' }
     - { src: 'etc/systemd/system/sriov.service.j2', dest: '/etc/systemd/system/sriov.service', mode: 644 }
   register: bind_dpdk
+  notify: enable sriov
   when: check_dpdk_bind.stdout | int < 4
   tags: sriov-dpdk
 
-- name: Enable SRIOV-DPDK service
-  systemd:
-    name: sriov
-    daemon_reload: true
-    enabled: yes
-  when: bind_dpdk.changed
+- meta: flush_handlers
   tags: sriov-dpdk
 
 - name: Reboot machine
@@ -85,10 +80,10 @@
   async: 1
   poll: 0
   ignore_errors: true
-  when: update_grub.changed or bind_dpdk.changed
+  when: grub.changed or bind_dpdk.changed # noqa 503
   tags: sriov-dpdk
 
-- name: Wait for server to restart successfully
+- name: Wait for server to restart
   wait_for:
     host: "{{ ansible_host }}"
     search_regex: "OpenSSH"
@@ -101,7 +96,9 @@
   tags: sriov-dpdk
 
 - name: Ensure enough VFIO bind devices
-  shell: "ls -l /dev/vfio | wc -l"
+  shell: "set -o pipefail && ls -l /dev/vfio | wc -l"
+  args:
+    executable: /bin/bash
   register: confirm_dpdk_bind
   changed_when: confirm_dpdk_bind.stdout | int < 4
   failed_when: confirm_dpdk_bind.stdout | int < 4

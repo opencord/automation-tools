@@ -13,11 +13,11 @@
 # limitations under the License.
 
 ---
-- name: netplan generate
-  command: netplan generate
+- name: update grub
+  command: update-grub
 
-- name: netplan apply
-  command: netplan apply
-
-- name: ipsec restart
-  command: ipsec restart
+- name: enable sriov
+  systemd:
+    name: sriov
+    daemon_reload: true
+    enabled: yes

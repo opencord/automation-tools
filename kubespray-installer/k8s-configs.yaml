@@ -58,5 +58,5 @@
       lineinfile:
         path: inventories/{{ deployment_name }}/group_vars/k8s-cluster/k8s-cluster.yml
         regexp: 'docker_options'
-        line: "docker_options: \"{{ item }} --insecure-registry={{ '{{' }} kube_service_addresses {{ '}}' }} --graph={{ '{{' }} docker_daemon_graph {{ '}}' }}  {{ '{{' }} docker_log_opts {{ '}}' }}\""
+        line: "docker_options: \"{{ item }} --insecure-registry={{ '{{' }} kube_service_addresses {{ '}}' }} --graph={{ '{{' }} docker_daemon_graph {{ '}}' }}  {{ '{{' }} docker_log_opts {{ '}}' }}\"" # noqa 204
       with_items: "{{ k8s_nodes.split(' ') | map('regex_replace', '(.*)', '--insecure-registry=\\1/32') | join(' ') }}"
