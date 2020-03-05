@@ -16,12 +16,13 @@
 
 - name: Install dependencies for Docker
   apt:
-    name:
+    name: "{{ item }}"
+    state: present
+  with_items:
       - apt-transport-https
       - ca-certificates
       - curl
       - software-properties-common
-    state: present
   tags: docker
 
 - name: Add Docker GPG key
@@ -51,7 +52,8 @@
 - name: Add current user to "docker" group
   user:
     name: "{{ ansible_user }}"
-    groups: docker
+    groups:
+      - docker
     append: true
   tags: docker
 
