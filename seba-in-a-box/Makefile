@@ -275,6 +275,7 @@ $(M)/ponsim-tosca: | $(M)/onos $(M)/nem-running
 	touch $@
 
 $(M)/siab: | $(M)/voltha-running $(M)/mininet $(M)/ponsim-tosca
+	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh
 	until http -a karaf:karaf --ignore-stdin --check-status GET http://127.0.0.1:30120/onos/v1/configuration/org.opencord.olt.impl.Olt; \
 	do \
 		sleep 5; \
