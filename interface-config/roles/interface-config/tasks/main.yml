@@ -42,7 +42,7 @@
 - name: Find management interfaces given management_net_kmods
   when: ( configure_management_interfaces ) and ( management_net_kmods | length > 0 )
   set_fact:
-    management_net_interfaces: "{{ [ hostvars[inventory_hostname]['ansible_' ~ item[0]] ] | selectattr('module', 'defined') | selectattr('module', 'equalto', item[1]) |  map(attribute='device') | list | union(management_net_interfaces) }}"
+    management_net_interfaces: "{{ [ hostvars[inventory_hostname]['ansible_' ~ item[0]] ] | selectattr('module', 'defined') | selectattr('module', 'equalto', item[1]) |  map(attribute='device') | list | union(management_net_interfaces) }}" # noqa 204
   with_nested:
     - "{{ ansible_interfaces }}"
     - "{{ management_net_kmods }}"
@@ -50,7 +50,7 @@
 - name: Find management interfaces given management_net_hwaddrs
   when: ( configure_management_interfaces ) and ( management_net_hwaddrs | length > 0 )
   set_fact:
-    management_net_interfaces: "{{ [ hostvars[inventory_hostname]['ansible_' ~ item[0]] ] | selectattr('macaddress', 'defined') | selectattr('macaddress', 'equalto', item[1]) |  map(attribute='device') | list | union(management_net_interfaces) }}"
+    management_net_interfaces: "{{ [ hostvars[inventory_hostname]['ansible_' ~ item[0]] ] | selectattr('macaddress', 'defined') | selectattr('macaddress', 'equalto', item[1]) |  map(attribute='device') | list | union(management_net_interfaces) }}" # noqa 204
   with_nested:
     - "{{ ansible_interfaces }}"
     - "{{ management_net_hwaddrs }}"
@@ -59,7 +59,7 @@
 - name: Find fabric interfaces given fabric_net_kmods
   when: ( configure_fabric_interfaces ) and ( fabric_net_kmods | length > 0 )
   set_fact:
-    fabric_net_interfaces: "{{ [ hostvars[inventory_hostname]['ansible_' ~ item[0]] ] | selectattr('module', 'defined') | selectattr('module', 'equalto', item[1]) |  map(attribute='device') | list | union(fabric_net_interfaces) }}"
+    fabric_net_interfaces: "{{ [ hostvars[inventory_hostname]['ansible_' ~ item[0]] ] | selectattr('module', 'defined') | selectattr('module', 'equalto', item[1]) |  map(attribute='device') | list | union(fabric_net_interfaces) }}" # noqa 204
   with_nested:
     - "{{ ansible_interfaces }}"
     - "{{ fabric_net_kmods }}"
@@ -67,7 +67,7 @@
 - name: Find fabric interfaces given fabric_net_hwaddrs
   when: ( configure_fabric_interfaces ) and ( fabric_net_hwaddrs | length > 0 )
   set_fact:
-    fabric_net_interfaces: "{{ [ hostvars[inventory_hostname]['ansible_' ~ item[0]] ] | selectattr('macaddress', 'defined') | selectattr('macaddress', 'equalto', item[1]) |  map(attribute='device') | list | union(fabric_net_interfaces) }}"
+    fabric_net_interfaces: "{{ [ hostvars[inventory_hostname]['ansible_' ~ item[0]] ] | selectattr('macaddress', 'defined') | selectattr('macaddress', 'equalto', item[1]) |  map(attribute='device') | list | union(fabric_net_interfaces) }}" # noqa 204
   with_nested:
     - "{{ ansible_interfaces }}"
     - "{{ fabric_net_hwaddrs }}"
