@@ -15,3 +15,4 @@
 ---
 # Provide SRIOV PF name for UPF to run the playbook
 #upf_sriov_pf:
+upf_sriov_num_vf: 8

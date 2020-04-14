@@ -32,7 +32,7 @@
     backrefs: yes
   loop:
     - { regex: 'intel_iommu=on', context: 'intel_iommu=on' }
-    - { regex: 'hugepagesz=', context: 'hugepagesz=1G default_hugepagesz=1G hugepages=32' }
+    - { regex: 'hugepagesz=', context: 'transparent_hugepage=never hugepagesz=1G default_hugepagesz=1G hugepages=32' }
   register: grub
   notify: update grub
   tags: sriov-dpdk
