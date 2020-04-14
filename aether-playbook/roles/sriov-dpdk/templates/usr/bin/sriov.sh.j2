@@ -27,7 +27,7 @@ setup_pf() {
 
 	echo "Resetting PF $pf"
 	echo 0 | tee /sys/class/net/"$pf"/device/sriov_numvfs
-	num_vfs=$(cat /sys/class/net/"$pf"/device/sriov_totalvfs)
+	num_vfs={{ upf_sriov_num_vf }}
 	echo "Enabling $num_vfs VFs for $pf"
 	echo "$num_vfs" | tee /sys/class/net/"$pf"/device/sriov_numvfs
 	ip link set "$pf" up
