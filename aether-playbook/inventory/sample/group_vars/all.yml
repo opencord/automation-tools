@@ -56,11 +56,11 @@ netplan_config_file: /etc/netplan/sgi-s1u-gateway.yaml
 
 # Enable to configure IPSec tunnel to Aether Central
 vpn_enabled: true
-vpn_local_addr: 128.105.144.246
-vpn_local_id: 128.105.144.246
+vpn_local_addr: 12.34.56.78
+vpn_local_id: 12.34.56.78
 # Provide management network and K8S pod/service ranges
 vpn_local_subnets: 10.212.73.0/24,10.56.0.0/16
-vpn_remote_addr: 34.94.146.56
+vpn_remote_addr: 98.76.54.32
 # Remote subnet (DO NOT CHANGE)
 vpn_remote_subnets: 10.168.0.0/20,10.45.0.0/16,10.52.0.0/16
 vpn_psk: T075X36ejt6qzaDHVG6Eunr6yynatdFI
