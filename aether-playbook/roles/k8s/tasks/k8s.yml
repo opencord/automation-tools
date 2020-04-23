@@ -42,7 +42,7 @@
     --volume /etc/kubernetes:/etc/kubernetes
     --volume /var/run:/var/run
     rancher/rancher-agent:v2.3.3
-    --server https://rancher.central.aetherproject.net
+    --server {{ rancher_server_url }}
     --token {{ rancher_cluster_token }}
     --ca-checksum {{ rancher_ca_checksum }}
     {{ k8s_roles }}

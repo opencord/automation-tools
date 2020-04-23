@@ -30,3 +30,5 @@ docker_daemon_options:
     - registry.central.aetherproject.net
 
 docker_version: 18.06.3~ce~3-0~ubuntu
+
+rancher_server_url: https://aether.onlab.us
