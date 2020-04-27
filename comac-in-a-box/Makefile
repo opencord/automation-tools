@@ -137,7 +137,7 @@ $(M)/platform: | $(M)/helm-ready $(WORKSPACE)/cord/helm-charts $(WORKSPACE)/cord
 	sudo cp $(BUILD)/cni-plugins/static /opt/cni/bin/
 
 # TODO: need to connect ONOS
-$(M)/fabric: | $(M)/setup /opt/cni/bin/simpleovs
+$(M)/fabric: | $(M)/setup /opt/cni/bin/simpleovs /opt/cni/bin/static
 	sudo apt install -y openvswitch-switch
 	sudo ovs-vsctl --may-exist add-br br-s1u-net
 	sudo ovs-vsctl --may-exist add-port br-s1u-net s1u-enb -- set Interface s1u-enb type=internal
@@ -151,10 +151,10 @@ $(M)/fabric: | $(M)/setup /opt/cni/bin/simpleovs
 
 $(M)/omec: | $(M)/helm-ready $(WORKSPACE)/cord/helm-charts /opt/cni/bin/simpleovs /opt/cni/bin/static $(M)/fabric
 	cd $(WORKSPACE)/cord/helm-charts/omec; \
-	helm dep up omec-data-plane && \
 	helm dep up omec-control-plane && \
+	helm upgrade --install $(HELM_GLOBAL_ARGS) --namespace omec omec-control-plane omec-control-plane -f $(CIABVALUES) && \
+	kubectl -n omec wait --for=condition=Ready --timeout=300s pod -l app=spgwc && \
 	helm upgrade --install $(HELM_GLOBAL_ARGS) --namespace omec omec-data-plane omec-data-plane -f $(CIABVALUES) && \
-	helm upgrade --install $(HELM_GLOBAL_ARGS) --namespace omec omec-control-plane omec-control-plane -f $(CIABVALUES)
 	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh omec
 	touch $@
 
