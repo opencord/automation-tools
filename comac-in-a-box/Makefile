@@ -137,7 +137,7 @@ $(M)/platform: | $(M)/helm-ready $(WORKSPACE)/cord/helm-charts $(WORKSPACE)/cord
 	sudo cp $(BUILD)/cni-plugins/static /opt/cni/bin/
 
 # TODO: need to connect ONOS
-$(M)/fabric: | $(M)/setup /opt/cni/bin/simpleovs
+$(M)/fabric: | $(M)/setup /opt/cni/bin/simpleovs /opt/cni/bin/static
 	sudo apt install -y openvswitch-switch
 	sudo ovs-vsctl --may-exist add-br br-s1u-net
 	sudo ovs-vsctl --may-exist add-port br-s1u-net s1u-enb -- set Interface s1u-enb type=internal
