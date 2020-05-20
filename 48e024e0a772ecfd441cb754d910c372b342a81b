@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "61e80c34_e1b6eba6",
+        "filename": "seba-in-a-box/Makefile",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1000016
+      },
+      "writtenOn": "2020-05-20T21:59:52Z",
+      "side": 1,
+      "message": "+zdw@opennetworking.org Zack can you confirm this \"v\" is correct? I recall this changing, but don\u0027t recall whether it was in the context of voltctl or cordctl (or both).",
+      "range": {
+        "startLine": 22,
+        "startChar": 22,
+        "endLine": 22,
+        "endChar": 28
+      },
+      "revId": "48e024e0a772ecfd441cb754d910c372b342a81b",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
