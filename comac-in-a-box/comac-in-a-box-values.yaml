@@ -38,16 +38,16 @@ cassandra:
 resources:
   enabled: false
 
-networks:
-  cniPlugin: simpleovs
-  ipam: static
-
 config:
-  sriov:
-    enabled: false
   spgwu:
-    dpName: "oaisim"
-    devices: "--no-pci --vdev eth_af_packet0,iface=s1u-net --vdev eth_af_packet1,iface=sgi-net"
+    mode: "af_packet"
+    name: "oaisim"
+    sriov:
+      enabled: false
+    hugepage:
+      enabled: false
+    cniPlugin: simpleovs
+    ipam: static
   mme:
     cfgFiles:
       config.json:
@@ -74,7 +74,7 @@ config:
       address: 127.0.0.1
     networks:
       s1u:
-        interface: s1u-enb
+        interface: enb
   plmn:
     mcc: "208"
     mnc: "01"
