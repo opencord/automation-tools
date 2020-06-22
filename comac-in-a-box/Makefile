@@ -29,7 +29,7 @@ cpu_model	:= $(shell lscpu | grep 'Model:' | awk '{print $$2}')
 os_vendor	:= $(shell lsb_release -i -s)
 os_release	:= $(shell lsb_release -r -s)
 
-ciab: $(M)/system-check $(M)/platform $(M)/omec
+ciab: $(M)/system-check $(M)/omec
 oaisim: $(M)/oaisim
 
 .PHONY: ciab oaisim test reset-test clean
@@ -127,25 +127,26 @@ $(M)/fabric: | $(M)/setup /opt/cni/bin/simpleovs /opt/cni/bin/static
 	sudo ip addr add 192.168.251.4/24 dev enb || true
 	sudo ip link set enb up
 	sudo ethtool --offload enb tx off
+	sudo ip route replace 192.168.252.0/24 via 192.168.251.1 dev enb
 	kubectl apply -f $(RESOURCEDIR)/router.yaml
 	kubectl wait pod -n default --for=condition=Ready -l app=router --timeout=300s
 	kubectl -n default exec router ip route add 10.250.0.0/16 via 192.168.250.3
 	kubectl delete net-attach-def sgi-net
 	touch $@
 
-$(M)/omec: | $(M)/helm-ready $(WORKSPACE)/cord/helm-charts /opt/cni/bin/simpleovs /opt/cni/bin/static $(M)/fabric
+$(M)/omec: | $(M)/helm-ready /opt/cni/bin/simpleovs /opt/cni/bin/static $(M)/fabric
 	helm upgrade --install $(HELM_GLOBAL_ARGS) \
 		--namespace omec \
 		--values $(CIABVALUES) \
 		omec-control-plane \
 		cord/omec-control-plane && \
-	kubectl -n omec wait --for=condition=Ready --timeout=300s pod -l app=spgwc && \
+	kubectl rollout status -n omec statefulset spgwc && \
 	helm upgrade --install $(HELM_GLOBAL_ARGS) \
 		--namespace omec \
 		--values $(CIABVALUES) \
 		omec-user-plane \
 		cord/omec-user-plane && \
-	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh omec
+	kubectl rollout status -n omec statefulset spgwu
 	touch $@
 
 # UE images includes kernel module, ue_ip.ko
@@ -165,10 +166,9 @@ $(M)/ue-image: | $(M)/k8s-ready $(BUILD)/openairinterface
 $(M)/oaisim: | $(M)/ue-image $(M)/omec
 	sudo ip addr add 127.0.0.2/8 dev lo || true
 	$(eval mme_iface=$(shell ip -4 route list default | awk -F 'dev' '{ print $$2; exit }' | awk '{ print $$1 }'))
-	cd $(WORKSPACE)/cord/helm-charts; \
-	helm upgrade --install $(HELM_GLOBAL_ARGS) --namespace omec oaisim oaisim -f $(CIABVALUES) \
+	helm upgrade --install $(HELM_GLOBAL_ARGS) --namespace omec oaisim cord/oaisim -f $(CIABVALUES) \
 		--set config.enb.networks.s1_mme.interface=$(mme_iface)
-	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh omec
+	kubectl rollout status -n omec statefulset ue
 	@timeout 60s bash -c \
 	"until ip addr show oip1 | grep -q inet; \
 	do \
@@ -178,6 +178,7 @@ $(M)/oaisim: | $(M)/ue-image $(M)/omec
 	touch $@
 
 test: | $(M)/fabric $(M)/omec $(M)/oaisim
+	@sleep 5
 	@echo "Test1: ping from UE to SGI network gateway"
 	ping -I oip1 192.168.250.1 -c 3
 	@echo "Test2: ping from UE to 8.8.8.8"
