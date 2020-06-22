@@ -29,7 +29,7 @@ cpu_model	:= $(shell lscpu | grep 'Model:' | awk '{print $$2}')
 os_vendor	:= $(shell lsb_release -i -s)
 os_release	:= $(shell lsb_release -r -s)
 
-ciab: $(M)/system-check $(M)/platform $(M)/omec
+ciab: $(M)/system-check $(M)/omec
 oaisim: $(M)/oaisim
 
 .PHONY: ciab oaisim test reset-test clean
@@ -133,7 +133,7 @@ $(M)/fabric: | $(M)/setup /opt/cni/bin/simpleovs /opt/cni/bin/static
 	kubectl delete net-attach-def sgi-net
 	touch $@
 
-$(M)/omec: | $(M)/helm-ready $(WORKSPACE)/cord/helm-charts /opt/cni/bin/simpleovs /opt/cni/bin/static $(M)/fabric
+$(M)/omec: | $(M)/helm-ready /opt/cni/bin/simpleovs /opt/cni/bin/static $(M)/fabric
 	helm upgrade --install $(HELM_GLOBAL_ARGS) \
 		--namespace omec \
 		--values $(CIABVALUES) \
