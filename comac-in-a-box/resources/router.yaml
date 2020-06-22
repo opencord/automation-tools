@@ -25,6 +25,30 @@ spec:
     }
   }'
 ---
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: s1u-net
+spec:
+  config: '{
+    "type": "simpleovs",
+    "ipam": {
+        "type": "static"
+    }
+  }'
+---
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: enb-net
+spec:
+  config: '{
+    "type": "simpleovs",
+    "ipam": {
+        "type": "static"
+    }
+  }'
+---
 apiVersion: v1
 kind: Pod
 metadata:
@@ -33,7 +57,9 @@ metadata:
     app: router
   annotations:
     k8s.v1.cni.cncf.io/networks: '[
-            { "name": "sgi-net", "interface": "sgi-rtr", "ips": "192.168.250.250/24" }
+            { "name": "sgi-net", "interface": "sgi-rtr", "ips": "192.168.250.1/24" },
+            { "name": "enb-net", "interface": "enb-rtr", "ips": "192.168.251.1/24" },
+            { "name": "s1u-net", "interface": "s1u-rtr", "ips": "192.168.252.1/24" }
     ]'
 spec:
   containers:

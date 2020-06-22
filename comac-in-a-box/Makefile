@@ -110,23 +110,6 @@ $(M)/helm-ready: | $(M)/k8s-ready
 	helm repo add cord https://charts.opencord.org
 	touch $@
 
-$(WORKSPACE)/cord/helm-charts: | $(M)/setup
-	mkdir -p $(WORKSPACE)/cord
-	cd $(WORKSPACE)/cord; git clone https://gerrit.opencord.org/helm-charts
-
-$(WORKSPACE)/cord/cord-platform: | $(M)/setup
-	mkdir -p $(WORKSPACE)/cord
-	cd $(WORKSPACE)/cord; git clone https://gerrit.opencord.org/cord-platform
-
-$(M)/platform: | $(M)/helm-ready $(WORKSPACE)/cord/helm-charts $(WORKSPACE)/cord/cord-platform
-	cd $(WORKSPACE)/cord/cord-platform && \
-	helm dep update cord-platform && \
-	helm upgrade --install $(HELM_GLOBAL_ARGS) cord-platform cord-platform -f $(CIABVALUES)
-	cd $(WORKSPACE)/cord/helm-charts && \
-	helm dep update comac && \
-	helm upgrade --install $(HELM_GLOBAL_ARGS) comac comac -f $(CIABVALUES)
-	touch $@
-
 /opt/cni/bin/simpleovs: | $(M)/k8s-ready
 	sudo cp $(RESOURCEDIR)/simpleovs /opt/cni/bin/
 
@@ -139,10 +122,11 @@ $(M)/platform: | $(M)/helm-ready $(WORKSPACE)/cord/helm-charts $(WORKSPACE)/cord
 # TODO: need to connect ONOS
 $(M)/fabric: | $(M)/setup /opt/cni/bin/simpleovs /opt/cni/bin/static
 	sudo apt install -y openvswitch-switch
-	sudo ovs-vsctl --may-exist add-br br-s1u-net
-	sudo ovs-vsctl --may-exist add-port br-s1u-net s1u-enb -- set Interface s1u-enb type=internal
-	sudo ip addr add 192.168.251.4/24 dev s1u-enb || true
-	sudo ip link set s1u-enb up
+	sudo ovs-vsctl --may-exist add-br br-enb-net
+	sudo ovs-vsctl --may-exist add-port br-enb-net enb -- set Interface enb type=internal
+	sudo ip addr add 192.168.251.4/24 dev enb || true
+	sudo ip link set enb up
+	sudo ethtool --offload enb tx off
 	kubectl apply -f $(RESOURCEDIR)/router.yaml
 	kubectl wait pod -n default --for=condition=Ready -l app=router --timeout=300s
 	kubectl -n default exec router ip route add 10.250.0.0/16 via 192.168.250.3
@@ -150,11 +134,17 @@ $(M)/fabric: | $(M)/setup /opt/cni/bin/simpleovs /opt/cni/bin/static
 	touch $@
 
 $(M)/omec: | $(M)/helm-ready $(WORKSPACE)/cord/helm-charts /opt/cni/bin/simpleovs /opt/cni/bin/static $(M)/fabric
-	cd $(WORKSPACE)/cord/helm-charts/omec; \
-	helm dep up omec-control-plane && \
-	helm upgrade --install $(HELM_GLOBAL_ARGS) --namespace omec omec-control-plane omec-control-plane -f $(CIABVALUES) && \
+	helm upgrade --install $(HELM_GLOBAL_ARGS) \
+		--namespace omec \
+		--values $(CIABVALUES) \
+		omec-control-plane \
+		cord/omec-control-plane && \
 	kubectl -n omec wait --for=condition=Ready --timeout=300s pod -l app=spgwc && \
-	helm upgrade --install $(HELM_GLOBAL_ARGS) --namespace omec omec-data-plane omec-data-plane -f $(CIABVALUES) && \
+	helm upgrade --install $(HELM_GLOBAL_ARGS) \
+		--namespace omec \
+		--values $(CIABVALUES) \
+		omec-user-plane \
+		cord/omec-user-plane && \
 	$(WORKSPACE)/cord/helm-charts/scripts/wait_for_pods.sh omec
 	touch $@
 
@@ -188,23 +178,17 @@ $(M)/oaisim: | $(M)/ue-image $(M)/omec
 	touch $@
 
 test: | $(M)/fabric $(M)/omec $(M)/oaisim
-	@timeout 120s bash -c \
-	"until timeout 3 ping -I oip1 192.168.250.250 -c 1 > /dev/null 2>&1; do \
-		echo 'Waiting for DP to be ready'; \
-	done"
 	@echo "Test1: ping from UE to SGI network gateway"
-	ping -I oip1 192.168.250.250 -c 3
+	ping -I oip1 192.168.250.1 -c 3
 	@echo "Test2: ping from UE to 8.8.8.8"
 	ping -I oip1 8.8.8.8 -c 3
-	@echo "Test3: ping from UE to opennetworking.org and google.com"
-	ping -I oip1 opennetworking.org -c 3
 	ping -I oip1 google.com -c 3
 	@echo "Finished to test"
 
 reset-test:
 	helm delete --purge oaisim || true
 	helm delete --purge omec-control-plane || true
-	helm delete --purge omec-data-plane || true
+	helm delete --purge omec-user-plane || true
 	cd $(M); rm -f oaisim omec
 
 clean: reset-test
