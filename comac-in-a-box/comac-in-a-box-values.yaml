@@ -12,23 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# cord-platform values
-etcd-operator:
-  enabled: false
-logging:
-  enabled: true
-nem-monitoring:
-  enabled: true
-
-# comac values
-seba-services:
-  enabled: false
-mcord-services:
-  fabric:
-    enabled: false
-  progran:
-    enabled: false
-
 # cassandra values
 cassandra:
   config:
