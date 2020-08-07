@@ -12,6 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+images:
+  tags:
+    init: docker.io/omecproject/pod-init:1.0.0
+    depCheck: quay.io/stackanetes/kubernetes-entrypoint:v0.3.1
+    hssdb: docker.io/omecproject/c3po-hssdb:master-2c49778
+    hss: docker.io/omecproject/c3po-hss:master-2c49778
+    mme: docker.io/omecproject/openmme:master-ab37a71
+    mmeExporter: docker.io/omecproject/mme-exporter:paging-latest
+    spgwc: docker.io/omecproject/ngic-cp:central-cp-multi-upfs-e8257e7
+    bess: docker.io/omecproject/upf-epc-bess:master-554b670
+    cpiface: docker.io/omecproject/upf-epc-cpiface:master-554b670
+  pullPolicy: IfNotPresent
+
 # cassandra values
 cassandra:
   config:
