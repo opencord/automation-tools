@@ -28,21 +28,26 @@ import re
 import pyshark
 
 # Map from UE ID to packet index
+ueMap = {}
+# Map from packet index to packet content in string format
 packetMap = {}
 # All the packets captured in pcap file
 captures = None
 
 def groupPacket(pkt, i):
+    if i > 0 and i % 10000 == 0:
+        print("Processed {} packets...".format(i))
     if 's1ap' in pkt:
+        packetMap[i] = str(pkt)
         #ueId = pkt.s1ap.enb_ue_s1ap_id
 
         # Looks like pyshark cannot handle packets with multiple sctp data chunks
         # So use regex match as a workaround
         ueIds = re.findall(r'ENB-UE-S1AP-ID: (\d+)', str(pkt))
         for ueId in ueIds:
-            if not ueId in packetMap.keys():
-                packetMap[ueId] = []
-            packetMap[ueId].append(i)
+            if not ueId in ueMap.keys():
+                ueMap[ueId] = []
+            ueMap[ueId].append(i)
 
 def validate(ueId, packets):
     # Get IMSI value from the first packet (assuming it's attach request)
@@ -50,19 +55,19 @@ def validate(ueId, packets):
 
     # FIXME: IMSI value could be wrong if the first packet is not attach request (e.g.
     # when packet contains multiple sctp data chunks)
-    imsi = re.findall(r'IMSI: (\d+)', str(captures[packets[0]]))
+    imsi = re.findall(r'IMSI: (\d+)', packetMap[packets[0]])
     # TODO: validate more attach/detach messages in addition to request and accept
     for keyword in ['Attach request', 'Attach accept', 'Detach request', 'Detach accept']:
         try:
-            assert any(keyword in str(captures[packet]) for packet in packets)
+            assert any(keyword in packetMap[packet] for packet in packets)
         except Exception:
             print('UE #{} (IMSI: {}): missing "{}"'.format(ueId, imsi, keyword))
             break
 
 if __name__ == "__main__":
     pcapFile = str(sys.argv[1])
-    captures = pyshark.FileCapture(pcapFile)
-    p = captures[0]
+    captures = pyshark.FileCapture(pcapFile, keep_packets=False)
+    p = captures.next()
     i = 0
     # Extract UE ID for each packet and group packets with the same UE ID
     while(p):
@@ -74,5 +79,5 @@ if __name__ == "__main__":
         i += 1
 
     # Check attach/detach packets for each UE
-    for ueId, packets in packetMap.items():
+    for ueId, packets in ueMap.items():
         validate(ueId, packets)
