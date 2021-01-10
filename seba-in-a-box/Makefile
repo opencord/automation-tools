@@ -155,7 +155,7 @@ $(M)/helm-init: | $(M)/kubeadm /usr/local/bin/helm
 		echo "Waiting for Helm to be ready"; \
 		sleep 5; \
 	done
-	helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com/
+	helm repo add incubator https://charts.helm.sh/incubator
 	helm repo add cord https://charts.opencord.org
 	helm repo update
 	touch $@
