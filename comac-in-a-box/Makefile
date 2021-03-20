@@ -11,7 +11,7 @@ CIABVALUES	?= $(MAKEDIR)/comac-in-a-box-values.yaml
 KUBESPRAY_VERSION ?= release-2.11
 DOCKER_VERSION	?= 18.09
 K8S_VERSION	?= v1.15.3
-HELM_VERSION	?= v2.16.1
+HELM_VERSION	?= v2.17.0
 
 # used to start logging/monitoring and other infrastructure charts
 INFRA_CHARTS	?=
@@ -106,7 +106,8 @@ $(M)/k8s-ready: | $(M)/setup $(BUILD)/kubespray $(VENV)/bin/activate $(M)/kubesp
 
 $(M)/helm-ready: | $(M)/k8s-ready
 	helm init --wait --client-only
-	helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com/
+	helm repo rm stable
+	helm repo add stable https://charts.helm.sh/stable
 	helm repo add cord https://charts.opencord.org
 	touch $@
 
